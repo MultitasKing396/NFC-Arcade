@@ -134,7 +134,7 @@ body[data-theme="cosmic"] .joker-card{background:radial-gradient(circle at cente
 <main class="app">
 <h1 id="gameTitle">Guess the Card.</h1>
 <div class="topline"><div class="stats"><div class="stat"><small>PUNKTE</small><strong id="score">0</strong></div><div class="stat"><small>HIGHSCORE</small><strong id="best">0</strong></div></div></div>
-<div class="settings setting-pair"><div class="setting"><label for="theme">Design</label><select id="theme"><option value="classic">Classic Casino</option><option value="cyber">Cyberpunk Neon</option><option value="cosmic">Cosmic Gold</option></select></div><div class="setting"><label for="mode">Spielmodus</label><select id="mode" aria-label="Spielmodus"><option value="higher">Higher or Lower</option><option value="color">Red or Black</option></select></div></div>
+<div class="settings setting-pair"><div class="setting"><label for="theme">Design</label><select id="theme"><option value="classic">Classic Casino</option><option value="cyber">Cyberpunk Neon</option><option value="cosmic">Cosmic Gold</option></select></div><div class="setting"><label for="mode">Modus</label><select id="mode" aria-label="Spielmodus"><option value="higher">Higher or Lower</option><option value="color">Red or Black</option></select></div></div>
 <section class="table" aria-label="Kartentisch">
 <div class="current-label" id="cardLabel">AKTUELLE KARTE</div>
 <div class="card-area"><div class="deck-stack" aria-label="Kartendeck"><div class="deck-top card-back"></div><div class="deck-caption">KARTENDECK</div></div><div id="currentCard" class="playing-card card-back" aria-label="Aktuelle Karte"></div><div id="nextCard" class="playing-card card-back hidden" aria-label="Gezogene Karte"></div></div>
@@ -208,7 +208,7 @@ $('again').addEventListener('click',()=>{start();$('again').textContent='Nochmal
 $('close').addEventListener('click',()=>{closeDialog();$('again').textContent='Nochmal spielen';$('close').textContent='Schließen'});
 els.theme.addEventListener('change',()=>{document.body.dataset.theme=els.theme.value;try{localStorage.setItem('higherLowerTheme',els.theme.value)}catch(e){}});
 try{best=Number(localStorage.getItem(BEST_KEYS[mode])||0);const t=localStorage.getItem('higherLowerTheme');if(t&&['classic','cyber','cosmic'].includes(t)){els.theme.value=t;document.body.dataset.theme=t}}catch(e){}setMode(els.mode.value);els.best.textContent=best;updateDeck();updateJoker();
-document.addEventListener('gesturestart',e=>e.preventDefault(),{passive:false});document.addEventListener('dblclick',e=>e.preventDefault(),{passive:false});
+document.addEventListener('gesturestart',e=>e.preventDefault(),{passive:false});document.addEventListener('gesturechange',e=>e.preventDefault(),{passive:false});document.addEventListener('gestureend',e=>e.preventDefault(),{passive:false});document.addEventListener('dblclick',e=>e.preventDefault(),{passive:false});let lastTouchEnd=0;document.addEventListener('touchend',e=>{const now=Date.now();if(now-lastTouchEnd<=300)e.preventDefault();lastTouchEnd=now},{passive:false});document.addEventListener('touchmove',e=>{if(e.touches.length>1)e.preventDefault()},{passive:false});
 })();
 </script>
 </body></html>
