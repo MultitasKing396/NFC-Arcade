@@ -70,9 +70,25 @@ footer,.byline{color:#aaa!important}
 /* Snake: Eingabepad bleibt bewusst dunkel; Spielfeld und Schlange bleiben original. */
 .pad button{background:linear-gradient(#555,#333)!important;color:#eee!important;border-color:#777!important}
 
+
+/* Snake: kompakter Kopfbereich und sichtbarer Footer */
+.app{gap:5px;padding:2px 0 0!important}
+h1{margin:0 0 1px!important;font-size:31px!important;line-height:1.05!important}
+.top{width:100%;margin:0 0 2px!important}
+.scores{width:100%;justify-content:space-between!important;gap:12px!important;font-size:10px!important}
+.scores>div:first-child{text-align:left}
+.scores>div:last-child{text-align:right}
+.scores b{font-size:18px!important;line-height:1.05}
+.settings{margin:0!important;padding:5px 9px!important}
+canvas{max-height: min(42dvh, 340px);width:100%;object-fit:contain}
+.actions{margin-top:1px!important}
+.pad{width:162px!important;gap:4px!important;margin:3px auto 0!important}
+.pad button{height:35px!important}
+footer{margin-top:auto!important;padding:4px 0 max(6px,env(safe-area-inset-bottom))!important}
+
 </style></head><body><main class="app">
-<div class="top"><div class="scores"><div>PUNKTE<b id="score">0</b></div><div>HIGHSCORE<b id="best">0</b></div></div></div>
 <h1>Snake.</h1>
+<div class="top"><div class="scores"><div>PUNKTE<b id="score">0</b></div><div>HIGHSCORE<b id="best">0</b></div></div></div>
 <div class="settings"><label for="difficulty">Schwierigkeit</label><select id="difficulty"><option value="easy">Einfach</option><option value="normal" selected>Normal</option><option value="hard">Schwer</option></select></div>
 <canvas id="game" width="600" height="480" aria-label="Snake Spielfeld"></canvas>
 <div class="actions"><button class="btn" id="start">Start</button></div>
