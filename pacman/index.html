@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#080b19"><title>Pac-Man · NFC Arcade</title>
+<style>
+:root{color-scheme:dark;--bg:#080b19;--panel:#11182d;--blue:#263cff;--yellow:#ffe34d;--muted:#8d9abd}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(ellipse at 50% 0,#17234a 0,var(--bg) 58%);color:#f5f7ff;font-family:system-ui,-apple-system,Segoe UI,sans-serif}
+body{display:flex;justify-content:center;padding:20px 14px 28px}.app{width:min(100%,480px);display:flex;flex-direction:column;gap:13px}
+header{text-align:center}h1{font-size:clamp(32px,9vw,48px);letter-spacing:.12em;color:var(--yellow);margin:0;text-shadow:0 0 18px #ffe34d55;font-weight:950}header p{margin:3px 0 0;color:var(--muted);font-size:11px;letter-spacing:.22em;text-transform:uppercase}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stat{background:#11182ddd;border:1px solid #28365e;border-radius:13px;padding:9px 6px;text-align:center;color:var(--muted);font-size:10px;letter-spacing:.12em}.stat b{display:block;color:white;font-size:21px;letter-spacing:0;font-variant-numeric:tabular-nums}
+.frame{background:#050817;border:2px solid #344cff;border-radius:16px;padding:7px;box-shadow:0 0 24px #344cff28, inset 0 0 16px #263cff18}
+canvas{display:block;width:100%;height:auto;aspect-ratio:19/21;image-rendering:pixelated;touch-action:none}
+.message{text-align:center;min-height:20px;color:#c4ccef;font-size:13px}
+.controls{display:grid;grid-template-columns:repeat(3,58px);grid-template-rows:repeat(2,52px);justify-content:center;gap:6px}
+button{border:1px solid #4054a8;background:linear-gradient(180deg,#1b2850,#121a36);color:#fff;border-radius:13px;font:700 15px system-ui;touch-action:manipulation;cursor:pointer;box-shadow:0 3px 0 #080d20}
+button:active{transform:translateY(2px);box-shadow:0 1px 0 #080d20}button:disabled{opacity:.35}
+.controls button{font-size:21px}.up{grid-column:2}.left{grid-column:1;grid-row:2}.down{grid-column:2;grid-row:2}.right{grid-column:3;grid-row:2}
+.actions{display:flex;gap:8px}.actions button{flex:1;padding:12px 8px;font-size:13px}.primary{background:linear-gradient(180deg,#4056ff,#2639d8);border-color:#7180ff}
+.help{text-align:center;color:#8996b9;font-size:11px;line-height:1.5}
+@media(min-width:600px){body{padding-top:26px}.controls{grid-template-columns:repeat(3,64px);grid-template-rows:repeat(2,56px)}}
+</style></head>
+<body><main class="app">
+<header><h1>PAC-MAN</h1><p>ARCADE CLASSIC · BY ALP</p></header>
+<section class="stats"><div class="stat">PUNKTE<b id="score">0</b></div><div class="stat">BEST<b id="best">0</b></div><div class="stat">LEBEN<b id="lives">3</b></div></section>
+<div class="frame"><canvas id="game" width="380" height="420" aria-label="Pac-Man Spielfeld"></canvas></div>
+<div class="message" id="message">Drücke Start, um loszulegen!</div>
+<div class="controls" aria-label="Steuerung">
+<button class="up" data-dir="up" aria-label="Oben">▲</button><button class="left" data-dir="left" aria-label="Links">◀</button><button class="down" data-dir="down" aria-label="Unten">▼</button><button class="right" data-dir="right" aria-label="Rechts">▶</button>
+</div>
+<div class="actions"><button class="primary" id="start">▶ Start</button><button id="restart">↻ Neu starten</button></div>
+<div class="help">Steuerung: Pfeiltasten, WASD oder die Touch-Tasten.<br>Sammle alle Punkte und weiche den Geistern aus. Große Punkte machen Geister kurz verwundbar.</div>
+</main>
+<script>
+(()=>{
+const canvas=document.getElementById('game'),ctx=canvas.getContext('2d'),$=id=>document.getElementById(id);
+const TILE=20,COLS=19,ROWS=21;
+const raw=[
+"###################",
+"#........#........#",
+"#.##.###.#.###.##.#",
+"#o##.###.#.###.##o#",
+"#.................#",
+"#.##.#.#####.#.##.#",
+"#....#...#...#....#",
+"####.###.#.###.####",
+"   #.#.......#.#   ",
+"####.#.## ##.#.####",
+"     .#     #.     ",
+"####.#.#####.#.####",
+"   #.#.......#.#   ",
+"####.#.#####.#.####",
+"#........#........#",
+"#.##.###.#.###.##.#",
+"#o.#.....P.....#.o#",
+"##.#.#.#####.#.#.##",
+"#....#...#...#....#",
+"#.######.#.######.#",
+"###################"
+];
+let map,player,ghosts,dots,score=0,lives=3,level=1,power=0,running=false,over=false,won=false,last=0,moveClock=0,ghostClock=0;
+let best=Number(localStorage.getItem('pacmanBest')||0);$('best').textContent=best;
+const dirs={left:{x:-1,y:0},right:{x:1,y:0},up:{x:0,y:-1},down:{x:0,y:1}};
+function fresh(){
+ map=raw.map(r=>r.split(''));dots=0;
+ for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++)if(map[y][x]==='.'||map[y][x]==='o')dots++;
+ player={x:9,y:16,dir:'left',next:'left',mouth:0};
+ ghosts=[{x:8,y:10,dir:'left',color:'#ff5268',homeX:8,homeY:10},{x:9,y:10,dir:'up',color:'#55e7ff',homeX:9,homeY:10},{x:10,y:10,dir:'right',color:'#ff9de1',homeX:10,homeY:10}];
+ power=0;won=false;over=false;
+}
+function wall(x,y){return y<0||y>=ROWS||x<0||x>=COLS||map[y][x]==='#'}
+function setDir(d){if(!dirs[d])return;player.next=d;if(!running&&!over&&!won)startGame()}
+function startGame(){if(over||won){score=0;lives=3;level=1;fresh();updateStats()}running=true;$('message').textContent='Los geht’s! Sammle alle Punkte.';$('start').textContent='Ⅱ Pause';}
+function pause(){running=false;$('start').textContent='▶ Weiter';$('message').textContent='Pausiert';}
+function updateStats(){$('score').textContent=score;$('lives').textContent=lives;$('best').textContent=best}
+function eat(){
+ const c=map[player.y][player.x];
+ if(c==='.'||c==='o'){map[player.y][player.x]=' ';score+=c==='o'?50:10;dots--;if(c==='o')power=7;if(score>best){best=score;localStorage.setItem('pacmanBest',best)}updateStats();if(dots<=0){won=true;running=false;$('message').textContent='Level geschafft! Fantastisch!';$('start').textContent='▶ Nächstes Level';}}
+}
+function movePlayer(){
+ let d=dirs[player.next];if(!wall(player.x+d.x,player.y+d.y))player.dir=player.next;
+ d=dirs[player.dir];if(!wall(player.x+d.x,player.y+d.y)){player.x+=d.x;player.y+=d.y;}eat();
+}
+function moveGhost(g){
+ const opts=Object.keys(dirs).filter(k=>{let d=dirs[k];return !wall(g.x+d.x,g.y+d.y)&&!(k===({left:'right',right:'left',up:'down',down:'up'})[g.dir]&&Math.random()<.8)});
+ if(!opts.length)return;
+ let chosen;
+ if(power>0&&Math.random()<.75)chosen=opts[Math.floor(Math.random()*opts.length)];
+ else {opts.sort((a,b)=>{let da=dirs[a],db=dirs[b];return Math.abs(g.x+da.x-player.x)+Math.abs(g.y+da.y-player.y)-(Math.abs(g.x+db.x-player.x)+Math.abs(g.y+db.y-player.y))});chosen=Math.random()<.72?opts[0]:opts[Math.floor(Math.random()*opts.length)]}
+ g.dir=chosen;g.x+=dirs[chosen].x;g.y+=dirs[chosen].y;
+}
+function collide(){
+ for(const g of ghosts)if(g.x===player.x&&g.y===player.y){
+  if(power>0){score+=200;g.x=g.homeX;g.y=g.homeY;updateStats()}
+  else {lives--;updateStats();if(lives<=0){running=false;over=true;$('message').textContent='Game Over · Punkte: '+score;$('start').textContent='↻ Nochmal';}
+   else {player.x=9;player.y=16;ghosts.forEach((g,i)=>{g.x=g.homeX;g.y=g.homeY;g.dir=['left','up','right'][i]});$('message').textContent='Autsch! Noch '+lives+' Leben.'}}
+ }
+}
+function tick(dt){moveClock+=dt;ghostClock+=dt;if(moveClock>125){moveClock=0;movePlayer();player.mouth=(player.mouth+1)%2;collide()}if(ghostClock>(power>0?245:320)){ghostClock=0;ghosts.forEach(moveGhost);collide()}if(power>0)power=Math.max(0,power-dt/1000)}
+function draw(){
+ ctx.fillStyle='#050817';ctx.fillRect(0,0,380,420);
+ for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){let c=map[y][x],px=x*TILE,py=y*TILE;
+  if(c==='#'){ctx.fillStyle='#111b58';ctx.fillRect(px,py,TILE,TILE);ctx.strokeStyle='#435cff';ctx.lineWidth=1.4;ctx.strokeRect(px+1,py+1,TILE-2,TILE-2)}
+  else if(c==='.'||c==='o'){ctx.fillStyle='#ffe9b0';ctx.beginPath();ctx.arc(px+10,py+10,c==='o'?5:2.1,0,Math.PI*2);ctx.fill()}
+ }
+ // player
+ const angle=player.mouth?0.23:0.04,face={right:0,left:Math.PI,up:-Math.PI/2,down:Math.PI/2}[player.dir];
+ ctx.fillStyle='#ffe34d';ctx.beginPath();ctx.moveTo(player.x*TILE+10,player.y*TILE+10);ctx.arc(player.x*TILE+10,player.y*TILE+10,9,face+angle,face+Math.PI*2-angle);ctx.closePath();ctx.fill();
+ ghosts.forEach(g=>{ctx.fillStyle=power>0?'#315cff':g.color;let x=g.x*TILE+10,y=g.y*TILE+10;ctx.beginPath();ctx.arc(x,y-1,8,Math.PI,0);ctx.lineTo(x+8,y+8);ctx.lineTo(x+4,y+5);ctx.lineTo(x,y+8);ctx.lineTo(x-4,y+5);ctx.lineTo(x-8,y+8);ctx.closePath();ctx.fill();ctx.fillStyle='white';ctx.beginPath();ctx.arc(x-3,y-2,2.6,0,Math.PI*2);ctx.arc(x+3,y-2,2.6,0,Math.PI*2);ctx.fill();ctx.fillStyle='#10152d';ctx.beginPath();ctx.arc(x-2,y-2,1.2,0,Math.PI*2);ctx.arc(x+4,y-2,1.2,0,Math.PI*2);ctx.fill()});
+}
+function loop(t){let dt=Math.min(50,t-last||16);last=t;if(running)tick(dt);draw();requestAnimationFrame(loop)}
+$('start').addEventListener('click',()=>{if(running)pause();else if(won){level++;fresh();$('message').textContent='Level '+level+' · Weiter geht’s!';startGame()}else startGame()});
+$('restart').addEventListener('click',()=>{score=0;lives=3;level=1;fresh();running=false;$('start').textContent='▶ Start';$('message').textContent='Drücke Start, um loszulegen!';updateStats()});
+document.querySelectorAll('[data-dir]').forEach(b=>{b.addEventListener('pointerdown',e=>{e.preventDefault();setDir(b.dataset.dir)})});
+window.addEventListener('keydown',e=>{let k={ArrowLeft:'left',a:'left',ArrowRight:'right',d:'right',ArrowUp:'up',w:'up',ArrowDown:'down',s:'down'}[e.key];if(k){e.preventDefault();setDir(k)}if(e.key===' '){e.preventDefault();running?pause():startGame()}});
+let sx=0,sy=0;canvas.addEventListener('touchstart',e=>{let t=e.changedTouches[0];sx=t.clientX;sy=t.clientY},{passive:true});canvas.addEventListener('touchend',e=>{let t=e.changedTouches[0],dx=t.clientX-sx,dy=t.clientY-sy;if(Math.max(Math.abs(dx),Math.abs(dy))>18)setDir(Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up'))},{passive:true});
+fresh();updateStats();requestAnimationFrame(loop);
+})();
+</script></body></html>
