@@ -144,7 +144,7 @@ body[data-theme="cosmic"] .joker-card{background:radial-gradient(circle at cente
 <main class="app">
 <h1 id="gameTitle">Guess the Card.</h1>
 <div class="topline"><div class="stats"><div class="stat"><small>PUNKTE</small><strong id="score">0</strong></div><div class="stat"><small>HIGHSCORE</small><strong id="best">0</strong></div></div></div>
-<div class="settings setting-pair"><div class="setting"><label for="theme">Design</label><select id="theme"><option value="classic">Classic Casino</option><option value="cyber">Cyberpunk Neon</option><option value="cosmic">Cosmic Gold</option></select></div><div class="setting"><label for="mode">Modus</label><select id="mode" aria-label="Spielmodus"><option value="higher">Higher or Lower</option><option value="color">Red or Black</option><option value="higher2">Higher or Lower · 2 Spieler</option><option value="color2">Red or Black · 2 Spieler</option></select></div></div>
+<div class="settings setting-pair"><div class="setting"><label for="theme">Design</label><select id="theme"><option value="classic">Classic Casino</option><option value="cyber">Cyberpunk Neon</option><option value="cosmic">Cosmic Gold</option></select></div><div class="setting"><label for="mode">Modus</label><select id="mode" aria-label="Spielmodus"><option value="higher">Higher or Lower</option><option value="color">Red or Black</option><option value="higher2">Higher or Lower · 2 Spieler</option><option value="color2">Red or Black · 2 Spieler</option><option value="higherE">Higher or Lower · Endlos</option><option value="colorE">Red or Black · Endlos</option></select></div></div>
 <section class="table" aria-label="Kartentisch">
 <div class="current-label" id="cardLabel">AKTUELLE KARTE</div>
 <div class="card-area"><div class="deck-stack" aria-label="Kartendeck"><div class="deck-top card-back"></div><div class="deck-caption">KARTENDECK</div></div><div id="currentCard" class="playing-card card-back" aria-label="Aktuelle Karte"></div><div id="nextCard" class="playing-card card-back hidden" aria-label="Gezogene Karte"></div></div>
@@ -162,8 +162,8 @@ const $=id=>document.getElementById(id);
 const els={score:$('score'),best:$('best'),theme:$('theme'),mode:$('mode'),gameTitle:$('gameTitle'),controls:$('controls'),duelControls:$('duelControls'),current:$('currentCard'),next:$('nextCard'),area:document.querySelector('.card-area'),label:$('cardLabel'),message:$('message'),higher:$('higher'),lower:$('lower'),joker:$('jokerStatus'),deck:$('deckCount'),start:$('start'),overlay:$('overlay'),dialogTitle:$('dialogTitle'),dialogText:$('dialogText')};
 const suits=[{s:'♠',c:'black'},{s:'♥',c:'red'},{s:'♦',c:'red'},{s:'♣',c:'black'}];
 const symbols={1:'A',11:'J',12:'Q',13:'K'};
-function setMode(next){twoPlayer=next.endsWith('2');mode=twoPlayer?next.slice(0,-1):next;document.querySelector('.app').classList.toggle('duel-mode',twoPlayer);els.duelControls.classList.toggle('hidden',!twoPlayer);els.gameTitle.textContent='Guess the Card.';els.higher.textContent=mode==='higher'?'↑ HÖHER':'ROT';els.lower.textContent=mode==='higher'?'↓ NIEDRIGER':'SCHWARZ';els.higher.classList.toggle('red-choice',mode==='color');els.lower.classList.toggle('black-choice',mode==='color');els.controls.classList.toggle('color-mode',mode==='color');configureDuelButtons();try{best=Number(localStorage.getItem(BEST_KEYS[mode])||0)}catch(e){best=0}els.best.textContent=best;els.message.textContent=mode==='higher'?'Tippe auf Start und rate die nächste Karte.':'Tippe auf Start und rate, ob die nächste Karte rot oder schwarz ist.';}
-let deck=[],current=null,score=0,best=0,jokerCharges=[0,0],started=false,finished=false,guess=null,waiting=false,freeRetry=false,restartArmed=false,mode='higher',twoPlayer=false,activePlayer=1,playerScores=[0,0],shootout=false,shootoutFirst=null,shootoutOpener=1,shootoutFirstPlayer=1;
+function setMode(next){twoPlayer=next.endsWith('2');endless=next.endsWith('E');mode=twoPlayer?next.slice(0,-1):(endless?next.slice(0,-1):next);document.querySelector('.app').classList.toggle('duel-mode',twoPlayer);els.duelControls.classList.toggle('hidden',!twoPlayer);els.gameTitle.textContent='Guess the Card.';els.higher.textContent=mode==='higher'?'↑ HÖHER':'ROT';els.lower.textContent=mode==='higher'?'↓ NIEDRIGER':'SCHWARZ';els.higher.classList.toggle('red-choice',mode==='color');els.lower.classList.toggle('black-choice',mode==='color');els.controls.classList.toggle('color-mode',mode==='color');configureDuelButtons();try{best=Number(localStorage.getItem(BEST_KEYS[mode])||0)}catch(e){best=0}els.best.textContent=best;els.message.textContent=endless?(mode==='higher'?'Endlos-Modus: Sammle Punkte bis alle 54 Karten durchgespielt sind.':'Endlos-Modus: Tippe Rot oder Schwarz und sammle Punkte bis zum Deckende.'):(mode==='higher'?'Tippe auf Start und rate die nächste Karte.':'Tippe auf Start und rate, ob die nächste Karte rot oder schwarz ist.');els.joker.closest('.joker-row').classList.toggle('hidden',endless);}
+let deck=[],current=null,score=0,best=0,jokerCharges=[0,0],started=false,finished=false,guess=null,waiting=false,freeRetry=false,restartArmed=false,mode='higher',twoPlayer=false,endless=false,activePlayer=1,playerScores=[0,0],shootout=false,shootoutFirst=null,shootoutOpener=1,shootoutFirstPlayer=1;
 const BEST_KEYS={higher:'higherLowerBest',color:'redBlackBest'};
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 function makeDeck(){const d=[];for(const suit of suits)for(let v=1;v<=13;v++)d.push({value:v,suit:suit.s,suitClass:suit.c,label:symbols[v]||String(v),joker:false});d.push({joker:true,label:'JOKER'},{joker:true,label:'JOKER'});return shuffle(d)}
@@ -206,6 +206,7 @@ function drawNextAfterJoker(){setTimeout(()=>{if(deck.length===0){endGame();retu
 function start(){closeDialog();restartArmed=false;shootout=false;shootoutFirst=null;shootoutOpener=1;shootoutFirstPlayer=1;activePlayer=1;playerScores=[0,0];$('scoreOne').textContent='0';$('scoreTwo').textContent='0';els.start.classList.remove('confirm');els.start.textContent='Neustarten';deck=makeDeck();current=null;score=0;jokerCharges=[0,0];started=true;finished=false;guess=null;waiting=false;freeRetry=false;els.score.textContent='0';updateJoker();updatePlayerTurn();updateDeck();setButtons(false);els.start.textContent='Neustarten';els.message.textContent='Die erste Karte wird aufgedeckt …';renderCard(els.current,null,true);els.label.textContent='DEINE STARTKARTE';drawNext()}
 function applyDuelOutcome(ok){
   if(twoPlayer&&shootout){finishShootoutAttempt(ok);return}
+  if(!twoPlayer&&endless&&ok===false){guess=null;waiting=false;els.message.textContent='Falsch! Kein Punkt – weiter geht’s.';setButtons(true);return;}
   if(!twoPlayer&&ok===false){
     if(spendJoker()){els.message.textContent='Leider falsch – deine Joker-Rettung greift! Du darfst erneut raten, ohne Punkt.';guess=null;waiting=false;setButtons(true)}
     else endGame();
@@ -226,6 +227,7 @@ function applyDuelOutcome(ok){
     else endGame();
     return;
   }
+  if(endless&&deck.length===0){endGame();return;}
   setButtons(true);
 }
 function beginShootout(){
