@@ -67,6 +67,50 @@ body[data-theme="cyber"] .table:before{border-color:#54dfff66}
 body[data-theme="cosmic"]{--bg:#10101f;--panel:#242039;--panel2:#30294b;--edge:#75649a;--gold:#e8c77e;--text:#f4edff;--muted:#b5a9ca;--felt:#262044}
 body[data-theme="cosmic"] .table{background:radial-gradient(ellipse at center,#34305c,#17152e 75%);border-color:#9d7acb;box-shadow:0 0 0 2px #d4b7ff22,0 12px 30px #0008}
 body[data-theme="cosmic"] .table:before{border-style:dashed;border-color:#e8c77e66}
+
+/* Theme-specific playing-card faces; Classic Casino intentionally remains untouched. */
+body[data-theme="cyber"] .playing-card:not(.card-back){
+  background:linear-gradient(145deg,#17254b 0%,#0b1027 58%,#1b1640 100%);
+  color:#72efff;border:2px solid #55eaff;
+  box-shadow:inset 0 0 0 4px #111a36,inset 0 0 22px #28cfff38,0 0 16px #29dfff55,0 7px 14px #0008;
+  border-radius:10px;
+}
+body[data-theme="cyber"] .playing-card:not(.card-back):before{
+  content:"";position:absolute;inset:8px;border:1px solid #55eaff88;
+  background:repeating-linear-gradient(135deg,transparent 0 13px,#53dfff0c 13px 15px);
+  clip-path:polygon(0 0,100% 0,100% 100%,0 100%);pointer-events:none;
+}
+body[data-theme="cyber"] .playing-card:not(.card-back) .corner,
+body[data-theme="cyber"] .playing-card:not(.card-back) .suit-big{z-index:1;text-shadow:0 0 7px currentColor,0 0 15px #25dfff88}
+body[data-theme="cyber"] .playing-card.red{color:#ff5bba}
+body[data-theme="cyber"] .card-back{
+  background:repeating-linear-gradient(135deg,#111a3c 0 8px,#1d3970 8px 11px,#111a3c 11px 19px);
+  border:7px solid #5cecff;color:#70f4ff;box-shadow:0 0 18px #35dfff66,inset 0 0 0 2px #b6faff;
+}
+body[data-theme="cyber"] .card-back:after{content:"✦";font-size:76px;color:#70f4ff;text-shadow:0 0 8px #42eaff,0 0 24px #9d5bff}
+body[data-theme="cyber"] .joker-card{background:radial-gradient(circle at 50% 35%,#34236c,#10152e 72%);color:#ff70d2;border-color:#d36cff}
+
+body[data-theme="cosmic"] .playing-card:not(.card-back){
+  background:radial-gradient(ellipse at 50% 35%,#40345d 0%,#211a38 62%,#151326 100%);
+  color:#f0d18a;border:2px solid #d6b66f;
+  box-shadow:inset 0 0 0 4px #211a35,inset 0 0 0 6px #a9874d88,inset 0 0 24px #d7b86b22,0 7px 14px #0009;
+  border-radius:12px;
+}
+body[data-theme="cosmic"] .playing-card:not(.card-back):before{
+  content:"✧     ·     ✦";position:absolute;inset:9px;border:1px solid #d8bd7b88;border-radius:7px;
+  display:flex;align-items:flex-start;justify-content:center;padding-top:14px;
+  font:20px Georgia,serif;letter-spacing:9px;color:#e8ce91;text-shadow:0 0 9px #e8c77e66;pointer-events:none;
+}
+body[data-theme="cosmic"] .playing-card:not(.card-back) .corner,
+body[data-theme="cosmic"] .playing-card:not(.card-back) .suit-big{z-index:1;text-shadow:0 1px 8px #e8c77e55}
+body[data-theme="cosmic"] .playing-card.red{color:#ef8b9d}
+body[data-theme="cosmic"] .card-back{
+  background:radial-gradient(circle,#4c3a70 0 2px,transparent 3px),repeating-conic-gradient(from 12deg at 50% 50%,#2c2448 0 10deg,#4a3a68 10deg 20deg);
+  background-size:18px 18px,100% 100%;border:7px double #e5c77e;color:#f0d18a;
+  box-shadow:0 0 0 2px #5d477e,0 0 18px #d9b76b44,inset 0 0 0 2px #f4dfaa;
+}
+body[data-theme="cosmic"] .card-back:after{content:"✦";font-size:76px;color:#f3d78e;text-shadow:0 0 8px #e8c77e,0 0 25px #d8a9ff}
+body[data-theme="cosmic"] .joker-card{background:radial-gradient(circle at center,#55406d,#21182f 75%);color:#f4d58e;border-color:#e8c77e}
 @media(max-height:700px){.app{gap:8px;padding-top:10px}.card-area{min-height:175px}.playing-card{height:168px;min-height:150px}.table{padding:11px}.stat{padding:6px}.footer{padding:5px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition:none!important}}
 </style>
