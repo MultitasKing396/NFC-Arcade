@@ -250,6 +250,11 @@ function drawNextAfterJoker(){setTimeout(()=>{if(deck.length===0){endGame();retu
 function start(){closeDialog();restartArmed=false;shootout=false;shootoutFirst=null;shootoutOpener=1;shootoutFirstPlayer=1;activePlayer=1;playerScores=[0,0];$('scoreOne').textContent='0';$('scoreTwo').textContent='0';els.start.classList.remove('confirm');els.start.textContent='Neustarten';deck=makeDeck();current=null;score=0;jokerCharges=[0,0];started=true;finished=false;guess=null;waiting=false;freeRetry=false;els.score.textContent='0';updateJoker();updatePlayerTurn();updateDeck();setButtons(false);els.start.textContent='Neustarten';els.message.textContent='Die erste Karte wird aufgedeckt …';renderCard(els.current,null,true);els.label.textContent='DEINE STARTKARTE';drawNext()}
 function applyDuelOutcome(ok){
   if(twoPlayer&&shootout){finishShootoutAttempt(ok);return}
+  if(ok===null){
+    guess=null;waiting=false;
+    els.message.textContent='Gleicher Kartenwert! Kein Punkt – du darfst direkt noch einmal tippen.';
+    setButtons(true);saveGameState();return;
+  }
   if(!twoPlayer&&endless&&ok===false){guess=null;waiting=false;els.message.textContent='Falsch! Kein Punkt – weiter geht’s.';setButtons(true);return;}
   if(!twoPlayer&&ok===false){
     if(spendJoker()){els.message.textContent='Leider falsch – deine Joker-Rettung greift! Du darfst erneut raten, ohne Punkt.';guess=null;waiting=false;setButtons(true)}
@@ -259,8 +264,7 @@ function applyDuelOutcome(ok){
   if(ok===true){
     if(twoPlayer){playerScores[activePlayer-1]++;$('score'+(activePlayer===1?'One':'Two')).textContent=playerScores[activePlayer-1];els.message.textContent='Richtig! +1 Punkt.'}
     else{score++;els.score.textContent=score;if(score>best){best=score;els.best.textContent=best;try{localStorage.setItem(bestKey(),String(best))}catch(e){}}els.message.textContent='Richtig! +1 Punkt.'}
-  }else if(ok===null){els.message.textContent=endless?'Gleicher Kartenwert! Kein Punkt – weiter geht’s.':'Gleicher Kartenwert! Kein Punkt – der andere Spieler ist an der Reihe.'}
-  else{
+  }else{
     const rescued=spendJoker();
     els.message.textContent=rescued?'Leider falsch – dein Joker wurde eingesetzt. Kein Punkt; der andere Spieler ist an der Reihe.':'Leider falsch! Kein Punkt – der andere Spieler ist an der Reihe.';
   }
@@ -281,6 +285,12 @@ function beginShootout(){
   updatePlayerTurn();setButtons(true);
 }
 function finishShootoutAttempt(ok){
+  if(ok===null){
+    waiting=false;guess=null;
+    els.message.textContent='Gleicher Kartenwert im Stechen! Spieler '+activePlayer+' darf erneut tippen.';
+    els.label.textContent='STECHEN · SPIELER '+activePlayer;
+    updatePlayerTurn();setButtons(true);saveGameState();return;
+  }
   const success=ok===true;
   if(shootoutFirst===null){
     shootoutFirst=success;shootoutFirstPlayer=activePlayer;activePlayer=activePlayer===1?2:1;waiting=false;guess=null;
