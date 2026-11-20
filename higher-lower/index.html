@@ -38,7 +38,7 @@ select{background:var(--panel);color:var(--text);border:1px solid var(--edge);bo
 .card-area #nextCard.dealing{animation:dealCard .684s cubic-bezier(.2,.72,.25,1) forwards}
 @keyframes dealCard{0%{transform:translate(0,-50%) rotateY(0deg);z-index:3}44%{transform:translate(calc(var(--move-x)*.44),-50%) rotateY(88deg)}56%{transform:translate(calc(var(--move-x)*.56),-50%) rotateY(88deg)}100%{transform:translate(var(--move-x),-50%) rotateY(0deg)}}
 .playing-card{width:min(39vw,142px);height:min(55vw,198px);max-height:198px;max-width:142px;min-height:165px;background:#fff;border-radius:13px;box-shadow:0 7px 14px #0006;color:#171717;position:relative;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid #ddd;transition:transform .25s ease}
-.playing-card.red{color:#c52632}.playing-card.black{color:#171717}
+.playing-card.red{color:#c52632}.playing-card.black{color:#171717}.deck-remaining{position:absolute;left:7px;bottom:7px;z-index:3;padding:3px 5px;border-radius:5px;background:#171717d9;color:#f1d28e;font:700 8px/1 system-ui,-apple-system,sans-serif;letter-spacing:.01em;white-space:nowrap;box-shadow:0 1px 4px #0007;pointer-events:none}
 .corner{position:absolute;left:9px;top:7px;display:flex;flex-direction:column;align-items:center;font-weight:900;line-height:1;font-size:21px}
 .corner.bottom{left:auto;top:auto;right:9px;bottom:7px;transform:rotate(180deg)}
 .corner span{font-size:17px;margin-top:2px}
@@ -216,14 +216,14 @@ function configureDuelButtons(){const labels=mode==='higher'?['↑ HÖHER','↓ 
 function updatePlayerTurn(){if(!twoPlayer)return;['playerOne','playerTwo'].forEach((id,i)=>{$(id).classList.toggle('active',activePlayer===i+1);$(id).classList.toggle('inactive',activePlayer!==i+1)});['p1a','p1b','p2a','p2b'].forEach(id=>$(id).disabled=!started||finished||waiting||(activePlayer===1?!id.startsWith('p1'):!id.startsWith('p2')))}
 function setPlayerButtons(on){if(!twoPlayer)return;['p1a','p1b','p2a','p2b'].forEach(id=>$(id).disabled=!on||(activePlayer===1?!id.startsWith('p1'):!id.startsWith('p2')))}
 function finishPlayerTurn(){if(twoPlayer){activePlayer=activePlayer===1?2:1;updatePlayerTurn()}}
-function updateDeck(){els.deck.textContent=deck.length+' Karten im Deck'}
+function updateDeck(){els.deck.textContent=deck.length+' Karten im Deck';const badge=els.current.querySelector('.deck-remaining');if(badge)badge.textContent=deck.length+' übrig'}
 function jokerOwner(){return twoPlayer?activePlayer-1:0}
 function updateJoker(){if(twoPlayer){$('jokerOne').textContent=jokerCharges[0]+'/2 Joker';$('jokerTwo').textContent=jokerCharges[1]+'/2 Joker';els.joker.textContent='Joker: '+jokerCharges[0]+' / '+jokerCharges[1]}else{els.joker.textContent=jokerCharges[0]+'/2 geladen'}}
 function chargeJoker(){const i=jokerOwner();jokerCharges[i]=Math.min(2,jokerCharges[i]+1);updateJoker()}
 function spendJoker(){const i=jokerOwner();if(jokerCharges[i]<=0)return false;jokerCharges[i]--;updateJoker();return true}
 function setButtons(on){els.higher.disabled=!on;els.lower.disabled=!on;if(twoPlayer)setPlayerButtons(on)}
 function rankText(c){return c.joker?'Joker':c.label}
-function renderCard(el,c,back=false){const wasDealing=el.classList.contains('dealing');el.className='playing-card';if(wasDealing)el.classList.add('dealing');if(back){el.classList.add('card-back');el.innerHTML='';return}if(c.joker){el.classList.add('joker-card');el.innerHTML='<span class="corner">★<span>J</span></span><span class="suit-big">🃏</span><span class="corner bottom">★<span>J</span></span>';return}el.classList.add(c.suitClass);el.innerHTML='<span class="corner">'+c.label+'<span>'+c.suit+'</span></span><span class="suit-big">'+c.suit+'</span><span class="corner bottom">'+c.label+'<span>'+c.suit+'</span></span>'}
+function renderCard(el,c,back=false){const wasDealing=el.classList.contains('dealing');el.className='playing-card';if(wasDealing)el.classList.add('dealing');if(back){el.classList.add('card-back');el.innerHTML=''}else if(c.joker){el.classList.add('joker-card');el.innerHTML='<span class="corner">★<span>J</span></span><span class="suit-big">🃏</span><span class="corner bottom">★<span>J</span></span>'}else{el.classList.add(c.suitClass);el.innerHTML='<span class="corner">'+c.label+'<span>'+c.suit+'</span></span><span class="suit-big">'+c.suit+'</span><span class="corner bottom">'+c.label+'<span>'+c.suit+'</span></span>'}const badge=document.createElement('span');badge.className='deck-remaining';badge.textContent=deck.length+' übrig';el.appendChild(badge)}
 function drawNext(){if(deck.length===0){endGame();return}dealNext()}
 function animateDeal(c,onDone){
   renderCard(els.next,null,true);
