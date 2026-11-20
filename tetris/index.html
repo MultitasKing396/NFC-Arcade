@@ -130,7 +130,7 @@ footer,.byline{color:#aaa!important}
  <aside class="side">
   <div class="panel">NÄCHSTER STEIN<canvas id="next" width="120" height="120"></canvas></div>
   <div class="panel">LEVEL<span class="level-val" id="level">1</span></div>
-  <div class="panel">SCHWIERIGKEIT<select id="difficulty" aria-label="Schwierigkeit" style="display:block;width:100%;margin:6px auto 0;border:1px solid #ddd;border-radius:8px;background:#fff;padding:5px 3px;font:600 11px system-ui;color:#222"><option value="easy">Einfach</option><option value="normal" selected>Normal</option><option value="hard">Schwer</option></select></div>
+  <div class="panel">SCHWIERIGKEIT<select id="difficulty" aria-label="Schwierigkeit" style="display:block;width:100%;margin:6px auto 0;border:1px solid #ddd;border-radius:8px;background:#fff;padding:5px 3px;font:600 11px system-ui;color:#222"><option value="easy">Einfach</option><option value="normal" selected>Normal</option><option value="fast">Schnell</option><option value="expert">Sehr schnell</option><option value="insane">Extrem</option></select></div>
  </aside>
 </div>
 <div class="actions"><button class="btn" id="start">Start</button></div>
@@ -147,7 +147,7 @@ const shapes={
 };
 const colors={I:'#36e7ff',O:'#ffe34d',T:'#c56bff',S:'#55f28c',Z:'#ff557c',J:'#5887ff',L:'#ff9b45'};
 let grid,piece,next,score,lines,level,best,active=false,paused=false,over=false,loop=null,last=0,dropCounter=0,mode=difficultyEl.value,clearFx=null;
-const modes={easy:{label:'Einfach',base:1120,step:55,min:180},normal:{label:'Normal',base:850,step:65,min:120},hard:{label:'Schwer',base:650,step:58,min:85}};
+const modes={easy:{label:'Einfach',base:850,step:65,min:120},normal:{label:'Normal',base:650,step:58,min:85},fast:{label:'Schnell',base:520,step:52,min:72},expert:{label:'Sehr schnell',base:420,step:46,min:62},insane:{label:'Extrem',base:330,step:40,min:52}};
 function bestKey(){return 'tetrisBest_'+mode}
 function freshPiece(type){return {type,m:shapes[type].map(r=>r.slice()),x:Math.floor((W-shapes[type][0].length)/2),y:0}}
 function randomType(){return Object.keys(shapes)[Math.floor(Math.random()*7)]}
