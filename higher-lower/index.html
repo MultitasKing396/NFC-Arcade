@@ -213,6 +213,7 @@ function restoreGameState(id){
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 function makeDeck(){const d=[];for(const suit of suits)for(let v=1;v<=13;v++)d.push({value:v,suit:suit.s,suitClass:suit.c,label:symbols[v]||String(v),joker:false});d.push({joker:true,label:'JOKER'},{joker:true,label:'JOKER'});return shuffle(d)}
 function cardName(c){return c.joker?'Joker':c.label+c.suit}
+function drawDistinctCard(){if(!deck.length)return null;const rank=c=>c.joker?'JOKER':c.value;let index=deck.length-1;if(current){index=deck.findLastIndex(c=>rank(c)!==rank(current));if(index<0)index=deck.length-1}return deck.splice(index,1)[0]}
 function configureDuelButtons(){const labels=mode==='higher'?['↑ HÖHER','↓ TIEFER']:['ROT','SCHWARZ'];[['p1a','p1b'],['p2a','p2b']].forEach(ids=>{ $(ids[0]).textContent=labels[0];$(ids[1]).textContent=labels[1];$(ids[0]).classList.toggle('red-choice',mode==='color');$(ids[1]).classList.toggle('black-choice',mode==='color')});updatePlayerTurn()}
 function updatePlayerTurn(){if(!twoPlayer)return;['playerOne','playerTwo'].forEach((id,i)=>{$(id).classList.toggle('active',activePlayer===i+1);$(id).classList.toggle('inactive',activePlayer!==i+1)});['p1a','p1b','p2a','p2b'].forEach(id=>$(id).disabled=!started||finished||waiting||(activePlayer===1?!id.startsWith('p1'):!id.startsWith('p2')))}
 function setPlayerButtons(on){if(!twoPlayer)return;['p1a','p1b','p2a','p2b'].forEach(id=>$(id).disabled=!on||(activePlayer===1?!id.startsWith('p1'):!id.startsWith('p2')))}
@@ -246,7 +247,7 @@ function animateDeal(c,onDone){
     if(onDone)onDone();saveGameState();
   });
 }
-function dealNext(){if(!deck.length)return;const c=deck.pop();updateDeck();if(c.joker){chargeJoker();els.message.textContent='Joker gezogen! Deine Joker-Rettung wurde aufgeladen.';drawNextAfterJoker();return}animateDeal(c,()=>{waiting=false;setButtons(true);els.label.textContent='AKTUELLE KARTE · '+cardName(current);if(guess){els.message.textContent='Gleicher Wert! Deine Auswahl bleibt bestehen – rate erneut.';setButtons(true)}})}
+function dealNext(){if(!deck.length)return;const c=drawDistinctCard();if(!c)return;updateDeck();if(c.joker){chargeJoker();els.message.textContent='Joker gezogen! Deine Joker-Rettung wurde aufgeladen.';drawNextAfterJoker();return}animateDeal(c,()=>{waiting=false;setButtons(true);els.label.textContent='AKTUELLE KARTE · '+cardName(current);if(guess){els.message.textContent='Gleicher Wert! Deine Auswahl bleibt bestehen – rate erneut.';setButtons(true)}})}
 function drawNextAfterJoker(){setTimeout(()=>{if(deck.length===0){endGame();return}dealNext()},450)}
 function start(){closeDialog();restartArmed=false;shootout=false;shootoutFirst=null;shootoutOpener=1;shootoutFirstPlayer=1;activePlayer=1;playerScores=[0,0];$('scoreOne').textContent='0';$('scoreTwo').textContent='0';els.start.classList.remove('confirm');els.start.textContent='Neustarten';deck=makeDeck();current=null;score=0;jokerCharges=[0,0];started=true;finished=false;guess=null;waiting=false;freeRetry=false;els.score.textContent='0';updateJoker();updatePlayerTurn();updateDeck();setButtons(false);els.start.textContent='Neustarten';els.message.textContent='Die erste Karte wird aufgedeckt …';renderCard(els.current,null,true);els.label.textContent='DEINE STARTKARTE';drawNext()}
 function applyDuelOutcome(ok){
@@ -325,7 +326,7 @@ function choose(direction){
   if(!started||finished||waiting||!current)return;
   guess=direction;waiting=true;setButtons(false);
   if(deck.length===0){if(shootout){deck=makeDeck();updateDeck()}else{endGame();return}}
-  const next=deck.pop();updateDeck();
+  const next=drawDistinctCard();if(!next){endGame();return}updateDeck();
   if(next.joker){chargeJoker();els.message.textContent='Joker gezogen! Joker aufgeladen – die Vorhersage bleibt offen.';setTimeout(()=>resolveWithReplacement(direction),450);return}
   const ok=mode==='color'?(next.suitClass===direction):(next.value===current.value?null:(direction==='higher'?next.value>current.value:next.value<current.value));
   animateDeal(next,()=>{els.current.classList.add(ok===true?'correct':ok===false?'wrong':'');els.label.textContent='AKTUELLE KARTE · '+cardName(current);if(ok===null){retrySameValue(direction);return}applyDuelOutcome(ok)});
