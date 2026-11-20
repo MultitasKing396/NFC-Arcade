@@ -64,28 +64,28 @@ let chess=null,mode="ai",difficulty=3,theme="minimal",selected=null,legal=[],las
 const symbols={k:"♚",q:"♛",r:"♜",b:"♝",n:"♞",p:"♟"};
 const pieceShapes={
 minimal:{
-k:'<path d="M46 8h8v10h10v8H54v8h-8v-8H36v-8h10z"/><path d="M29 42Q50 33 71 42L78 78H22z"/><path d="M18 82h64v9H18z"/>',
-q:'<path d="M25 18l12 8 13-15 13 15 12-8-5 21H30z"/><path d="M32 42h36l8 36H24z"/><path d="M18 82h64v9H18z"/>',
-r:'<path d="M24 15h14v12h24V15h14v24H24z"/><path d="M30 42h40l7 36H23z"/><path d="M18 82h64v9H18z"/>',
-b:'<path d="M50 10c-15 13-18 27-7 38L29 78h42L57 48c11-11 8-25-7-38z"/><path d="M18 82h64v9H18z"/>',
-n:'<path d="M27 78V48l12-26 10 9 8-14 18 22-8 39z"/><path d="M18 82h64v9H18z"/>',
-p:'<circle cx="50" cy="27" r="13"/><path d="M38 43h24l8 35H30z"/><path d="M22 82h56v9H22z"/>'
+k:'<path d="M45 5h10v13h13v9H55v11H45V27H32v-9h13z"/><path d="M35 42h30l8 35H27z"/><path d="M18 82h64v9H18z"/>',
+q:'<path d="M50 7l8 13 17-7-6 24H31l-6-24 17 7z"/><path d="M30 43h40l8 34H22z"/><path d="M18 82h64v9H18z"/>',
+r:'<path d="M21 12h15v13h8V12h12v13h8V12h15v30H21z"/><path d="M30 45h40l7 32H23z"/><path d="M18 82h64v9H18z"/>',
+b:'<path d="M50 7L69 31 64 45 76 78H24l12-33-5-14z"/><path d="M45 18l10 10-10 10-5-10z" fill="#000" opacity=".32"/><path d="M18 82h64v9H18z"/>',
+n:'<path d="M25 78l4-31 12-27 12-9 5 16 15 8 8 19-8 24z"/><path d="M50 28l12 8-13 5z" fill="#000" opacity=".28"/><path d="M18 82h64v9H18z"/>',
+p:'<circle cx="50" cy="25" r="11"/><path d="M45 37h10l5 10H40z"/><path d="M36 49h28l7 28H29z"/><path d="M22 82h56v9H22z"/>'
 },
 classic:{
-k:'<path d="M46 7h8v11h11v7H54v10h-8V25H35v-7h11z"/><path d="M39 38h22l4 9 9 9-5 22H31l-5-22 9-9z"/><path d="M20 82h60v9H20z"/>',
-q:'<path d="M25 18l12 8 13-15 13 15 12-8-5 25H30z"/><path d="M35 45h30l8 33H27z"/><path d="M20 82h60v9H20z"/>',
-r:'<path d="M25 14h12v12h8V14h10v12h8V14h12v28H25z"/><path d="M33 44h34l6 34H27z"/><path d="M20 82h60v9H20z"/>',
-b:'<path d="M50 10c-13 0-18 13-12 25l8 10-15 33h38L54 45l8-10c6-12 1-25-12-25z"/><path d="M46 15l8 8-8 8-8-8z"/><path d="M20 82h60v9H20z"/>',
-n:'<path d="M29 78l-3-26 8-27 15-13 5 13 13 3 8 18-8 32z"/><path d="M49 23l9 9-11 2z"/><path d="M20 82h60v9H20z"/>',
-p:'<circle cx="50" cy="25" r="13"/><path d="M39 41h22l5 10 7 27H27l7-27z"/><path d="M20 82h60v9H20z"/>'
+k:'<path d="M46 5h8v12h12v8H54v11h-8V25H34v-8h12z"/><path d="M36 39h28l8 15-5 24H33l-5-24z"/><path d="M20 82h60v9H20z"/>',
+q:'<path d="M24 16l14 9 12-16 12 16 14-9-6 27H30z"/><path d="M33 45h34l8 33H25z"/><path d="M20 82h60v9H20z"/>',
+r:'<path d="M23 12h13v12h9V12h10v12h9V12h13v30H23z"/><path d="M32 44h36l7 34H25z"/><path d="M20 82h60v9H20z"/>',
+b:'<path d="M50 7c-5 8-15 16-14 28 1 9 7 14 10 19L29 78h42L54 54c5-6 11-12 10-21C63 20 55 13 50 7z"/><path d="M42 26l16 13" fill="none" stroke="#000" stroke-width="4" opacity=".38"/><path d="M20 82h60v9H20z"/>',
+n:'<path d="M26 78l-2-27 9-27 17-15 7 15 14 5 9 21-8 28z"/><path d="M48 25l13 10-13 4z" fill="#000" opacity=".3"/><path d="M20 82h60v9H20z"/>',
+p:'<circle cx="50" cy="24" r="12"/><path d="M44 37h12l5 10H39z"/><path d="M36 49h28l7 29H29z"/><path d="M20 82h60v9H20z"/>'
 },
 future:{
-k:'<path d="M44 6h12v13h13v10H56v12H44V29H31V19h13z"/><path d="M50 38l24 17-8 24H34l-8-24z"/><path d="M17 83h66v8H17z"/>',
-q:'<path d="M50 8l10 14 18-8-8 28H30l-8-28 18 8z"/><path d="M32 45h36l12 34H20z"/><path d="M17 83h66v8H17z"/>',
-r:'<path d="M20 12h18v13h24V12h18v31H20z"/><path d="M29 45h42l9 34H20z"/><path d="M17 83h66v8H17z"/>',
-b:'<path d="M50 7l19 27-8 14 14 31H25l14-31-8-14z"/><path d="M50 20l7 13-7 9-7-9z"/><path d="M17 83h66v8H17z"/>',
-n:'<path d="M22 79l8-37 18-27 8 18 17 4 8 42z"/><path d="M47 30l11 8-13 5z"/><path d="M17 83h66v8H17z"/>',
-p:'<path d="M50 10l15 17-15 16-15-16z"/><path d="M38 45h24l12 34H26z"/><path d="M17 83h66v8H17z"/>'
+k:'<path d="M44 4h12v13h13v11H56v13H44V28H31V17h13z"/><path d="M50 39l27 17-10 23H33L23 56z"/><path d="M16 83h68v8H16z"/>',
+q:'<path d="M50 6l10 16 20-9-9 29H29l-9-29 20 9z"/><path d="M31 45h38l12 34H19z"/><path d="M16 83h68v8H16z"/>',
+r:'<path d="M18 10h19v14h9V10h8v14h9V10h19v33H18z"/><path d="M28 45h44l10 34H18z"/><path d="M16 83h68v8H16z"/>',
+b:'<path d="M50 5l23 31-10 13 16 30H21l16-30-10-13z"/><path d="M42 19l16 15-8 10-8-10z" fill="#000" opacity=".32"/><path d="M16 83h68v8H16z"/>',
+n:'<path d="M20 79l8-39 21-29 8 19 17 4 9 45z"/><path d="M47 28l14 10-15 5z" fill="#000" opacity=".3"/><path d="M16 83h68v8H16z"/>',
+p:'<path d="M50 10l12 12-12 13-12-13z"/><path d="M45 36h10l6 10H39z"/><path d="M34 48h32l9 31H25z"/><path d="M16 83h68v8H16z"/>'
 }};
 function pieceSvg(type){return '<svg viewBox="0 0 100 100" aria-hidden="true" focusable="false"><g>'+pieceShapes[theme][type]+'</g></svg>';}
 
