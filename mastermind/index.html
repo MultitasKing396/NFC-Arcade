@@ -206,7 +206,7 @@ function renderRows(){
   const row=document.createElement('div');row.className='guessRow'+(r===activeRow&&!gameOver?' current':'')+(r<activeRow?' past':'');
   const main=document.createElement('div');main.className='guessMain';const num=document.createElement('span');num.className='rowNum';num.textContent=(r+1)+'.';main.append(num);
   const pegs=document.createElement('div');pegs.className='pegs';pegs.style.setProperty('--slots',length);
-  for(let c=0;c<length;c++){const b=document.createElement('button');b.className='peg'+(rows[r][c]!==null?' filled':'')+(r===activeRow&&selected===c&&!gameOver?' selected':'');b.style.setProperty('--peg-color',rows[r][c]===null?'#181818':COLORS[rows[r][c]].hex);b.setAttribute('aria-label','Position '+(c+1));b.disabled=r!==activeRow||gameOver;b.onclick=()=>{selected=c;renderRows()};pegs.append(b)}
+  for(let c=0;c<length;c++){const b=document.createElement('button');const colorIndex=rows[r][c];b.className='peg'+(colorIndex!==null?' filled':'')+(r===activeRow&&selected===c&&!gameOver?' selected':'');const pegColor=colorIndex===null?'#181818':COLORS[colorIndex].hex;b.style.setProperty('--peg-color',pegColor);if(colorIndex!==null){b.style.setProperty('background','radial-gradient(circle at 32% 25%,#ffffffa8,'+pegColor+' 48%,#1118 130%)','important');b.title=COLORS[colorIndex].name;}b.setAttribute('aria-label','Position '+(c+1)+(colorIndex!==null?': '+COLORS[colorIndex].name:''));b.disabled=r!==activeRow||gameOver;b.onclick=()=>{selected=c;renderRows()};pegs.append(b)}
   main.append(pegs);
   const feedback=document.createElement('div');feedback.className='feedback';feedback.setAttribute('aria-label','Hinweise');
   const marks=r<activeRow?rows[r].feedback||[]:[];
