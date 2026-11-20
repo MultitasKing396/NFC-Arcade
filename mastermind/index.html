@@ -140,7 +140,7 @@ function renderRows(){
   for(let i=0;i<length;i++){const dot=document.createElement('span');dot.className='hint'+(marks[i]==='good'?' good':marks[i]==='color'?' color':'');feedback.append(dot)}
   row.append(main,feedback);$('guesses').append(row);
  }
- $('tries').textContent=activeRow+' / '+maxAttempts;
+ $('tries').textContent=(gameOver?activeRow+1:activeRow)+' / '+maxAttempts;
  $('checkBtn').disabled=gameOver||rows[activeRow].some(v=>v===null);
  $('clearBtn').disabled=gameOver||rows[activeRow].every(v=>v===null);
 }
