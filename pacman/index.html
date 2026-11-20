@@ -57,6 +57,19 @@ canvas{width:auto;height:100%;max-width:100%;max-height:100%;aspect-ratio:19/21;
 .controls .sprint small{font-size:9px;font-weight:900;letter-spacing:.08em}
 @media(max-height:620px){.controls{height:84px}.dpad{grid-template-rows:repeat(3,25px);grid-template-columns:repeat(3,42px)}.controls .sprint{width:58px;height:58px}.miniAction{min-height:25px;padding:3px 7px;font-size:9px}}
 
+
+/* Alle Bedienelemente horizontal um ca. 5 mm verbreitert; Höhen bleiben unverändert */
+.dpad{grid-template-columns:repeat(3,calc(clamp(43px,12vw,54px) + 19px))}
+.controls .sprint{width:calc(clamp(64px,18vw,78px) + 19px)}
+.miniAction{min-width:calc(19px + 54px)}
+.sound{min-width:calc(19px + 64px)}
+.overlay .primary{min-width:calc(100% + 19px);padding-left:calc(18px + 9.5px);padding-right:calc(18px + 9.5px)}
+@media(max-height:620px){
+ .dpad{grid-template-columns:repeat(3,61px)}
+ .controls .sprint{width:77px;height:58px}
+ .miniAction{min-width:calc(19px + 48px)}
+}
+
 </style></head>
 <body><main class="app">
 <header><h1>PAC-MAN</h1><p>SOFT RETRO ARCADE · BY ALP</p></header>
