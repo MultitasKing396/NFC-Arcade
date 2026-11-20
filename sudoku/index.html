@@ -100,6 +100,17 @@ footer,.byline{color:#aaa!important}
 @media(hover:none){button:hover:not(:disabled),.btn:hover:not(:disabled){filter:none}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation-duration:.01ms!important;animation-iteration-count:1!important}}
 
+
+/* Deutlichere 3x3-Blockgrenzen im Sudoku-Raster. */
+.cell:nth-child(3n){border-right:4px solid #d8b66a!important}
+.cell:nth-child(n+19):nth-child(-n+27),
+.cell:nth-child(n+46):nth-child(-n+54){border-bottom:4px solid #d8b66a!important}
+/* Hinweis: erster Tipp schaltet in einen klar erkennbaren Bestätigungszustand. */
+#hint.hint-armed{
+ background:#fff!important;color:#211b12!important;border:2px solid #d8b66a!important;
+ box-shadow:0 0 0 3px #d8b66a55,0 3px 0 #100e0b!important;
+}
+
 /* Sudoku: Zahlenfeld bekommt dieselbe Gold-Bedienoptik; Rasterfarben bleiben erhalten. */
 .numbers button,.num{border:1px solid #8d7955!important;border-radius:9px!important;background:linear-gradient(#d7bd83,#a88a53)!important;color:#211b12!important;box-shadow:0 2px 0 #100e0b!important}
 .cell{transition:background-color .12s ease}
@@ -118,19 +129,20 @@ footer,.byline{color:#aaa!important}
 <script>
 (()=>{'use strict';
 const $=id=>document.getElementById(id),boardEl=$('board'),difficulty=$('difficulty');
-let solution=[],puzzle=[],values=[],fixed=[],selected=-1,mistakes=0,seconds=0,completed=false,tick=null,toastTimer=null,clockPaused=false;
+let solution=[],puzzle=[],values=[],fixed=[],selected=-1,mistakes=0,seconds=0,completed=false,tick=null,toastTimer=null,clockPaused=false,hintArmed=false;
 const targets=[28,36,45,52,58],names=['Anfänger','Einfach','Mittel','Schwer','Meister'];
 const key='sudokuByAlpSaveV1';
 function shuffle(a){for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 function pattern(r,c){return (r*3+Math.floor(r/3)+c)%9}
 function solvedGrid(){let rows=shuffle([0,1,2]).flatMap(g=>shuffle([0,1,2]).map(x=>g*3+x));let cols=shuffle([0,1,2]).flatMap(g=>shuffle([0,1,2]).map(x=>g*3+x));let nums=shuffle([1,2,3,4,5,6,7,8,9]);return rows.map(r=>cols.map(c=>nums[pattern(r,c)]))}
 function countSolutions(g,limit=2){let count=0;function solve(){let best=-1,opts=null;for(let i=0;i<81;i++)if(!g[Math.floor(i/9)][i%9]){let r=Math.floor(i/9),c=i%9,used=new Set([...g[r],...g.map(row=>row[c]),...g.slice(Math.floor(r/3)*3,Math.floor(r/3)*3+3).flatMap(row=>row.slice(Math.floor(c/3)*3,Math.floor(c/3)*3+3))]);let o=[1,2,3,4,5,6,7,8,9].filter(n=>!used.has(n));if(!opts||o.length<opts.length){best=i;opts=o;if(o.length===0)break;if(o.length===1)break}}if(best<0){count++;return count>=limit}let r=Math.floor(best/9),c=best%9;for(const n of opts){g[r][c]=n;if(solve())return true;g[r][c]=0}return false}solve();return count}
-function makePuzzle(level){solution=solvedGrid();puzzle=solution.map(r=>r.slice());let indices=shuffle(Array.from({length:81},(_,i)=>i)),removed=0,target=targets[level];for(const i of indices){if(removed>=target)break;let r=Math.floor(i/9),c=i%9,old=puzzle[r][c];puzzle[r][c]=0;if(countSolutions(puzzle.map(row=>row.slice()))===1)removed++;else puzzle[r][c]=old}values=puzzle.flat();fixed=values.map(v=>v!==0);mistakes=0;seconds=0;selected=-1;completed=false;clockPaused=false;startClock();save();render()}
-function render(){boardEl.innerHTML='';for(let i=0;i<81;i++){let r=Math.floor(i/9),c=i%9,v=values[i],el=document.createElement('button');el.className='cell'+(fixed[i]?' fixed':'');el.type='button';el.setAttribute('role','gridcell');el.setAttribute('aria-label','Zeile '+(r+1)+', Spalte '+(c+1)+(v?', Zahl '+v:' leer'));if(selected>=0){let sr=Math.floor(selected/9),sc=selected%9;if(r===sr||c===sc||(Math.floor(r/3)===Math.floor(sr/3)&&Math.floor(c/3)===Math.floor(sc/3)))el.classList.add('related');if(i===selected)el.classList.add('selected');if(v&&v===values[selected])el.classList.add('same')}if(v){el.textContent=v;if(!fixed[i]&&isWrong(i))el.classList.add('error')}el.addEventListener('click',()=>{selected=i;render()});boardEl.append(el)}$('mistakes').textContent=mistakes+' / 3';let done=values.filter(Boolean).length;$('progress').style.width=(done/81*100)+'%';document.querySelectorAll('.num').forEach(b=>{let n=Number(b.dataset.n),left=values.filter(v=>v===n).length;b.disabled=left>=9;b.style.opacity=left>=9?'.35':'1'})}
+function makePuzzle(level){disarmHint();solution=solvedGrid();puzzle=solution.map(r=>r.slice());let indices=shuffle(Array.from({length:81},(_,i)=>i)),removed=0,target=targets[level];for(const i of indices){if(removed>=target)break;let r=Math.floor(i/9),c=i%9,old=puzzle[r][c];puzzle[r][c]=0;if(countSolutions(puzzle.map(row=>row.slice()))===1)removed++;else puzzle[r][c]=old}values=puzzle.flat();fixed=values.map(v=>v!==0);mistakes=0;seconds=0;selected=-1;completed=false;clockPaused=false;startClock();save();render()}
+function render(){boardEl.innerHTML='';for(let i=0;i<81;i++){let r=Math.floor(i/9),c=i%9,v=values[i],el=document.createElement('button');el.className='cell'+(fixed[i]?' fixed':'');el.type='button';el.setAttribute('role','gridcell');el.setAttribute('aria-label','Zeile '+(r+1)+', Spalte '+(c+1)+(v?', Zahl '+v:' leer'));if(selected>=0){let sr=Math.floor(selected/9),sc=selected%9;if(r===sr||c===sc||(Math.floor(r/3)===Math.floor(sr/3)&&Math.floor(c/3)===Math.floor(sc/3)))el.classList.add('related');if(i===selected)el.classList.add('selected');if(v&&v===values[selected])el.classList.add('same')}if(v){el.textContent=v;if(!fixed[i]&&isWrong(i))el.classList.add('error')}el.addEventListener('click',()=>{disarmHint();selected=i;render()});boardEl.append(el)}$('mistakes').textContent=mistakes+' / 3';let done=values.filter(Boolean).length;$('progress').style.width=(done/81*100)+'%';document.querySelectorAll('.num').forEach(b=>{let n=Number(b.dataset.n),left=values.filter(v=>v===n).length;b.disabled=left>=9;b.style.opacity=left>=9?'.35':'1'})}
 function isWrong(i){let r=Math.floor(i/9),c=i%9;return values[i]!==solution[r][c]}
-function input(n){if(selected<0||fixed[selected]||completed)return;values[selected]=n;let wrong=isWrong(selected);if(wrong){mistakes++;showToast('Diese Zahl stimmt leider nicht.')}save();render();if(values.every((v,i)=>v===solution[Math.floor(i/9)][i%9]))winGame()}
+function input(n){disarmHint();if(selected<0||fixed[selected]||completed)return;values[selected]=n;let wrong=isWrong(selected);if(wrong){mistakes++;showToast('Diese Zahl stimmt leider nicht.')}save();render();if(values.every((v,i)=>v===solution[Math.floor(i/9)][i%9]))winGame()}
 function clearCell(){if(selected<0||fixed[selected]||completed)return;values[selected]=0;save();render()}
-function hint(){if(selected<0){showToast('Wähle zuerst ein Feld aus.');return}if(fixed[selected]){showToast('Diese Zahl ist bereits vorgegeben.');return}values[selected]=solution[Math.floor(selected/9)][selected%9];save();render();if(values.every((v,i)=>v===solution[Math.floor(i/9)][i%9]))winGame()}
+function disarmHint(){hintArmed=false;const b=$('hint');b.classList.remove('hint-armed');b.textContent='Hinweis'}
+function hint(){if(selected<0){disarmHint();showToast('Wähle zuerst ein Feld aus.');return}if(fixed[selected]){disarmHint();showToast('Diese Zahl ist bereits vorgegeben.');return}if(!hintArmed){hintArmed=true;$('hint').classList.add('hint-armed');$('hint').textContent='NOCHMAL TIPPEN';return}disarmHint();values[selected]=solution[Math.floor(selected/9)][selected%9];save();render();if(values.every((v,i)=>v===solution[Math.floor(i/9)][i%9]))winGame()}
 function showToast(msg){let el=$('toast');el.textContent=msg;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),1700)}
 function startClock(){clearInterval(tick);tick=setInterval(()=>{if(!completed&&!clockPaused){seconds++;$('timer').textContent=formatTime(seconds);save()}},1000);$('timer').textContent=formatTime(seconds);updateClockControl()}
 function updateClockControl(){$('pauseLabel').textContent=clockPaused?'PAUSIERT · TIPPE ZUM FORTSETZEN':'TIPPE ZUM PAUSIEREN';$('timeToggle').setAttribute('aria-label',clockPaused?'Timer fortsetzen':'Timer pausieren')}
@@ -143,7 +155,7 @@ function restore(){try{let s=JSON.parse(localStorage.getItem(key));if(!s||s.leve
 function winGame(){completed=true;clockPaused=false;clearInterval(tick);let b=Number(localStorage.getItem(bestKey())||0);if(!b||seconds<b){localStorage.setItem(bestKey(),String(seconds));b=seconds}loadBest();$('wintext').textContent='Du hast das '+names[Number(difficulty.value)]+'-Sudoku in '+formatTime(seconds)+' gelöst – mit '+mistakes+' Fehlern. '+(seconds===b?'Neue Bestzeit!':'Deine Bestzeit: '+formatTime(b)+'.');$('win').classList.remove('hidden');save()}
 function newGame(){difficulty.value=difficulty.value;loadBest();makePuzzle(Number(difficulty.value))}
 $('numbers').innerHTML='';for(let n=1;n<=9;n++){let b=document.createElement('button');b.className='num';b.textContent=n;b.dataset.n=n;b.addEventListener('click',()=>input(n));$('numbers').append(b)}
-$('new').addEventListener('click',newGame);$('erase').addEventListener('click',clearCell);$('hint').addEventListener('click',hint);$('timeToggle').addEventListener('click',toggleClock);$('winnew').addEventListener('click',()=>{$('win').classList.add('hidden');newGame()});difficulty.addEventListener('change',()=>{loadBest();newGame()});
+$('new').addEventListener('click',newGame);$('erase').addEventListener('click',()=>{disarmHint();clearCell()});$('hint').addEventListener('click',hint);$('timeToggle').addEventListener('click',toggleClock);$('winnew').addEventListener('click',()=>{$('win').classList.add('hidden');newGame()});difficulty.addEventListener('change',()=>{loadBest();newGame()});
 document.addEventListener('keydown',e=>{if(e.key>='1'&&e.key<='9')input(Number(e.key));if(e.key==='Backspace'||e.key==='Delete')clearCell();if(e.key.startsWith('Arrow')&&selected>=0){e.preventDefault();let r=Math.floor(selected/9),c=selected%9;if(e.key==='ArrowUp')r=Math.max(0,r-1);if(e.key==='ArrowDown')r=Math.min(8,r+1);if(e.key==='ArrowLeft')c=Math.max(0,c-1);if(e.key==='ArrowRight')c=Math.min(8,c+1);selected=r*9+c;render()}});
 if(!restore()){loadBest();makePuzzle(Number(difficulty.value))}else loadBest();
 })();
