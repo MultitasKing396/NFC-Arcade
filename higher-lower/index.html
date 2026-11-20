@@ -215,7 +215,7 @@ function applyDuelOutcome(ok){
   if(ok===true){
     if(twoPlayer){playerScores[activePlayer-1]++;$('score'+(activePlayer===1?'One':'Two')).textContent=playerScores[activePlayer-1];els.message.textContent='Richtig! +1 Punkt.'}
     else{score++;els.score.textContent=score;if(score>best){best=score;els.best.textContent=best;try{localStorage.setItem(BEST_KEYS[mode],String(best))}catch(e){}}els.message.textContent='Richtig! +1 Punkt.'}
-  }else if(ok===null){els.message.textContent='Gleicher Kartenwert! Kein Punkt – der andere Spieler ist an der Reihe.'}
+  }else if(ok===null){els.message.textContent=endless?'Gleicher Kartenwert! Kein Punkt – weiter geht’s.':'Gleicher Kartenwert! Kein Punkt – der andere Spieler ist an der Reihe.'}
   else{
     const rescued=spendJoker();
     els.message.textContent=rescued?'Leider falsch – dein Joker wurde eingesetzt. Kein Punkt; der andere Spieler ist an der Reihe.':'Leider falsch! Kein Punkt – der andere Spieler ist an der Reihe.';
