@@ -92,11 +92,11 @@ body[data-theme="cosmic"] .table:before{border-style:dashed;border-color:#e8c77e
 const $=id=>document.getElementById(id);
 const els={score:$('score'),best:$('best'),theme:$('theme'),current:$('currentCard'),next:$('nextCard'),label:$('cardLabel'),message:$('message'),higher:$('higher'),lower:$('lower'),joker:$('jokerStatus'),deck:$('deckCount'),start:$('start'),restart:$('restart'),overlay:$('overlay'),dialogTitle:$('dialogTitle'),dialogText:$('dialogText')};
 const suits=[{s:'♠',c:'black'},{s:'♥',c:'red'},{s:'♦',c:'red'},{s:'♣',c:'black'}];
-const symbols={11:'J',12:'Q',13:'K',14:'A'};
+const symbols={1:'A',11:'J',12:'Q',13:'K'};
 let deck=[],current=null,score=0,best=0,jokerAvailable=true,started=false,finished=false,guess=null,waiting=false,freeRetry=false;
 const BEST_KEY='higherLowerBest';
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
-function makeDeck(){const d=[];for(const suit of suits)for(let v=2;v<=14;v++)d.push({value:v,suit:suit.s,suitClass:suit.c,label:symbols[v]||String(v),joker:false});d.push({joker:true,label:'JOKER'});return shuffle(d)}
+function makeDeck(){const d=[];for(const suit of suits)for(let v=1;v<=13;v++)d.push({value:v,suit:suit.s,suitClass:suit.c,label:symbols[v]||String(v),joker:false});d.push({joker:true,label:'JOKER'});return shuffle(d)}
 function cardName(c){return c.joker?'Joker':c.label+c.suit}
 function updateDeck(){els.deck.textContent=deck.length+' Karten im Deck'}
 function updateJoker(){els.joker.textContent=jokerAvailable?'Noch verfügbar':'Eingesetzt'}
