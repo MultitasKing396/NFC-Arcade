@@ -1,14 +1,65 @@
 <!doctype html>
-<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><meta name="theme-color" content="#fff"><title>NFC Arcade – Snake</title><style>
-*{box-sizing:border-box}body{margin:0;background:#f4f4f4;color:#111;font-family:system-ui,-apple-system,sans-serif;display:flex;justify-content:center;min-height:100vh;padding:22px 14px}.app{width:min(100%,440px);text-align:center}.top{display:flex;justify-content:space-between;align-items:center;margin:8px 0 14px}.brand{font-weight:900;letter-spacing:.12em;font-size:13px;color:#777}.scores{display:flex;gap:18px;font-size:12px;color:#666}.scores b{display:block;color:#111;font-size:21px}h1{font-size:34px;margin:8px 0 2px;letter-spacing:-1.5px}.sub{color:#777;margin:0 0 18px;font-size:13px}canvas{width:100%;height:auto;display:block;background:white;border:1px solid #e4e4e4;border-radius:18px;box-shadow:0 8px 30px #0000000b;touch-action:none}.status{min-height:24px;margin:12px 0;color:#666;font-size:14px;font-weight:600}.actions{display:flex;gap:10px}.btn{border:0;border-radius:13px;padding:13px 18px;font-weight:750;font-size:15px;background:#111;color:white;flex:1}.btn.secondary{background:#e8e8e8;color:#111}.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:210px;margin:16px auto 0}.pad button{height:53px;border:0;border-radius:13px;background:#e8e8e8;font-size:22px;font-weight:800;color:#111;touch-action:manipulation}.empty{visibility:hidden}.hint{color:#999;font-size:11px;margin-top:16px}
-</style></head><body><main class="app"><div class="top"><div class="brand">NFC ARCADE</div><div class="scores"><div>PUNKTE<b id="score">0</b></div><div>REKORD<b id="best">0</b></div></div></div><h1>Snake.</h1><p class="sub">Ein Klassiker. Neu gedacht.</p><canvas id="game" width="600" height="480"></canvas><div class="status" id="status">Tippe auf Start, um zu spielen.</div><div class="actions"><button class="btn" id="start">Start</button><button class="btn secondary" id="reset">Neustart</button></div><div class="pad"><span class="empty"></span><button data-dir="up">↑</button><span class="empty"></span><button data-dir="left">←</button><button data-dir="down">↓</button><button data-dir="right">→</button></div><p class="hint">Steuerung: Tasten, Wischen oder Tastatur · 15 × 12 Raster</p></main><script>
-(()=>{const c=document.getElementById('game'),ctx=c.getContext('2d'),scoreEl=document.getElementById('score'),bestEl=document.getElementById('best'),statusEl=document.getElementById('status'),startBtn=document.getElementById('start'),cols=15,rows=12,cell=40;let snake,food,dir,next,score,best=+(localStorage.snakeBest||0),timer=null,running=false,over=false;bestEl.textContent=best;
-function reset(){clearInterval(timer);timer=null;snake=[{x:7,y:6},{x:6,y:6},{x:5,y:6}];dir={x:1,y:0};next={...dir};score=0;running=false;over=false;scoreEl.textContent=0;statusEl.textContent='Bereit? Los geht’s!';startBtn.textContent='Start';spawn();draw()}
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#f4f4f4">
+<title>NFC Arcade – Snake by Alp</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;margin:0;overflow:hidden;overscroll-behavior:none;touch-action:none}
+body{background:#f4f4f4;color:#111;font-family:system-ui,-apple-system,sans-serif;display:flex;justify-content:center;align-items:center;padding:12px}
+.app{width:min(100%,440px);max-height:100dvh;text-align:center;display:flex;flex-direction:column;justify-content:center}
+.top{display:flex;justify-content:space-between;align-items:center;margin:4px 0 8px}
+.brand{font-weight:900;letter-spacing:.12em;font-size:12px;color:#777}
+.scores{display:flex;gap:18px;font-size:11px;color:#666}
+.scores b{display:block;color:#111;font-size:20px}
+h1{font-size:34px;margin:4px 0 0;letter-spacing:-1.5px;line-height:1.1}
+.sub{color:#777;margin:1px 0 12px;font-size:13px;font-weight:650;letter-spacing:.04em}
+canvas{width:100%;height:auto;display:block;background:white;border:1px solid #e4e4e4;border-radius:16px;box-shadow:0 8px 30px #0000000b;touch-action:none}
+.actions{display:flex;gap:10px;margin-top:10px}
+.btn{border:0;border-radius:12px;padding:12px 16px;font-weight:750;font-size:15px;background:#111;color:white;flex:1;touch-action:manipulation}
+.btn.secondary{background:#e8e8e8;color:#111}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;width:195px;margin:12px auto 0}
+.pad button{height:47px;border:0;border-radius:12px;background:#e8e8e8;font-size:21px;font-weight:800;color:#111;touch-action:manipulation}
+.empty{visibility:hidden}
+.hint{color:#999;font-size:10px;margin:10px 0 0}
+</style>
+</head>
+<body>
+<main class="app">
+<div class="top"><div class="brand">NFC ARCADE</div><div class="scores"><div>PUNKTE<b id="score">0</b></div><div>HIGHSCORE<b id="best">0</b></div></div></div>
+<h1>Snake.</h1><p class="sub">By Alp</p>
+<canvas id="game" width="600" height="480" aria-label="Snake Spielfeld"></canvas>
+<div class="actions"><button class="btn" id="start">Start</button><button class="btn secondary" id="reset">Neustart</button></div>
+<div class="pad"><span class="empty"></span><button data-dir="up" aria-label="Hoch">↑</button><span class="empty"></span><button data-dir="left" aria-label="Links">←</button><button data-dir="down" aria-label="Runter">↓</button><button data-dir="right" aria-label="Rechts">→</button></div>
+<p class="hint">Steuerung: Tasten, Wischen oder Tastatur · 15 × 12 Raster</p>
+</main>
+<script>
+(()=> {
+const c=document.getElementById('game'),ctx=c.getContext('2d'),scoreEl=document.getElementById('score'),bestEl=document.getElementById('best'),startBtn=document.getElementById('start'),cols=15,rows=12,cell=40;
+const bestKey='snakeBest';let snake,food,dir,next,score,best=Number(localStorage.getItem(bestKey)||0),timer=null,running=false,paused=false,over=false;
+bestEl.textContent=best;
+const palettes=['#242424','#2563a6','#168477','#8055a5','#c46b25','#54833c'];
+function reset(){clearInterval(timer);timer=null;snake=[{x:7,y:6},{x:6,y:6},{x:5,y:6}];dir={x:1,y:0};next={...dir};score=0;running=false;paused=false;over=false;scoreEl.textContent='0';startBtn.textContent='Start';spawn();draw()}
 function spawn(){let p;do{p={x:Math.floor(Math.random()*cols),y:Math.floor(Math.random()*rows)}}while(snake.some(s=>s.x===p.x&&s.y===p.y));food=p}
-function draw(){ctx.clearRect(0,0,600,480);ctx.strokeStyle='#f0f0f0';ctx.lineWidth=1;for(let x=0;x<=cols;x++){ctx.beginPath();ctx.moveTo(x*cell,0);ctx.lineTo(x*cell,480);ctx.stroke()}for(let y=0;y<=rows;y++){ctx.beginPath();ctx.moveTo(0,y*cell);ctx.lineTo(600,y*cell);ctx.stroke()}ctx.fillStyle='#ef3340';ctx.beginPath();ctx.arc(food.x*cell+20,food.y*cell+20,11,0,Math.PI*2);ctx.fill();snake.forEach((s,i)=>{ctx.fillStyle=i===0?'#111':'#292929';ctx.beginPath();ctx.roundRect(s.x*cell+3,s.y*cell+3,34,34,i===0?10:8);ctx.fill()});if(!running&&over){ctx.fillStyle='#ffffffdd';ctx.fillRect(0,0,600,480);ctx.fillStyle='#111';ctx.textAlign='center';ctx.font='bold 38px system-ui';ctx.fillText('GAME OVER',300,220);ctx.font='18px system-ui';ctx.fillText('Punkte: '+score,300,258)}}
-function tick(){dir=next;const head={x:snake[0].x+dir.x,y:snake[0].y+dir.y};if(head.x<0||head.x>=cols||head.y<0||head.y>=rows||snake.some((s,i)=>i<snake.length-1&&s.x===head.x&&s.y===head.y)){end();return}snake.unshift(head);if(head.x===food.x&&head.y===food.y){score++;scoreEl.textContent=score;if(score>best){best=score;bestEl.textContent=best;localStorage.snakeBest=best}spawn();clearInterval(timer);timer=setInterval(tick,Math.max(65,145-score*3))}else snake.pop();draw()}
-function end(){clearInterval(timer);timer=null;running=false;over=true;startBtn.textContent='Nochmal';statusEl.textContent='Game Over – '+score+' Punkte';draw()}
-function start(){if(running)return;if(over)reset();running=true;statusEl.textContent='Viel Erfolg!';startBtn.textContent='Läuft…';timer=setInterval(tick,145)}
+function draw(){ctx.clearRect(0,0,600,480);ctx.strokeStyle='#f0f0f0';ctx.lineWidth=1;for(let x=0;x<=cols;x++){ctx.beginPath();ctx.moveTo(x*cell,0);ctx.lineTo(x*cell,480);ctx.stroke()}for(let y=0;y<=rows;y++){ctx.beginPath();ctx.moveTo(0,y*cell);ctx.lineTo(600,y*cell);ctx.stroke()}
+ctx.fillStyle='#ef3340';ctx.beginPath();ctx.arc(food.x*cell+20,food.y*cell+20,11,0,Math.PI*2);ctx.fill();
+const bodyColor=palettes[Math.floor(score/6)%palettes.length];
+snake.forEach((s,i)=>{ctx.fillStyle=i===0?'#888888':bodyColor;ctx.beginPath();ctx.roundRect(s.x*cell+3,s.y*cell+3,34,34,i===0?10:8);ctx.fill();if(i===0){ctx.fillStyle='#fff';let ex= s.x*cell+20+(dir.x*7)-(dir.y*5),ey=s.y*cell+20+(dir.y*7)+(dir.x*5);ctx.beginPath();ctx.arc(ex,ey,2.8,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(s.x*cell+20+(dir.x*7)+(dir.y*5),s.y*cell+20+(dir.y*7)-(dir.x*5),2.8,0,Math.PI*2);ctx.fill()}});
+if(paused||over){ctx.fillStyle='#ffffffdf';ctx.fillRect(0,0,600,480);ctx.fillStyle='#111';ctx.textAlign='center';ctx.font='bold 38px system-ui';ctx.fillText(over?'GAME OVER':'PAUSE',300,220);ctx.font='18px system-ui';ctx.fillText(over?'Punkte: '+score:'Tippe auf Weiter',300,258)}}
+function tick(){dir=next;const head={x:snake[0].x+dir.x,y:snake[0].y+dir.y};if(head.x<0||head.x>=cols||head.y<0||head.y>=rows||snake.some((s,i)=>i<snake.length-1&&s.x===head.x&&s.y===head.y)){end();return}snake.unshift(head);if(head.x===food.x&&head.y===food.y){score++;scoreEl.textContent=score;if(score>best){best=score;bestEl.textContent=best;try{localStorage.setItem(bestKey,String(best))}catch(e){}}spawn();clearInterval(timer);timer=setInterval(tick,Math.max(65,145-score*3))}else snake.pop();draw()}
+function end(){clearInterval(timer);timer=null;running=false;paused=false;over=true;startBtn.textContent='Start';draw()}
+function begin(){if(over)reset();if(running)return;paused=false;running=true;startBtn.textContent='Pause';draw();timer=setInterval(tick,Math.max(65,145-score*3))}
+function toggle(){if(running){clearInterval(timer);timer=null;running=false;paused=true;startBtn.textContent='Weiter';draw()}else begin()}
 function turn(d){if(d.x!==-dir.x||d.y!==-dir.y)next=d}
-const dirs={up:{x:0,y:-1},down:{x:0,y:1},left:{x:-1,y:0},right:{x:1,y:0}};document.querySelectorAll('[data-dir]').forEach(b=>b.addEventListener('click',()=>{turn(dirs[b.dataset.dir]);if(!running&&!over)start()}));document.addEventListener('keydown',e=>{const map={ArrowUp:'up',w:'up',ArrowDown:'down',s:'down',ArrowLeft:'left',a:'left',ArrowRight:'right',d:'right'},d=map[e.key];if(d){e.preventDefault();turn(dirs[d]);if(!running&&!over)start()}else if(e.key===' '&&!running)start()});let touch=null;c.addEventListener('touchstart',e=>{touch={x:e.changedTouches[0].clientX,y:e.changedTouches[0].clientY}},{passive:true});c.addEventListener('touchend',e=>{if(!touch)return;const dx=e.changedTouches[0].clientX-touch.x,dy=e.changedTouches[0].clientY-touch.y;if(Math.max(Math.abs(dx),Math.abs(dy))>18){turn(Math.abs(dx)>Math.abs(dy)?{x:Math.sign(dx),y:0}:{x:0,y:Math.sign(dy)});if(!running&&!over)start()}touch=null},{passive:true});startBtn.addEventListener('click',start);document.getElementById('reset').addEventListener('click',reset);reset()})();
-</script></body></html>
+const dirs={up:{x:0,y:-1},down:{x:0,y:1},left:{x:-1,y:0},right:{x:1,y:0}};
+document.querySelectorAll('[data-dir]').forEach(b=>b.addEventListener('click',()=>{turn(dirs[b.dataset.dir]);if(!running&&!over)begin()}));
+document.addEventListener('keydown',e=>{const map={ArrowUp:'up',w:'up',ArrowDown:'down',s:'down',ArrowLeft:'left',a:'left',ArrowRight:'right',d:'right'},d=map[e.key];if(d){e.preventDefault();turn(dirs[d]);if(!running&&!over)begin()}else if(e.key===' '){e.preventDefault();toggle()}});
+let touch=null;c.addEventListener('touchstart',e=>{touch={x:e.changedTouches[0].clientX,y:e.changedTouches[0].clientY}},{passive:true});c.addEventListener('touchend',e=>{if(!touch)return;const dx=e.changedTouches[0].clientX-touch.x,dy=e.changedTouches[0].clientY-touch.y;if(Math.max(Math.abs(dx),Math.abs(dy))>18){turn(Math.abs(dx)>Math.abs(dy)?{x:Math.sign(dx),y:0}:{x:0,y:Math.sign(dy)});if(!running&&!over)begin()}touch=null},{passive:true});
+startBtn.addEventListener('click',toggle);document.getElementById('reset').addEventListener('click',reset);
+document.addEventListener('gesturestart',e=>e.preventDefault(),{passive:false});document.addEventListener('gesturechange',e=>e.preventDefault(),{passive:false});document.addEventListener('gestureend',e=>e.preventDefault(),{passive:false});document.addEventListener('dblclick',e=>e.preventDefault(),{passive:false});
+reset();
+})();
+</script>
+</body></html>
