@@ -317,7 +317,7 @@ function endGame(){
   finished=true;waiting=true;restartArmed=false;els.start.classList.remove('confirm');els.start.textContent='Spiel starten';setButtons(false);
   if(twoPlayer){
     const a=playerScores[0],b=playerScores[1];
-    if(a===b){beginShootout();return}
+    if(a===b){beginShootout();saveGameState();return}
     els.dialogTitle.textContent=a>b?'Sieger: Spieler 1':'Sieger: Spieler 2';
     els.dialogText.textContent='Spieler 1: '+a+' Punkte · Spieler 2: '+b+' Punkte. Das Kartendeck ist vollständig durchgespielt.';
     els.message.textContent='Match beendet – das Deck ist leer.';
