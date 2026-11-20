@@ -120,6 +120,17 @@ footer,.byline{color:#aaa!important}
 @media(hover:none){button:hover:not(:disabled),.btn:hover:not(:disabled){filter:none}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation-duration:.01ms!important;animation-iteration-count:1!important}}
 
+
+/* Touch-Bedienung: Doppeltippen soll nicht den Seitenzoom auslösen. */
+html,body{touch-action:pan-y}
+button{touch-action:manipulation;-webkit-user-select:none;user-select:none}
+/* Die gerade bearbeitete Tipp-Reihe zeigt jede gesetzte Farbe deutlich. */
+.guessRow.current .peg.filled{
+ opacity:1!important;border:2px solid #f1eadb!important;
+ box-shadow:inset 0 2px 5px #0006,0 0 0 2px #d8b66a88,0 3px 5px #000b!important;
+}
+.guessRow.current .peg:not(.filled){background:radial-gradient(circle at 34% 28%,#555,#181818 68%)!important}
+
 /* Mastermind: Farbstecker behalten ihre Spiel-Farben und runden Highlights. */
 button.peg,button.swatch{transition:transform .12s ease,outline-color .12s ease!important}
 button.peg:hover,button.swatch:hover{filter:brightness(1.08)!important}
@@ -230,6 +241,7 @@ $('clearBtn').onclick=()=>{if(gameOver)return;rows[activeRow].fill(null);selecte
 $('newBtn').onclick=()=>{$('game').classList.add('hidden');$('setup').classList.remove('hidden')};
 $('againBtn').onclick=start;$('menuBtn').onclick=()=>{$('result').classList.add('hidden');$('setup').classList.remove('hidden')};
 $('difficulty').addEventListener('change',()=>{length=+$('difficulty').value});
+document.addEventListener('dblclick',e=>e.preventDefault(),{passive:false});
 })();
 </script>
 </body></html>
