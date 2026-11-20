@@ -333,7 +333,7 @@ function choose(direction){
 }
 function resolveWithReplacement(direction){
   if(!deck.length){deck=makeDeck();updateDeck()}
-  const c=deck.pop();updateDeck();
+  const c=drawDistinctCard();if(!c){endGame();return}updateDeck();
   if(c.joker){chargeJoker();els.message.textContent='Joker gezogen! Joker aufgeladen.';resolveWithReplacement(direction);return}
   const ok=mode==='color'?(c.suitClass===direction):(c.value===current.value?null:(direction==='higher'?c.value>current.value:c.value<current.value));
   renderCard(els.current,c);current=c;els.label.textContent='AKTUELLE KARTE · '+cardName(current);
