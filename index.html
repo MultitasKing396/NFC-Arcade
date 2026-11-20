@@ -7,14 +7,14 @@
 </style></head><body><main class="app">
 <div class="top"><div class="brand">NFC ARCADE</div><div class="scores"><div>PUNKTE<b id="score">0</b></div><div>HIGHSCORE<b id="best">0</b></div></div></div>
 <h1>Snake.</h1>
-<div class="settings"><label for="difficulty">Schwierigkeit</label><select id="difficulty"><option value="easy">Einfach</option><option value="normal" selected>Normal</option><option value="hard">Schwer</option></select><span id="modeHint">● Normal</span></div>
+<div class="settings"><label for="difficulty">Schwierigkeit</label><select id="difficulty"><option value="easy">Einfach</option><option value="normal" selected>Normal</option><option value="hard">Schwer</option></select></div>
 <canvas id="game" width="600" height="480" aria-label="Snake Spielfeld"></canvas>
 <div class="actions"><button class="btn" id="start">Start</button><button class="btn secondary" id="reset">Neustart</button></div>
 <div class="pad"><span class="empty"></span><button data-dir="up" aria-label="Hoch">↑</button><span class="empty"></span><button data-dir="left" aria-label="Links">←</button><button data-dir="down" aria-label="Runter">↓</button><button data-dir="right" aria-label="Rechts">→</button></div>
 <p class="sub">By Alp</p>
 </main><script>
 (()=> {
-const c=document.getElementById('game'),ctx=c.getContext('2d'),scoreEl=document.getElementById('score'),bestEl=document.getElementById('best'),startBtn=document.getElementById('start'),difficultyEl=document.getElementById('difficulty'),modeHint=document.getElementById('modeHint'),cols=15,rows=12,cell=40;
+const c=document.getElementById('game'),ctx=c.getContext('2d'),scoreEl=document.getElementById('score'),bestEl=document.getElementById('best'),startBtn=document.getElementById('start'),difficultyEl=document.getElementById('difficulty'),cols=15,rows=12,cell=40;
 const modes={easy:{label:'Einfach',speed:174,step:2.5},normal:{label:'Normal',speed:152.25,step:3.15},hard:{label:'Schwer',speed:126,step:2.6}};
 let snake,food,dir,next,score,best,timer=null,countdownTimer=null,foodTimer=null,slowTimer=null,running=false,paused=false,over=false,countdown=0,specialUntil=0,slowUntil=0,particles=[],mode=difficultyEl.value;
 const palettes=['#242424','#2563a6','#168477','#8055a5','#c46b25','#54833c'];
@@ -43,9 +43,9 @@ document.querySelectorAll('[data-dir]').forEach(b=>b.addEventListener('click',()
 document.addEventListener('keydown',e=>{const map={ArrowUp:'up',w:'up',ArrowDown:'down',s:'down',ArrowLeft:'left',a:'left',ArrowRight:'right',d:'right'},d=map[e.key];if(d){e.preventDefault();turn(dirs[d]);if(!running&&!countdownTimer&&!over)startCountdown()}else if(e.key===' '){e.preventDefault();toggle()}});
 let touch=null;c.addEventListener('touchstart',e=>{touch={x:e.changedTouches[0].clientX,y:e.changedTouches[0].clientY}},{passive:true});c.addEventListener('touchend',e=>{if(!touch)return;const dx=e.changedTouches[0].clientX-touch.x,dy=e.changedTouches[0].clientY-touch.y;if(Math.max(Math.abs(dx),Math.abs(dy))>18){turn(Math.abs(dx)>Math.abs(dy)?{x:Math.sign(dx),y:0}:{x:0,y:Math.sign(dy)});if(!running&&!countdownTimer&&!over)startCountdown()}touch=null},{passive:true});
 startBtn.addEventListener('click',toggle);document.getElementById('reset').addEventListener('click',reset);
-difficultyEl.addEventListener('change',()=>{mode=difficultyEl.value;modeHint.textContent='● '+modes[mode].label;reset()});
+difficultyEl.addEventListener('change',()=>{mode=difficultyEl.value;reset()});
 document.addEventListener('gesturestart',e=>e.preventDefault(),{passive:false});document.addEventListener('gesturechange',e=>e.preventDefault(),{passive:false});document.addEventListener('gestureend',e=>e.preventDefault(),{passive:false});document.addEventListener('dblclick',e=>e.preventDefault(),{passive:false});
-reset();modeHint.textContent='● '+modes[mode].label;
+reset();
 function animate(){if(particles.length||food)draw();requestAnimationFrame(animate)}requestAnimationFrame(animate);
 })();
 </script></body></html>
