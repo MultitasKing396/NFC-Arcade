@@ -195,6 +195,11 @@ function dealNext(){if(!deck.length)return;const c=deck.pop();updateDeck();if(c.
 function drawNextAfterJoker(){setTimeout(()=>{if(deck.length===0){endGame();return}dealNext()},450)}
 function start(){closeDialog();restartArmed=false;activePlayer=1;playerScores=[0,0];$('scoreOne').textContent='0';$('scoreTwo').textContent='0';els.start.classList.remove('confirm');els.start.textContent='Neustarten';deck=makeDeck();current=null;score=0;jokerCharges=[0,0];started=true;finished=false;guess=null;waiting=false;freeRetry=false;els.score.textContent='0';updateJoker();updatePlayerTurn();updateDeck();setButtons(false);els.start.textContent='Neustarten';els.message.textContent='Die erste Karte wird aufgedeckt …';renderCard(els.current,null,true);els.label.textContent='DEINE STARTKARTE';drawNext()}
 function applyDuelOutcome(ok){
+  if(!twoPlayer&&ok===false){
+    if(spendJoker()){els.message.textContent='Leider falsch – deine Joker-Rettung greift! Du darfst erneut raten, ohne Punkt.';guess=null;waiting=false;setButtons(true)}
+    else endGame();
+    return;
+  }
   if(ok===true){
     if(twoPlayer){playerScores[activePlayer-1]++;$('score'+(activePlayer===1?'One':'Two')).textContent=playerScores[activePlayer-1];els.message.textContent='Richtig! +1 Punkt.'}
     else{score++;els.score.textContent=score;if(score>best){best=score;els.best.textContent=best;try{localStorage.setItem(BEST_KEYS[mode],String(best))}catch(e){}}els.message.textContent='Richtig! +1 Punkt.'}
