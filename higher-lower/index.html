@@ -293,7 +293,7 @@ function finishShootoutAttempt(ok){
   updatePlayerTurn();setButtons(true);
 }
 function finishMatch(message){
-  finished=true;waiting=true;restartArmed=false;els.start.classList.remove('confirm');els.start.textContent='Spiel starten';setButtons(false);els.message.textContent=message;els.overlay.classList.add('show');
+  finished=true;waiting=true;restartArmed=false;els.start.classList.remove('confirm');els.start.textContent='Spiel starten';setButtons(false);els.message.textContent=message;els.overlay.classList.add('show');saveGameState();
 }
 function choose(direction){
   if(!started||finished||waiting||!current)return;
@@ -326,7 +326,7 @@ function endGame(){
     els.dialogText.textContent='Du hast '+score+' Punkt'+(score===1?'':'e')+' erzielt. Dein Highscore liegt bei '+best+'.';
     els.message.textContent='Das Kartendeck ist vollständig durchgespielt.';
   }
-  els.overlay.classList.add('show');
+  els.overlay.classList.add('show');saveGameState();
 }
 function closeDialog(){els.overlay.classList.remove('show')}
 function requestStartOrRestart(){
