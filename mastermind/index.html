@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#171717">
+<title>Mastermind · NFC Arcade</title>
+<style>
+:root{color-scheme:dark;--bg:#171717;--board:#242424;--well:#111;--edge:#555;--cream:#f1eadb;--muted:#aaa;--gold:#d8b66a;--green:#52c878;--yellow:#e6c75a}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:radial-gradient(ellipse at 50% 0,#333 0,#171717 65%);color:var(--cream);font-family:system-ui,-apple-system,Segoe UI,sans-serif}
+body{padding:12px 10px 24px;display:flex;justify-content:center}
+button,select{font:inherit}
+.app{width:min(100%,470px);display:flex;flex-direction:column;gap:10px}
+header{text-align:center}
+.brand{font-size:10px;letter-spacing:.24em;color:#aaa;text-transform:uppercase}
+h1{font-family:Georgia,serif;font-size:clamp(32px,8vw,43px);letter-spacing:.12em;margin:0;color:#e7d7b3;text-shadow:0 2px 0 #6b5836}
+.tagline{font-size:11px;color:#aaa;margin-top:1px}
+.panel{background:linear-gradient(145deg,#2b2b2b,#202020);border:1px solid #555;border-radius:15px;padding:12px;box-shadow:0 5px 0 #090909}
+h2{font:700 17px Georgia,serif;margin:0 0 10px;color:#e8d8b5}
+.settingsGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.field{display:flex;flex-direction:column;gap:5px;font-size:11px;color:#c4bba9}
+select{width:100%;border:1px solid #666;border-radius:9px;background:#171717;color:#f4ead6;padding:9px}
+.toggle{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;font-size:12px;color:#ddd}
+.switch{appearance:none;width:42px;height:24px;border-radius:99px;background:#555;position:relative;cursor:pointer;margin:0}
+.switch:before{content:"";position:absolute;width:18px;height:18px;left:3px;top:3px;border-radius:50%;background:#eee;transition:.18s}
+.switch:checked{background:#9b8150}.switch:checked:before{transform:translateX(18px)}
+button{border:1px solid #8d7955;border-radius:10px;background:linear-gradient(#d7bd83,#a88a53);color:#211b12;font-weight:800;padding:11px 16px;cursor:pointer;box-shadow:0 3px 0 #100e0b}
+button:active{transform:translateY(2px);box-shadow:0 1px 0 #100e0b}
+button:disabled{opacity:.4;cursor:default}
+.primary{width:100%;margin-top:12px}
+.topbar{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#c7bdac;gap:8px}
+.topbar button{padding:7px 11px;font-size:11px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.stat{border:1px solid #4d4d4d;background:#222;border-radius:10px;padding:6px;text-align:center;color:#aaa;font-size:9px;letter-spacing:.1em}
+.stat b{display:block;color:#f3e8d2;font-size:17px;letter-spacing:0;font-variant-numeric:tabular-nums}
+.board{background:linear-gradient(145deg,#292929,#1c1c1c);border:2px solid #626262;border-radius:16px;padding:10px;box-shadow:inset 0 2px 8px #0008,0 5px 0 #090909}
+.secretRow,.guessRow{display:grid;grid-template-columns:minmax(0,1fr) 78px;align-items:center;gap:8px}
+.secretRow{padding:0 4px 10px;border-bottom:1px solid #4a4a4a;margin-bottom:7px}
+.secretLabel{font:12px Georgia,serif;color:#cfc3ad}
+.pegs{display:grid;grid-template-columns:repeat(var(--slots,4),1fr);gap:7px;align-items:center}
+.peg{aspect-ratio:1;border-radius:50%;max-width:43px;width:100%;justify-self:center;background:radial-gradient(circle at 34% 28%,#555,#181818 68%);border:2px solid #666;box-shadow:inset 0 2px 5px #000b,0 2px 2px #ffffff12;cursor:pointer;padding:0;min-width:0}
+.peg.filled{border-color:#aaa;box-shadow:inset 0 2px 5px #0006,0 0 0 2px #ffffff12,0 2px 2px #000}
+.peg.selected{outline:2px solid #f1d99b;outline-offset:3px}
+.secretRow .peg{cursor:default}
+.feedback{display:grid;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(2,1fr);gap:4px;justify-items:center;align-items:center;justify-self:center;width:42px}
+.hint{width:13px;height:13px;border-radius:50%;background:#101010;border:1px solid #666;box-shadow:inset 0 1px 3px #000}
+.hint.good{background:var(--green);border-color:#8be5a7;box-shadow:0 0 7px #52c87855}
+.hint.color{background:var(--yellow);border-color:#f7e59b;box-shadow:0 0 7px #e6c75a55}
+.guesses{display:flex;flex-direction:column;gap:6px}
+.guessRow{min-height:37px;padding:2px 3px;border-radius:8px}
+.guessRow.current{background:#ffffff0b;outline:1px solid #8d795544}
+.guessRow.past{opacity:.8}
+.guessRow .peg{width:min(100%,34px);border-width:1px;cursor:default}
+.guessRow .feedback{grid-template-columns:repeat(4,1fr);grid-template-rows:1fr;gap:3px;width:100%;max-width:74px}
+.guessRow .hint{width:11px;height:11px}
+.rowNum{font-size:9px;color:#888;width:16px}
+.guessMain{display:flex;align-items:center;gap:5px;min-width:0}
+.paletteWrap{padding:10px 4px 2px}
+.paletteTitle{font-size:10px;color:#bdb3a2;text-align:center;margin-bottom:8px;letter-spacing:.08em}
+.palette{display:flex;justify-content:center;gap:clamp(8px,3vw,14px);flex-wrap:wrap}
+.swatch{width:39px;height:39px;border-radius:50%;border:2px solid #aaa;box-shadow:inset 0 2px 5px #fff5,inset 0 -4px 7px #0006,0 3px 3px #0009;padding:0}
+.swatch.active{outline:3px solid #f3e4bf;outline-offset:3px;transform:translateY(-2px)}
+.actions{display:flex;gap:8px;margin-top:10px}
+.actions button{flex:1}
+.secondary{background:linear-gradient(#555,#333);border-color:#777;color:#eee}
+.note{text-align:center;min-height:16px;font-size:11px;color:#d7c49b}
+.hidden{display:none!important}
+.result{text-align:center;padding:14px}
+.result h2{font-size:25px;color:#e8d7ac}
+.result p{font-size:12px;color:#c9c0b0;line-height:1.6}
+.result .secretReveal{display:flex;justify-content:center;gap:10px;margin:14px 0}
+.secretReveal span{width:35px;height:35px;border-radius:50%;border:2px solid #aaa;box-shadow:inset 0 2px 5px #fff5,inset 0 -4px 7px #0006}
+.statsPanel{font-size:11px;color:#bdb3a2;line-height:1.8}
+@media(max-width:370px){body{padding:8px 6px}.app{gap:7px}.board{padding:8px}.peg{max-width:36px}.guessRow{min-height:33px}.swatch{width:35px;height:35px}.secretRow,.guessRow{grid-template-columns:minmax(0,1fr) 70px}}
+</style>
+</head>
+<body>
+<main class="app">
+<header><div class="brand">NFC Arcade · Alp präsentiert</div><h1>MASTERMIND</h1><div class="tagline">Knacke den geheimen Farbcode</div></header>
+<section id="setup" class="panel">
+<h2>Neue Runde</h2>
+<div class="settingsGrid">
+<label class="field">Schwierigkeit<select id="difficulty"><option value="3">Leicht · 3 Positionen</option><option value="4" selected>Mittel · 4 Positionen</option><option value="5">Schwer · 5 Positionen</option></select></label>
+<label class="field">Versuche<select id="attempts"><option value="10" selected>10 Versuche</option></select></label>
+</div>
+<label class="toggle"><span>Gleiche Farben im Code erlauben</span><input id="repeats" class="switch" type="checkbox" checked></label>
+<button id="startBtn" class="primary">SPIEL STARTEN</button>
+</section>
+<section id="game" class="hidden">
+<div class="topbar"><span id="roundInfo">MITTEL · 4 POSITIONEN</span><button id="newBtn" class="secondary">NEUE RUNDE</button></div>
+<div class="stats"><div class="stat">PUNKTE<b id="score">0</b></div><div class="stat">VERSUCHE<b id="tries">0 / 10</b></div><div class="stat">BEST<b id="best">0</b></div></div>
+<div class="board">
+<div class="secretRow"><div><div class="secretLabel">GEHEIMCODE</div><div class="pegs" id="secretPegs"></div></div><div class="feedback" aria-label="Geheimer Code"></div></div>
+<div class="guesses" id="guesses"></div>
+<div class="paletteWrap"><div class="paletteTitle">POSITION ANTIPPEN, DANN FARBE WÄHLEN</div><div class="palette" id="palette"></div></div>
+<div class="actions"><button id="checkBtn" disabled>CODE PRÜFEN</button><button id="clearBtn" class="secondary">LÖSCHEN</button></div>
+</div>
+<div id="note" class="note" aria-live="polite">Wähle eine Position und anschließend eine Farbe.</div>
+<div class="panel statsPanel" id="statsPanel"></div>
+</section>
+<section id="result" class="panel result hidden">
+<h2 id="resultTitle">Code geknackt!</h2><p id="resultText"></p><div class="secretReveal" id="reveal"></div>
+<button id="againBtn" class="primary">NOCH EINE RUNDE</button><button id="menuBtn" class="secondary" style="width:100%;margin-top:9px">ZUM MENÜ</button>
+</section>
+</main>
+<script>
+(()=>{
+const COLORS=[
+{name:'Rot',hex:'#d94b43'},{name:'Blau',hex:'#397bc5'},{name:'Grün',hex:'#4d9b60'},
+{name:'Gelb',hex:'#e7c64f'},{name:'Orange',hex:'#df873b'},{name:'Violett',hex:'#9162b5'}
+];
+const $=id=>document.getElementById(id);
+const saved=JSON.parse(localStorage.getItem('mastermindStats')||'{}');
+let stats={best:saved.best||0,wins:saved.wins||0,losses:saved.losses||0,totalGuesses:saved.totalGuesses||0,rounds:saved.rounds||0};
+let length=4,maxAttempts=10,allowRepeats=true,secret=[],rows=[],activeRow=0,selected=0,gameOver=false,won=false,score=0;
+const save=()=>localStorage.setItem('mastermindStats',JSON.stringify(stats));
+const shuffle=a=>a.sort(()=>Math.random()-.5);
+function makeSecret(){let pool=COLORS.map((_,i)=>i);if(allowRepeats)return Array.from({length},()=>Math.floor(Math.random()*6));return shuffle(pool).slice(0,length)}
+function start(){
+ length=+$('difficulty').value;maxAttempts=+$('attempts').value;allowRepeats=$('repeats').checked;
+ secret=makeSecret();rows=Array.from({length:maxAttempts},()=>Array(length).fill(null));activeRow=0;selected=0;gameOver=false;won=false;score=0;
+ $('setup').classList.add('hidden');$('result').classList.add('hidden');$('game').classList.remove('hidden');
+ $('roundInfo').textContent=(length===3?'LEICHT':length===4?'MITTEL':'SCHWER')+' · '+length+' POSITIONEN';
+ $('best').textContent=stats.best.toLocaleString('de-DE');$('score').textContent='0';$('tries').textContent='0 / '+maxAttempts;
+ $('secretPegs').style.setProperty('--slots',length);$('secretPegs').innerHTML=Array.from({length},()=>'<span class="peg"></span>').join('');
+ renderRows();renderPalette();renderStats();message('Wähle eine Position und anschließend eine Farbe.');
+}
+function message(s){$('note').textContent=s}
+function renderRows(){
+ $('guesses').innerHTML='';
+ for(let r=0;r<maxAttempts;r++){
+  const row=document.createElement('div');row.className='guessRow'+(r===activeRow&&!gameOver?' current':'')+(r<activeRow?' past':'');
+  const main=document.createElement('div');main.className='guessMain';const num=document.createElement('span');num.className='rowNum';num.textContent=(r+1)+'.';main.append(num);
+  const pegs=document.createElement('div');pegs.className='pegs';pegs.style.setProperty('--slots',length);
+  for(let c=0;c<length;c++){const b=document.createElement('button');b.className='peg'+(rows[r][c]!==null?' filled':'')+(r===activeRow&&selected===c&&!gameOver?' selected':'');b.style.background=rows[r][c]===null?'radial-gradient(circle at 34% 28%,#555,#181818 68%)':COLORS[rows[r][c]].hex;b.setAttribute('aria-label','Position '+(c+1));b.disabled=r!==activeRow||gameOver;b.onclick=()=>{selected=c;renderRows()};pegs.append(b)}
+  main.append(pegs);
+  const feedback=document.createElement('div');feedback.className='feedback';feedback.setAttribute('aria-label','Hinweise');
+  const marks=r<activeRow?rows[r].feedback||[]:[];
+  for(let i=0;i<length;i++){const dot=document.createElement('span');dot.className='hint'+(marks[i]==='good'?' good':marks[i]==='color'?' color':'');feedback.append(dot)}
+  row.append(main,feedback);$('guesses').append(row);
+ }
+ $('tries').textContent=activeRow+' / '+maxAttempts;
+ $('checkBtn').disabled=gameOver||rows[activeRow].some(v=>v===null);
+ $('clearBtn').disabled=gameOver||rows[activeRow].every(v=>v===null);
+}
+function renderPalette(){
+ $('palette').innerHTML='';
+ COLORS.forEach((color,i)=>{const b=document.createElement('button');b.className='swatch';b.style.background='radial-gradient(circle at 32% 25%,#ffffff88,'+color.hex+' 48%,#1118 130%)';b.title=color.name;b.setAttribute('aria-label',color.name);b.onclick=()=>choose(i);$('palette').append(b)});
+}
+function choose(i){if(gameOver)return;if(rows[activeRow][selected]===i){rows[activeRow][selected]=null}else rows[activeRow][selected]=i;renderRows();const next=rows[activeRow].findIndex(v=>v===null);if(next>=0)selected=next;renderRows()}
+function evaluate(guess){
+ let good=0,secretRest=[],guessRest=[];
+ guess.forEach((v,i)=>{if(v===secret[i])good++;else{secretRest.push(secret[i]);guessRest.push(v)}});
+ let color=0;guessRest.forEach(v=>{const i=secretRest.indexOf(v);if(i>=0){color++;secretRest.splice(i,1)}});
+ return [...Array(good).fill('good'),...Array(color).fill('color'),...Array(length-good-color).fill('')];
+}
+function submit(){
+ if(gameOver||rows[activeRow].some(v=>v===null))return;
+ const guess=rows[activeRow].slice(),marks=evaluate(guess);rows[activeRow].feedback=marks;
+ const exact=marks.filter(x=>x==='good').length;
+ if(exact===length){won=true;gameOver=true;score=Math.max(100,(maxAttempts-activeRow)*100)*(length===3?1:length===4?2:3);stats.wins++;stats.totalGuesses+=activeRow+1;stats.rounds++;stats.best=Math.max(stats.best,score);save();$('score').textContent=score.toLocaleString('de-DE');}
+ else if(activeRow===maxAttempts-1){gameOver=true;won=false;stats.losses++;stats.rounds++;stats.totalGuesses+=maxAttempts;save()}
+ else activeRow++;
+ renderRows();renderStats();
+ if(gameOver)showResult();
+ else{selected=0;renderRows();message('Hinweise: '+marks.filter(x=>x==='good').length+' richtige Position(en), '+marks.filter(x=>x==='color').length+' richtige Farbe(n).')}
+}
+function renderStats(){$('statsPanel').innerHTML='RUNDEN: '+stats.rounds+' · GEWONNEN: '+stats.wins+' · VERLOREN: '+stats.losses+' · Ø VERSUCHE: '+(stats.rounds?(stats.totalGuesses/stats.rounds).toFixed(1).replace('.',','):'–')}
+function showResult(){
+ $('game').classList.add('hidden');$('result').classList.remove('hidden');
+ $('resultTitle').textContent=won?'CODE GEKNACKT!':'LEIDER VERLOREN';
+ $('resultText').textContent=won?'Du hast den Code in '+(activeRow+1)+' von '+maxAttempts+' Versuchen geknackt und '+score+' Punkte erreicht.':'Du hast alle '+maxAttempts+' Versuche gebraucht. Beim nächsten Mal klappt es!';
+ $('reveal').innerHTML='';secret.forEach(i=>{const p=document.createElement('span');p.style.background='radial-gradient(circle at 32% 25%,#ffffff88,'+COLORS[i].hex+' 48%,#1118 130%)';$('reveal').append(p)});
+}
+$('startBtn').onclick=start;$('checkBtn').onclick=submit;
+$('clearBtn').onclick=()=>{if(gameOver)return;rows[activeRow].fill(null);selected=0;renderRows();message('Versuch zurückgesetzt.')};
+$('newBtn').onclick=()=>{$('game').classList.add('hidden');$('setup').classList.remove('hidden')};
+$('againBtn').onclick=start;$('menuBtn').onclick=()=>{$('result').classList.add('hidden');$('setup').classList.remove('hidden')};
+$('difficulty').addEventListener('change',()=>{length=+$('difficulty').value});
+})();
+</script>
+</body></html>
