@@ -75,7 +75,7 @@ footer,.byline{color:#aaa!important}
 <h1>Snake.</h1>
 <div class="settings"><label for="difficulty">Schwierigkeit</label><select id="difficulty"><option value="easy">Einfach</option><option value="normal" selected>Normal</option><option value="hard">Schwer</option></select></div>
 <canvas id="game" width="600" height="480" aria-label="Snake Spielfeld"></canvas>
-<div class="actions"><button class="btn" id="start">Start</button><button class="btn secondary" id="reset">Neustart</button></div>
+<div class="actions"><button class="btn" id="start">Start</button></div>
 <div class="pad"><span class="empty"></span><button data-dir="up" aria-label="Hoch">↑</button><span class="empty"></span><button data-dir="left" aria-label="Links">←</button><span class="empty"></span><button data-dir="right" aria-label="Rechts">→</button><span class="empty"></span><button data-dir="down" aria-label="Runter">↓</button><span class="empty"></span></div>
 <footer>by Alp</footer>
 </main><script>
@@ -108,7 +108,7 @@ const dirs={up:{x:0,y:-1},down:{x:0,y:1},left:{x:-1,y:0},right:{x:1,y:0}};
 document.querySelectorAll('[data-dir]').forEach(b=>b.addEventListener('click',()=>{turn(dirs[b.dataset.dir]);if(!running&&!countdownTimer&&!over)startCountdown()}));
 document.addEventListener('keydown',e=>{const map={ArrowUp:'up',w:'up',ArrowDown:'down',s:'down',ArrowLeft:'left',a:'left',ArrowRight:'right',d:'right'},d=map[e.key];if(d){e.preventDefault();turn(dirs[d]);if(!running&&!countdownTimer&&!over)startCountdown()}else if(e.key===' '){e.preventDefault();toggle()}});
 let touch=null;c.addEventListener('touchstart',e=>{touch={x:e.changedTouches[0].clientX,y:e.changedTouches[0].clientY}},{passive:true});c.addEventListener('touchend',e=>{if(!touch)return;const dx=e.changedTouches[0].clientX-touch.x,dy=e.changedTouches[0].clientY-touch.y;if(Math.max(Math.abs(dx),Math.abs(dy))>18){turn(Math.abs(dx)>Math.abs(dy)?{x:Math.sign(dx),y:0}:{x:0,y:Math.sign(dy)});if(!running&&!countdownTimer&&!over)startCountdown()}touch=null},{passive:true});
-startBtn.addEventListener('click',toggle);document.getElementById('reset').addEventListener('click',reset);
+startBtn.addEventListener('click',toggle);
 difficultyEl.addEventListener('change',()=>{mode=difficultyEl.value;reset()});
 document.addEventListener('gesturestart',e=>e.preventDefault(),{passive:false});document.addEventListener('gesturechange',e=>e.preventDefault(),{passive:false});document.addEventListener('gestureend',e=>e.preventDefault(),{passive:false});document.addEventListener('dblclick',e=>e.preventDefault(),{passive:false});
 reset();
