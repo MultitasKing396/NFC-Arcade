@@ -17,12 +17,12 @@ button{touch-action:manipulation;cursor:pointer}
 h1{font:700 clamp(30px,8vw,39px)/1.05 Georgia,serif;letter-spacing:.02em;text-align:center;color:var(--gold);margin:0}
 .home-screen{display:flex;flex-direction:column;gap:20px;justify-content:center;flex:1;padding:8px 0 18px}.home-screen h1{font-size:clamp(34px,9vw,44px);margin:8px 0 4px}.home-theme{display:flex;align-items:center;justify-content:center;gap:10px;color:var(--muted);font-size:11px;font-weight:850;letter-spacing:.14em}.home-theme select{font-size:12px}.mode-grid,.two-player-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.mode-tile{min-height:112px;border:1px solid #a88b55;border-radius:16px;background:linear-gradient(145deg,#3a3428,#24221d 70%);color:var(--text);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:12px 8px;box-shadow:0 5px 0 #090909,0 10px 20px #0005;transition:transform .12s,border-color .2s,filter .2s}.mode-tile:active{transform:translateY(3px);filter:brightness(1.15)}.mode-tile strong{font-size:14px;letter-spacing:.06em}.mode-tile small{font-size:10px;color:var(--muted)}.tile-symbol{font:700 27px Georgia,serif;color:var(--gold)}.mode-tile.red-tile{border-color:#a84a50;background:linear-gradient(145deg,#48272b,#251c20 75%)}.red-tile .tile-symbol{color:#f06b72}.mode-tile.endless-tile{background:linear-gradient(145deg,#273b39,#1b2527 75%);border-color:#5c9a89}.endless-tile .tile-symbol{color:#8bd4bb}.red-tile.endless-tile{background:linear-gradient(145deg,#492b38,#251d2b 75%);border-color:#b16d91}.red-tile.endless-tile .tile-symbol{color:#ff8ab5}.section-caption{text-align:center;color:var(--gold);font-size:11px;font-weight:900;letter-spacing:.2em;margin-bottom:10px}.two-player-home{margin-top:2px}.two-player-grid .mode-tile{min-height:84px}.app:not(.playing)>.game-topline,.app:not(.playing)>#gameTitle,.app:not(.playing)>.settings,.app:not(.playing)>.table,.app:not(.playing)>.duel-controls,.app:not(.playing)>.message,.app:not(.playing)>.controls,.app:not(.playing)>.topline:has(#start){display:none!important}.app.playing>#home{display:none}.home-button{padding:8px 10px;font-size:11px;white-space:nowrap}.game-topline .stats{min-width:0}
 .topline{display:flex;justify-content:space-between;align-items:center;gap:10px}
-.modebar{display:flex;align-items:center;justify-content:space-between;gap:8px}.modebar h1{text-align:left;min-width:0;font-size:clamp(25px,6.5vw,34px)}#mode{max-width:145px;flex-shrink:0;font-size:12px;font-weight:800;padding:9px 8px;border-color:var(--gold)}
+
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;flex:1}
 .stat{background:linear-gradient(145deg,var(--panel2),var(--panel));border:1px solid var(--edge);border-radius:12px;padding:8px 12px;text-align:center}
 .stat small{display:block;color:var(--muted);font-size:10px;letter-spacing:.12em;font-weight:800}
 .stat strong{display:block;font-size:23px;line-height:1.2}
-.settings{display:flex;align-items:center;justify-content:center;gap:8px;color:var(--muted);font-size:12px}.setting-pair{justify-content:space-between;gap:12px}.setting{display:flex;align-items:center;gap:7px;min-width:0}.setting select{min-width:0;max-width:170px}.setting label{white-space:nowrap;font-weight:750}
+.settings{display:flex;align-items:center;justify-content:center;gap:8px;color:var(--muted);font-size:12px}
 select{background:var(--panel);color:var(--text);border:1px solid var(--edge);border-radius:9px;padding:7px 10px}
 .table{background:radial-gradient(ellipse at center,#23634f,var(--felt) 65%,#10382e);border:5px solid #674d2c;border-radius:24px;padding:16px 12px 18px;box-shadow:0 8px 0 #0a0a0a,0 15px 28px #0005;position:relative;overflow:hidden}
 .table:before{content:"";position:absolute;inset:5px;border:1px solid #ffffff20;border-radius:17px;pointer-events:none}
@@ -156,7 +156,7 @@ body[data-theme="cosmic"] .joker-card{background:radial-gradient(circle at cente
 </section>
 <h1 id="gameTitle">What's the Card?</h1>
 <div class="topline game-topline"><button class="secondary home-button" id="backHome">← MENÜ</button><div class="stats"><div class="stat"><small>PUNKTE</small><strong id="score">0</strong></div><div class="stat"><small>HIGHSCORE</small><strong id="best">0</strong></div></div></div>
-<div class="settings setting-pair"><div class="setting"><label for="mode">Modus</label><select id="mode" aria-label="Spielmodus"><option value="higher">Higher or Lower</option><option value="color">Red or Black</option><option value="higher2">Higher or Lower · 2 Spieler</option><option value="color2">Red or Black · 2 Spieler</option><option value="higherE">Higher or Lower · Endlos</option><option value="colorE">Red or Black · Endlos</option></select></div></div>
+
 <section class="table" aria-label="Kartentisch">
 <div class="current-label" id="cardLabel">AKTUELLE KARTE</div>
 <div class="card-area"><div class="deck-stack" aria-label="Kartendeck"><div class="deck-top card-back"></div><div class="deck-caption">KARTENDECK</div></div><div id="currentCard" class="playing-card card-back" aria-label="Aktuelle Karte"></div><div id="nextCard" class="playing-card card-back hidden" aria-label="Gezogene Karte"></div></div>
@@ -171,13 +171,35 @@ body[data-theme="cosmic"] .joker-card{background:radial-gradient(circle at cente
 <script>
 (()=>{
 const $=id=>document.getElementById(id);
-const els={score:$('score'),best:$('best'),theme:$('theme'),mode:$('mode'),gameTitle:$('gameTitle'),controls:$('controls'),duelControls:$('duelControls'),current:$('currentCard'),next:$('nextCard'),area:document.querySelector('.card-area'),label:$('cardLabel'),message:$('message'),higher:$('higher'),lower:$('lower'),joker:$('jokerStatus'),deck:$('deckCount'),start:$('start'),overlay:$('overlay'),dialogTitle:$('dialogTitle'),dialogText:$('dialogText')};
+const els={score:$('score'),best:$('best'),theme:$('theme'),gameTitle:$('gameTitle'),controls:$('controls'),duelControls:$('duelControls'),current:$('currentCard'),next:$('nextCard'),area:document.querySelector('.card-area'),label:$('cardLabel'),message:$('message'),higher:$('higher'),lower:$('lower'),joker:$('jokerStatus'),deck:$('deckCount'),start:$('start'),overlay:$('overlay'),dialogTitle:$('dialogTitle'),dialogText:$('dialogText')};
 const suits=[{s:'♠',c:'black'},{s:'♥',c:'red'},{s:'♦',c:'red'},{s:'♣',c:'black'}];
 const symbols={1:'A',11:'J',12:'Q',13:'K'};
 function setMode(next){twoPlayer=next.endsWith('2');endless=next.endsWith('E');mode=twoPlayer?next.slice(0,-1):(endless?next.slice(0,-1):next);document.querySelector('.app').classList.toggle('duel-mode',twoPlayer);els.duelControls.classList.toggle('hidden',!twoPlayer);els.gameTitle.textContent='Guess the Card.';els.higher.textContent=mode==='higher'?'↑ HÖHER':'ROT';els.lower.textContent=mode==='higher'?'↓ NIEDRIGER':'SCHWARZ';els.higher.classList.toggle('red-choice',mode==='color');els.lower.classList.toggle('black-choice',mode==='color');els.controls.classList.toggle('color-mode',mode==='color');configureDuelButtons();try{best=Number(localStorage.getItem(bestKey())||0)}catch(e){best=0}els.best.textContent=best;els.message.textContent=endless?(mode==='higher'?'Endlos-Modus: Sammle Punkte bis alle 54 Karten durchgespielt sind.':'Endlos-Modus: Tippe Rot oder Schwarz und sammle Punkte bis zum Deckende.'):(mode==='higher'?'Tippe auf Start und rate die nächste Karte.':'Tippe auf Start und rate, ob die nächste Karte rot oder schwarz ist.');els.joker.closest('.joker-row').classList.toggle('hidden',endless);}
 let deck=[],current=null,score=0,best=0,jokerCharges=[0,0],started=false,finished=false,guess=null,waiting=false,freeRetry=false,restartArmed=false,mode='higher',twoPlayer=false,endless=false,activePlayer=1,playerScores=[0,0],shootout=false,shootoutFirst=null,shootoutOpener=1,shootoutFirstPlayer=1;
 const BEST_KEYS={higher:'higherLowerBest',color:'redBlackBest',higherE:'higherLowerEndlessBest',colorE:'redBlackEndlessBest'};
 function bestKey(){return twoPlayer?null:(mode+(endless?'E':'') in BEST_KEYS?BEST_KEYS[mode+(endless?'E':'')]:BEST_KEYS[mode])}
+function modeId(){return mode+(twoPlayer?'2':(endless?'E':''))}
+function saveGameState(){
+  if(!started)return;
+  const state={deck,current,score,best,jokerCharges,started,finished,guess,waiting,freeRetry,restartArmed,mode,twoPlayer,endless,activePlayer,playerScores,shootout,shootoutFirst,shootoutOpener,shootoutFirstPlayer};
+  try{localStorage.setItem('guessCardState_'+modeId(),JSON.stringify(state))}catch(e){}
+}
+function restoreGameState(id){
+  let state;try{state=JSON.parse(localStorage.getItem('guessCardState_'+id)||'null')}catch(e){state=null}
+  if(!state||!Array.isArray(state.deck))return false;
+  mode=state.mode;twoPlayer=!!state.twoPlayer;endless=!!state.endless;
+  deck=state.deck;current=state.current;score=state.score||0;best=state.best||0;jokerCharges=state.jokerCharges||[0,0];started=!!state.started;finished=!!state.finished;guess=state.guess;waiting=false;freeRetry=!!state.freeRetry;restartArmed=false;activePlayer=state.activePlayer||1;playerScores=state.playerScores||[0,0];shootout=!!state.shootout;shootoutFirst=state.shootoutFirst??null;shootoutOpener=state.shootoutOpener||1;shootoutFirstPlayer=state.shootoutFirstPlayer||1;
+  setMode(id);document.querySelector('.app').classList.add('playing');
+  els.score.textContent=score;els.best.textContent=best;$('scoreOne').textContent=playerScores[0];$('scoreTwo').textContent=playerScores[1];
+  updateJoker();updateDeck();renderCard(els.current,current,current==null);els.next.classList.add('hidden');
+  els.label.textContent=current?'AKTUELLE KARTE · '+cardName(current):'DEINE STARTKARTE';
+  els.start.textContent=finished?'Spiel starten':'Neustarten';els.start.classList.remove('confirm');
+  els.message.textContent=finished?'Diese Runde ist beendet. Du kannst sie erneut starten.':'Runde fortgesetzt – viel Glück!';
+  setButtons(started&&!finished);updatePlayerTurn();
+  if(finished){els.dialogTitle.textContent='Spiel beendet';els.dialogText.textContent=twoPlayer?'Spieler 1: '+playerScores[0]+' Punkte · Spieler 2: '+playerScores[1]+' Punkte.':'Du hast '+score+' Punkte erzielt. Dein Highscore liegt bei '+best+'.';}
+  return true;
+}
+
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 function makeDeck(){const d=[];for(const suit of suits)for(let v=1;v<=13;v++)d.push({value:v,suit:suit.s,suitClass:suit.c,label:symbols[v]||String(v),joker:false});d.push({joker:true,label:'JOKER'},{joker:true,label:'JOKER'});return shuffle(d)}
 function cardName(c){return c.joker?'Joker':c.label+c.suit}
@@ -211,7 +233,7 @@ function animateDeal(c,onDone){
     els.next.classList.add('hidden');
     renderCard(els.current,c);
     current=c;
-    if(onDone)onDone();
+    if(onDone)onDone();saveGameState();
   });
 }
 function dealNext(){if(!deck.length)return;const c=deck.pop();updateDeck();if(c.joker){chargeJoker();els.message.textContent='Joker gezogen! Deine Joker-Rettung wurde aufgeladen.';drawNextAfterJoker();return}animateDeal(c,()=>{waiting=false;setButtons(true);els.label.textContent='AKTUELLE KARTE · '+cardName(current);if(guess){els.message.textContent='Gleicher Wert! Deine Auswahl bleibt bestehen – rate erneut.';setButtons(true)}})}
@@ -320,13 +342,13 @@ function requestStartOrRestart(){
   }
   start();
 }
-els.higher.addEventListener('click',()=>choose(mode==='color'?'red':'higher'));els.lower.addEventListener('click',()=>choose(mode==='color'?'black':'lower'));$('p1a').addEventListener('click',()=>{if(twoPlayer&&activePlayer===1)choose(mode==='color'?'red':'higher')});$('p1b').addEventListener('click',()=>{if(twoPlayer&&activePlayer===1)choose(mode==='color'?'black':'lower')});$('p2a').addEventListener('click',()=>{if(twoPlayer&&activePlayer===2)choose(mode==='color'?'red':'higher')});$('p2b').addEventListener('click',()=>{if(twoPlayer&&activePlayer===2)choose(mode==='color'?'black':'lower')});els.mode.addEventListener('change',()=>{setMode(els.mode.value);start()});els.start.addEventListener('click',requestStartOrRestart);
-document.querySelectorAll('[data-mode]').forEach(btn=>btn.addEventListener('click',()=>{els.mode.value=btn.dataset.mode;setMode(btn.dataset.mode);$('home').classList.add('hidden');document.querySelector('.app').classList.add('playing');start()}));
-$('backHome').addEventListener('click',()=>{closeDialog();started=false;finished=false;document.querySelector('.app').classList.remove('playing','duel-mode');$('home').classList.remove('hidden');});
+els.higher.addEventListener('click',()=>choose(mode==='color'?'red':'higher'));els.lower.addEventListener('click',()=>choose(mode==='color'?'black':'lower'));$('p1a').addEventListener('click',()=>{if(twoPlayer&&activePlayer===1)choose(mode==='color'?'red':'higher')});$('p1b').addEventListener('click',()=>{if(twoPlayer&&activePlayer===1)choose(mode==='color'?'black':'lower')});$('p2a').addEventListener('click',()=>{if(twoPlayer&&activePlayer===2)choose(mode==='color'?'red':'higher')});$('p2b').addEventListener('click',()=>{if(twoPlayer&&activePlayer===2)choose(mode==='color'?'black':'lower')});els.start.addEventListener('click',requestStartOrRestart);
+document.querySelectorAll('[data-mode]').forEach(btn=>btn.addEventListener('click',()=>{setMode(btn.dataset.mode);$('home').classList.add('hidden');document.querySelector('.app').classList.add('playing');if(!restoreGameState(btn.dataset.mode))start()}));
+$('backHome').addEventListener('click',()=>{saveGameState();closeDialog();started=false;finished=false;document.querySelector('.app').classList.remove('playing','duel-mode');$('home').classList.remove('hidden');});
 $('again').addEventListener('click',()=>{start();$('again').textContent='Nochmal spielen';$('close').textContent='Schließen'});
 $('close').addEventListener('click',()=>{closeDialog();$('again').textContent='Nochmal spielen';$('close').textContent='Schließen'});
 els.theme.addEventListener('change',()=>{document.body.dataset.theme=els.theme.value;try{localStorage.setItem('higherLowerTheme',els.theme.value)}catch(e){}});
-try{best=Number(localStorage.getItem(bestKey())||0);const t=localStorage.getItem('higherLowerTheme');if(t&&['classic','cyber','cosmic'].includes(t)){els.theme.value=t;document.body.dataset.theme=t}}catch(e){}setMode(els.mode.value);els.best.textContent=best;updateDeck();updateJoker();
+try{best=Number(localStorage.getItem(bestKey())||0);const t=localStorage.getItem('higherLowerTheme');if(t&&['classic','cyber','cosmic'].includes(t)){els.theme.value=t;document.body.dataset.theme=t}}catch(e){}setMode('higher');els.best.textContent=best;updateDeck();updateJoker();
 document.addEventListener('gesturestart',e=>e.preventDefault(),{passive:false});document.addEventListener('gesturechange',e=>e.preventDefault(),{passive:false});document.addEventListener('gestureend',e=>e.preventDefault(),{passive:false});document.addEventListener('dblclick',e=>e.preventDefault(),{passive:false});let lastTouchEnd=0;document.addEventListener('touchend',e=>{const now=Date.now();if(now-lastTouchEnd<=300)e.preventDefault();lastTouchEnd=now},{passive:false});document.addEventListener('touchmove',e=>{if(e.touches.length>1)e.preventDefault()},{passive:false});
 })();
 </script>
