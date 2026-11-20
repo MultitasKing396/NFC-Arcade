@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#171717">
-<title>Mastermind · NFC Arcade</title>
+<title>Mastermind.</title>
 <style>
 :root{color-scheme:dark;--bg:#171717;--board:#242424;--well:#111;--edge:#555;--cream:#f1eadb;--muted:#aaa;--gold:#d8b66a;--green:#52c878;--yellow:#e6c75a}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;min-height:100%;background:radial-gradient(ellipse at 50% 0,#333 0,#171717 65%);color:var(--cream);font-family:system-ui,-apple-system,Segoe UI,sans-serif}
-body{padding:12px 10px 24px;display:flex;justify-content:center}
+body{padding:12px 10px max(12px,env(safe-area-inset-bottom));display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow-x:hidden;overflow-y:auto}
 button,select{font:inherit}
-.app{width:min(100%,470px);display:flex;flex-direction:column;gap:10px}
+.app{width:min(100%,470px);display:flex;flex-direction:column;gap:10px;flex:none}
 header{text-align:center}
 .brand{font-size:10px;letter-spacing:.24em;color:#aaa;text-transform:uppercase}
 h1{font-family:Georgia,serif;font-size:clamp(32px,8vw,43px);letter-spacing:.12em;margin:0;color:#e7d7b3;text-shadow:0 2px 0 #6b5836}
@@ -77,11 +77,12 @@ button:disabled{opacity:.4;cursor:default}
 /* Farbstecker behalten ihre jeweilige Spielfarbe trotz des gemeinsamen Button-Designs. */
 button.peg,button.swatch{background:radial-gradient(circle at 32% 25%,#ffffff88,var(--peg-color,#181818) 48%,#1118 130%)!important;border-color:#aaa!important;color:transparent!important;box-shadow:inset 0 2px 5px #0006,0 2px 3px #0009!important}
 button.peg.selected{outline:2px solid #f1d99b!important;outline-offset:3px}
+.byline{width:min(100%,470px);margin-top:12px;text-align:center;color:#aaa;font-size:10px;font-weight:700;letter-spacing:.16em;padding:8px 0}
 </style>
 </head>
 <body>
 <main class="app">
-<header><div class="brand">NFC Arcade · Alp präsentiert</div><h1>Mastermind.</h1><div class="tagline">Knacke den geheimen Farbcode</div></header>
+<header><h1>Mastermind.</h1></header>
 <section id="setup" class="panel">
 <h2>Neue Runde</h2>
 <div class="settingsGrid">
@@ -108,6 +109,7 @@ button.peg.selected{outline:2px solid #f1d99b!important;outline-offset:3px}
 <button id="againBtn" class="primary">NOCH EINE RUNDE</button><button id="menuBtn" class="secondary" style="width:100%;margin-top:9px">ZUM MENÜ</button>
 </section>
 </main>
+<footer class="byline">by Alp</footer>
 <script>
 (()=>{
 const COLORS=[
