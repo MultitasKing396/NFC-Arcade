@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#f5f6f8"><title>Tic-Tac-Toe – NFC Arcade</title>
+<style>
+:root{color-scheme:light;--bg:#f5f6f8;--panel:#fff;--panel2:#eef0f4;--text:#17191f;--muted:#737987;--line:#252a33;--accent:#5267d9;--x:#27364f;--o:#d65b63;--win:#25a36f;--shadow:0 12px 34px #17203312}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100vh;transition:background .2s,color .2s}
+body[data-theme=neon]{color-scheme:dark;--bg:#080d18;--panel:#111b2d;--panel2:#192840;--text:#eaf5ff;--muted:#9bb1c9;--line:#79dfff;--accent:#53dfff;--x:#6cecff;--o:#ff73b8;--win:#9bffca;--shadow:0 0 30px #26c9ff12}
+body[data-theme=soft]{--bg:#f3f0e9;--panel:#fffdf8;--panel2:#e9e5d9;--text:#343c36;--muted:#788078;--line:#647d69;--accent:#64866c;--x:#456b86;--o:#c47b73;--win:#4d946d;--shadow:0 12px 34px #514b3912}
+button,select{font:inherit}button{cursor:pointer;border:0}.app{width:min(760px,calc(100% - 28px));margin:auto;padding:18px 0 40px}.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}.brand{font-size:12px;letter-spacing:.18em;font-weight:900;color:var(--muted)}.brand b{color:var(--accent)}.theme{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--muted)}select{border:1px solid var(--line);border-radius:10px;padding:9px 28px 9px 10px;background:var(--panel);color:var(--text);max-width:175px}
+h1{font-size:clamp(29px,7vw,43px);letter-spacing:-.05em;margin:5px 0 6px}.sub{color:var(--muted);margin:0 0 22px;font-size:14px}.panel{background:var(--panel);border:1px solid color-mix(in srgb,var(--line) 18%,transparent);border-radius:20px;padding:18px;box-shadow:var(--shadow)}.menu-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:18px 0}.mode{background:var(--panel2);color:var(--text);border:1px solid transparent;border-radius:15px;padding:15px 10px;text-align:left;min-height:115px}.mode.active{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}.mode .symbol{font-size:24px;display:block;margin-bottom:8px}.mode strong{font-size:13px;display:block}.mode small{display:block;color:var(--muted);font-size:11px;line-height:1.4;margin-top:5px}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.row>*{flex:1}.field{display:flex;flex-direction:column;gap:6px;color:var(--muted);font-size:12px;margin:10px 0}.field select{width:100%;max-width:none}.primary,.secondary{border-radius:12px;padding:13px 16px;font-weight:800}.primary{background:var(--accent);color:white}.secondary{background:var(--panel2);color:var(--text);border:1px solid color-mix(in srgb,var(--line) 20%,transparent)}.primary:disabled{opacity:.4;cursor:not-allowed}.hidden{display:none!important}.game-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}.status{font-size:14px;font-weight:800}.hint{font-size:11px;color:var(--muted);margin-top:4px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}.stat{background:var(--panel2);border-radius:12px;padding:10px;text-align:center}.stat b{font-size:20px;display:block}.stat span{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.board{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;aspect-ratio:1;max-width:500px;margin:12px auto 16px;position:relative}.cell{background:transparent;color:var(--text);border:0;border-right:3px solid var(--line);border-bottom:3px solid var(--line);display:grid;place-items:center;min-width:0;min-height:0;font-size:clamp(42px,13vw,86px);font-weight:800;position:relative;padding:0;touch-action:manipulation}.cell:nth-child(3n){border-right:0}.cell:nth-child(n+7){border-bottom:0}.cell.x{color:var(--x)}.cell.o{color:var(--o)}.cell:disabled{cursor:default}.cell.win{background:color-mix(in srgb,var(--win) 14%,transparent);animation:winPulse .8s ease-in-out infinite alternate}.cell.pending:after{content:"";position:absolute;inset:12%;border:3px dashed var(--accent);border-radius:50%;animation:oldestPulse .85s ease-in-out infinite}.cell.pending{opacity:.78}.cell.pending:before{content:"";position:absolute;width:9px;height:9px;border-radius:50%;background:var(--accent);top:12%;right:12%;box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 20%,transparent);z-index:2}
+@keyframes oldestPulse{0%,100%{opacity:.35;transform:scale(.92)}50%{opacity:1;transform:scale(1.04)}}@keyframes winPulse{from{background:transparent}to{background:color-mix(in srgb,var(--win) 25%,transparent)}}
+.board.ultimate{max-width:540px;gap:5px;aspect-ratio:1}.mini{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);border:2px solid var(--line);border-radius:8px;overflow:hidden;position:relative;min-width:0;min-height:0;background:var(--panel)}.mini.active{outline:3px solid var(--accent);outline-offset:-3px}.mini.closed{background:var(--panel2)}.mini .cell{font-size:clamp(13px,4.2vw,26px);border-right:1px solid var(--line);border-bottom:1px solid var(--line)}.mini .cell:nth-child(3n){border-right:0}.mini .cell:nth-child(n+7){border-bottom:0}.mini .cell.pending:after{border-width:1px;inset:8%}.mini .cell.pending:before{width:4px;height:4px;top:7%;right:7%}.mini .winner{position:absolute;inset:0;display:grid;place-items:center;font-size:clamp(30px,9vw,62px);font-weight:900;pointer-events:none;background:color-mix(in srgb,var(--panel) 35%,transparent)}.mini .winner.x{color:var(--x)}.mini .winner.o{color:var(--o)}.mini .draw{position:absolute;inset:0;display:grid;place-items:center;font-size:28px;color:var(--muted);background:color-mix(in srgb,var(--panel) 45%,transparent)}
+.note{color:var(--muted);font-size:12px;text-align:center;min-height:18px}.game-actions{display:flex;gap:9px;margin-top:12px}.game-actions button{flex:1}.result{font-size:14px;font-weight:800;text-align:center;min-height:23px;color:var(--win)}.legend{display:flex;justify-content:center;gap:18px;font-size:11px;color:var(--muted);margin:8px 0}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;background:var(--accent)}.footer{text-align:center;color:var(--muted);font-size:10px;margin-top:20px}.back{background:none;color:var(--muted);font-weight:700;padding:8px 0}
+@media(max-width:560px){.menu-grid{grid-template-columns:1fr}.mode{min-height:0;display:flex;align-items:center;gap:12px}.mode .symbol{margin:0}.mode small{margin-top:3px}.panel{padding:14px}.top{margin-bottom:12px}}
+</style>
+</head>
+<body data-theme="minimal">
+<div class="app">
+ <div class="top"><div class="brand">NFC <b>ARCADE</b> · BY ALP</div><label class="theme">DESIGN <select id="theme"><option value="minimal">Minimal White</option><option value="neon">Neon Dark</option><option value="soft">Soft Modern</option></select></label></div>
+ <section id="home">
+  <h1>Tic-Tac-Toe</h1><p class="sub">Drei Spielvarianten. Deine Strategie entscheidet.</p>
+  <div class="panel">
+   <div class="brand">SPIELMODUS WÄHLEN</div>
+   <div class="menu-grid">
+    <button class="mode active" data-mode="classic"><span class="symbol">✕ ○</span><span><strong>Classic</strong><small>Das klassische 3×3-Duell</small></span></button>
+    <button class="mode" data-mode="ultimate"><span class="symbol">▦</span><span><strong>Ultimate</strong><small>Neun kleine Spielfelder</small></span></button>
+    <button class="mode" data-mode="vanish"><span class="symbol">◉</span><span><strong>Vanishing</strong><small>Vier Steine – der älteste verschwindet</small></span></button>
+   </div>
+   <div class="row">
+    <label class="field">GEGENSPIELER<select id="opponent"><option value="ai">Computer</option><option value="human">Zweiter Spieler</option></select></label>
+    <label class="field" id="difficultyWrap">COMPUTER-STÄRKE<select id="difficulty"><option value="easy">Leicht</option><option value="normal" selected>Normal</option><option value="hard">Schwer</option></select></label>
+   </div>
+   <div class="field" id="variantHint">Classic: drei gleiche Zeichen in einer Reihe gewinnen.</div>
+   <button class="primary" id="start" style="width:100%">Spiel starten</button>
+  </div>
+  <div class="panel" style="margin-top:14px"><div class="brand">DEINE STATISTIK</div><div class="stats"><div class="stat"><b id="wins">0</b><span>Siege</span></div><div class="stat"><b id="losses">0</b><span>Niederlagen</span></div><div class="stat"><b id="draws">0</b><span>Remis</span></div></div><button class="secondary" id="resetStats" style="width:100%">Statistik zurücksetzen</button></div>
+ </section>
+ <section id="play" class="hidden">
+  <button class="back" id="back">← Zurück zur Auswahl</button>
+  <div class="panel">
+   <div class="game-head"><div><div class="status" id="turn">X ist am Zug</div><div class="hint" id="gameHint">Tippe auf ein freies Feld.</div></div><button class="secondary" id="restart">Neu starten</button></div>
+   <div class="legend"><span><i class="dot" style="background:var(--x)"></i>X</span><span><i class="dot" style="background:var(--o)"></i>O</span></div>
+   <div id="board" class="board" aria-label="Spielfeld"></div>
+   <div class="result" id="result"></div><div class="note" id="note"></div>
+   <div class="game-actions"><button class="secondary" id="newGame">Neue Runde</button><button class="secondary" id="menuBtn">Modus wechseln</button></div>
+  </div>
+ </section>
+ <div class="footer">NFC ARCADE · BY ALP</div>
+</div>
+<script>
+(()=> {
+const $=id=>document.getElementById(id);
+const themes=['minimal','neon','soft'];let mode='classic',opponent='ai',difficulty='normal',board=[],turn='X',over=false,history=[],ultimate=[],nextBoard=-1,stats={wins:0,losses:0,draws:0},vanish={X:[],O:[]},winning=[];
+const wins=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+try{const t=localStorage.getItem('arcadeTttTheme');if(themes.includes(t))document.body.dataset.theme=$('theme').value=t;stats=JSON.parse(localStorage.getItem('arcadeTttStats')||'null')||stats}catch(e){}
+function saveStats(){try{localStorage.setItem('arcadeTttStats',JSON.stringify(stats))}catch(e){}renderStats()}
+function renderStats(){$('wins').textContent=stats.wins;$('losses').textContent=stats.losses;$('draws').textContent=stats.draws}
+function setMode(m){mode=m;document.querySelectorAll('.mode').forEach(b=>b.classList.toggle('active',b.dataset.mode===m));$('variantHint').textContent=m==='classic'?'Classic: drei gleiche Zeichen in einer Reihe gewinnen.':m==='ultimate'?'Ultimate: Dein Feld bestimmt, in welchem kleinen Feld dein Gegner spielen muss.':'Vanishing: Jeder Spieler hat maximal vier aktive Zeichen. Das älteste pulsiert vor dem Verschwinden.'}
+document.querySelectorAll('.mode').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode)));
+$('opponent').addEventListener('change',()=>{$('difficultyWrap').classList.toggle('hidden',$('opponent').value==='human')});
+$('theme').addEventListener('change',()=>{document.body.dataset.theme=$('theme').value;try{localStorage.setItem('arcadeTttTheme',$('theme').value)}catch(e){}});
+$('resetStats').addEventListener('click',()=>{if(confirm('Persönliche Statistik wirklich zurücksetzen?')){stats={wins:0,losses:0,draws:0};saveStats()}});
+function fresh(){turn='X';over=false;winning=[];history=[];vanish={X:[],O:[]};board=Array(9).fill('');ultimate=Array.from({length:9},()=>Array(9).fill(''));nextBoard=-1;$('result').textContent='';$('note').textContent='';render()}
+function start(){opponent=$('opponent').value;difficulty=$('difficulty').value;$('home').classList.add('hidden');$('play').classList.remove('hidden');fresh();if(opponent==='ai'&&turn==='O')aiMove()}
+function back(){ $('play').classList.add('hidden');$('home').classList.remove('hidden');renderStats()}
+$('start').addEventListener('click',start);$('back').addEventListener('click',back);$('menuBtn').addEventListener('click',back);$('restart').addEventListener('click',fresh);$('newGame').addEventListener('click',fresh);
+function winner(b){for(const line of wins)if(b[line[0]]&&b[line[0]]===b[line[1]]&&b[line[1]]===b[line[2]])return {p:b[line[0]],line};return null}
+function finish(w,p){over=true;if(w){winning=w.line;$('result').textContent=w.p+' gewinnt!';if(opponent==='human'){}else if(w.p==='X')stats.wins++;else stats.losses++;}else{$('result').textContent='Unentschieden';if(opponent==='ai')stats.draws++;}saveStats();render()}
+function switchTurn(){turn=turn==='X'?'O':'X'}
+function placeClassic(i){if(over||board[i]||isAiTurn())return;board[i]=turn;const w=winner(board);if(w){finish(w);return}if(board.every(Boolean)){finish(null);return}switchTurn();render();if(isAiTurn())setTimeout(aiMove,260)}
+function isAiTurn(){return opponent==='ai'&&turn==='O'}
+function placeVanish(i){if(over||board[i]||isAiTurn())return;const list=vanish[turn];if(list.length===4){const old=list.shift();board[old]=''}board[i]=turn;list.push(i);const w=winner(board);if(w){finish(w);return}if(board.every(Boolean)){finish(null);return}switchTurn();render();if(isAiTurn())setTimeout(aiMove,260)}
+function macroWinner(){const b=ultimate.map(a=>{const w=winner(a);return w?w.p:(a.every(Boolean)?'D':'')});for(const line of wins)if(b[line[0]]&&b[line[0]]!=='D'&&b[line[0]]===b[line[1]]&&b[line[1]]===b[line[2]])return {p:b[line[0]],line};if(b.every(Boolean))return {p:'',line:[]};return null}
+function openBoards(){return ultimate.map((b,i)=>({b,i})).filter(x=>!winner(x.b)&&!x.b.every(Boolean)).map(x=>x.i)}
+function placeUltimate(bi,ci){if(over||isAiTurn())return;const allowed=nextBoard===-1||(!winner(ultimate[nextBoard])&&!ultimate[nextBoard].every(Boolean))? (nextBoard===-1?openBoards():[nextBoard]):openBoards();if(!allowed.includes(bi)||ultimate[bi][ci])return;ultimate[bi][ci]=turn;const localWin=winner(ultimate[bi]);if(localWin){const macro=macroWinner();if(macro){finish(macro.p?{p:macro.p,line:macro.line}:null);return}}const mw=macroWinner();if(mw){finish(mw.p?{p:mw.p,line:mw.line}:null);return}nextBoard=ci;switchTurn();render();if(isAiTurn())setTimeout(aiMove,300)}
+function render(){ $('turn').textContent=over?'Partie beendet':turn+' ist am Zug';$('gameHint').textContent=mode==='vanish'?vanish[turn].length===4?'Dein ältester Stein pulsiert – er verschwindet beim nächsten Setzen.':'Maximal vier aktive Zeichen pro Spieler.':mode==='ultimate'?nextBoard===-1||winner(ultimate[nextBoard])||ultimate[nextBoard].every(Boolean)?'Freie Wahl: Wähle ein offenes kleines Spielfeld.':'Nächster Zug im hervorgehobenen kleinen Feld.':'Tippe auf ein freies Feld.';const root=$('board');root.innerHTML='';root.className='board'+(mode==='ultimate'?' ultimate':'');
+if(mode==='ultimate'){const open=nextBoard===-1||winner(ultimate[nextBoard])||ultimate[nextBoard].every(Boolean);ultimate.forEach((b,bi)=>{const mini=document.createElement('div');mini.className='mini'+((!over&&(open||nextBoard===bi))?' active':'')+(winner(b)||b.every(Boolean)?' closed':'');b.forEach((v,ci)=>{const cell=document.createElement('button');cell.className='cell'+(v?' '+v.toLowerCase():'');cell.textContent=v;cell.disabled=over||!!v||isAiTurn()||(!open&&bi!==nextBoard)||!!winner(b)||b.every(Boolean);cell.addEventListener('click',()=>placeUltimate(bi,ci));mini.append(cell)});const w=winner(b);if(w){const cover=document.createElement('div');cover.className='winner '+w.p.toLowerCase();cover.textContent=w.p;mini.append(cover)}else if(b.every(Boolean)){const cover=document.createElement('div');cover.className='draw';cover.textContent='=';mini.append(cover)}root.append(mini)})}
+else{board.forEach((v,i)=>{const cell=document.createElement('button');cell.className='cell'+(v?' '+v.toLowerCase():'');cell.textContent=v;cell.disabled=over||!!v||isAiTurn();if(mode==='vanish'&&vanish[turn].length===4&&vanish[turn][0]===i&&!over)cell.classList.add('pending');if(winning.includes(i))cell.classList.add('win');cell.addEventListener('click',()=>mode==='vanish'?placeVanish(i):placeClassic(i));root.append(cell)})}
+if(mode==='vanish'&&!over){$('note').textContent=vanish[turn].length===4?'Der älteste Stein pulsiert und wird mit deinem nächsten Zug entfernt.':''}else if(mode==='ultimate'&&!over){$('note').textContent=nextBoard!==-1&&!openBoards().includes(nextBoard)?'Das Zielfeld ist bereits abgeschlossen – du darfst frei wählen.':''}else $('note').textContent=''}
+function available(b){return b.map((v,i)=>v?null:i).filter(i=>i!==null)}
+function tacticalMove(b,p){for(const i of available(b)){const c=b.slice();c[i]=p;if(winner(c))return i}return -1}
+function minimax(b,player,depth){const w=winner(b);if(w)return w.p==='O'?10-depth:depth-10;if(b.every(Boolean))return 0;let best=player==='O'?-Infinity:Infinity;for(const i of available(b)){b[i]=player;const s=minimax(b,player==='O'?'X':'O',depth+1);b[i]='';best=player==='O'?Math.max(best,s):Math.min(best,s)}return best}
+function aiClassic(){const moves=available(board);if(difficulty==='easy')return moves[Math.floor(Math.random()*moves.length)];let m=tacticalMove(board,'O');if(m<0&&difficulty!=='easy')m=tacticalMove(board,'X');if(m>=0)return m;if(difficulty==='normal'){if(!board[4])return 4;const corners=[0,2,6,8].filter(i=>!board[i]);return corners.length?corners[Math.floor(Math.random()*corners.length)]:moves[0]}let best=-Infinity,choice=moves[0];for(const i of moves){board[i]='O';const s=minimax(board,'X',0);board[i]='';if(s>best){best=s;choice=i}}return choice}
+function aiMove(){if(over||!isAiTurn())return;if(mode==='classic'){const i=aiClassic();if(i!==undefined)placeClassicAI(i)}else if(mode==='vanish'){const i=aiVanishing();if(i!==undefined)placeVanishAI(i)}else{const m=aiUltimate();if(m)placeUltimateAI(m[0],m[1])}}
+function placeClassicAI(i){board[i]='O';const w=winner(board);if(w){finish(w);return}if(board.every(Boolean)){finish(null);return}switchTurn();render()}
+function aiVanishing(){const sim=board.slice(),list=vanish.O.slice();if(list.length===4)sim[list.shift()]='';let m=tacticalMove(sim,'O');if(m<0&&difficulty!=='easy')m=tacticalMove(sim,'X');if(m>=0)return m;const moves=available(sim);if(difficulty==='easy')return moves[Math.floor(Math.random()*moves.length)];if(!sim[4])return 4;return moves[Math.floor(Math.random()*moves.length)]}
+function placeVanishAI(i){const list=vanish.O;if(list.length===4)board[list.shift()]='';board[i]='O';list.push(i);const w=winner(board);if(w){finish(w);return}if(board.every(Boolean)){finish(null);return}switchTurn();render()}
+function aiUltimate(){const allowed=nextBoard===-1||winner(ultimate[nextBoard])||ultimate[nextBoard].every(Boolean)?openBoards():[nextBoard];for(const bi of allowed){let c=ultimate[bi];let ci=tacticalMove(c,'O');if(ci<0&&difficulty!=='easy')ci=tacticalMove(c,'X');if(ci>=0)return[bi,ci]}let opts=[];for(const bi of allowed)for(const ci of available(ultimate[bi]))opts.push([bi,ci]);if(!opts.length)return null;if(difficulty==='easy')return opts[Math.floor(Math.random()*opts.length)];return opts.find(x=>x[1]===4)||opts[Math.floor(Math.random()*opts.length)]}
+function placeUltimateAI(bi,ci){ultimate[bi][ci]='O';let mw=macroWinner();if(mw){finish(mw.p?{p:mw.p,line:mw.line}:null);return}nextBoard=ci;switchTurn();render()}
+renderStats();
+})();
+</script>
+</body></html>
