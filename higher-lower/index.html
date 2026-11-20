@@ -159,10 +159,11 @@ function rankText(c){return c.joker?'Joker':c.label}
 function renderCard(el,c,back=false){const wasDealing=el.classList.contains('dealing');el.className='playing-card';if(wasDealing)el.classList.add('dealing');if(back){el.classList.add('card-back');el.innerHTML='';return}if(c.joker){el.classList.add('joker-card');el.innerHTML='<span class="corner">★<span>J</span></span><span class="suit-big">🃏</span><span class="corner bottom">★<span>J</span></span>';return}el.classList.add(c.suitClass);el.innerHTML='<span class="corner">'+c.label+'<span>'+c.suit+'</span></span><span class="suit-big">'+c.suit+'</span><span class="corner bottom">'+c.label+'<span>'+c.suit+'</span></span>'}
 function drawNext(){if(deck.length===0){els.message.textContent='Deck wird neu gemischt …';els.current.classList.add('shuffle');setTimeout(()=>{deck=makeDeck();updateDeck();els.current.classList.remove('shuffle');dealNext()},720);return}dealNext()}
 function animateDeal(c,onDone){
-  const travel=Math.max(0,els.area.clientWidth-els.next.offsetWidth-30);
-  els.next.style.setProperty('--move-x',travel+'px');
   renderCard(els.next,null,true);
   els.next.classList.remove('hidden','flip','dealing');
+  void els.next.offsetWidth;
+  const travel=Math.max(0,els.area.clientWidth-els.next.offsetWidth-20);
+  els.next.style.setProperty('--move-x',travel+'px');
   void els.next.offsetWidth;
   els.next.classList.add('dealing');
   const flipTimer=setTimeout(()=>renderCard(els.next,c),350);
