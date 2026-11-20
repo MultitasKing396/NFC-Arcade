@@ -58,6 +58,52 @@ body{background:radial-gradient(ellipse at 50% 0,#333 0,#171717 65%)!important}
 .cell.selected,.cell.related{background:#55472d!important}
 footer{margin-top:auto!important}
 
+
+/* NFC ARCADE — gemeinsames Finish: Typografie, Oberflächen, Dialoge und Bedienzustände */
+:root{
+ --arc-bg:#171717;--arc-surface:#252525;--arc-surface-hi:#303030;--arc-border:#595959;
+ --arc-gold:#d8b66a;--arc-gold-hi:#ead39c;--arc-text:#f1eadb;--arc-muted:#aaa397;
+ --arc-shadow:0 4px 0 #0b0b0b,0 8px 18px #0003;
+ color-scheme:dark;
+}
+html{scrollbar-color:#766344 #171717;scrollbar-width:thin}
+body{color:var(--arc-text)!important;accent-color:var(--arc-gold)}
+::selection{background:#d8b66a55;color:#fff}
+:focus-visible{outline:2px solid var(--arc-gold-hi)!important;outline-offset:3px}
+button,.btn,select,input,textarea{font:inherit}
+button,.btn{
+ transition:transform .12s ease,filter .15s ease,box-shadow .15s ease;
+}
+button:hover:not(:disabled),.btn:hover:not(:disabled){filter:brightness(1.08)}
+button:active:not(:disabled),.btn:active:not(:disabled){filter:brightness(.96)}
+button:disabled,.btn:disabled{cursor:not-allowed;filter:saturate(.45);opacity:.48}
+input:not([type=checkbox]):not([type=radio]),select,textarea{
+ background:#191919!important;color:var(--arc-text)!important;border:1px solid #68604f!important;
+ border-radius:9px!important;box-shadow:inset 0 1px 3px #0008!important;
+}
+input::placeholder,textarea::placeholder{color:#827d73!important}
+.panel,.stat,.settings,.side .panel,.theme-preview-wrap,.result,.win-card,.dialog{
+ background:linear-gradient(145deg,#303030,#202020)!important;
+ border:1px solid var(--arc-border)!important;border-radius:13px!important;
+ box-shadow:var(--arc-shadow)!important;color:#d8d0c2!important;
+}
+h1,h2,h3{ text-wrap:balance }
+h2,h3{color:#e8d8b5}
+.stat,.statsPanel,.note,.message,.help,.hint,.gesture-hint{color:var(--arc-muted)}
+hr{border:0;border-top:1px solid #5b4b30}
+a{color:var(--arc-gold-hi)}
+.overlay,.modal,.win{
+ background:#101010df!important;backdrop-filter:blur(7px);
+}
+.overlay h2,.modal h2,.win h2,.result h2{color:#ead8ae!important;font-family:Georgia,serif!important}
+footer,.byline{color:#aaa!important}
+@media(hover:none){button:hover:not(:disabled),.btn:hover:not(:disabled){filter:none}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation-duration:.01ms!important;animation-iteration-count:1!important}}
+
+/* Sudoku: Zahlenfeld bekommt dieselbe Gold-Bedienoptik; Rasterfarben bleiben erhalten. */
+.numbers button,.num{border:1px solid #8d7955!important;border-radius:9px!important;background:linear-gradient(#d7bd83,#a88a53)!important;color:#211b12!important;box-shadow:0 2px 0 #100e0b!important}
+.cell{transition:background-color .12s ease}
+
 </style></head><body><main class="app">
 <header><h1>Sudoku.</h1></header>
 <section class="topstats"><div class="stat"><button class="time-toggle" id="timeToggle" type="button" aria-label="Timer pausieren">ZEIT<b id="timer">00:00</b><span class="pause-label" id="pauseLabel">TIPPE ZUM PAUSIEREN</span></button></div><div class="stat">FEHLER<b id="mistakes">0 / 3</b></div><div class="stat">BESTZEIT<b id="best">—</b></div></section>
