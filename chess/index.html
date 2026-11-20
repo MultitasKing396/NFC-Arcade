@@ -86,6 +86,17 @@ footer,.byline{color:#aaa!important}
 @media(hover:none){button:hover:not(:disabled),.btn:hover:not(:disabled){filter:none}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation-duration:.01ms!important;animation-iteration-count:1!important}}
 
+/* Schachbretter: je Design ein eigener Untergrund; Figuren bleiben unverändert. */
+.theme-minimal .board,.theme-minimal .preview-board{border:1px solid #9ca3af!important;border-radius:0!important;box-shadow:none!important;background:#555!important}
+.theme-minimal .board .sq.light,.theme-minimal .preview-board .sq.light{background:#e5e7eb!important}
+.theme-minimal .board .sq.dark,.theme-minimal .preview-board .sq.dark{background:#6b7280!important}
+.theme-classic .board,.theme-classic .preview-board{border:5px solid #684326!important;border-radius:8px!important;box-shadow:0 12px 28px #0005!important}
+.theme-classic .board .sq.light,.theme-classic .preview-board .sq.light{background:#f3ead8!important}
+.theme-classic .board .sq.dark,.theme-classic .preview-board .sq.dark{background:#956b46!important}
+.theme-future .board,.theme-future .preview-board{border:2px solid #35eaff!important;border-radius:2px!important;box-shadow:0 0 0 1px #ff3fcf66,0 0 18px #35eaff55,0 12px 28px #0007!important;background:#111b3d!important}
+.theme-future .board .sq.light,.theme-future .preview-board .sq.light{background:linear-gradient(135deg,#c5fff8,#83d9e8)!important}
+.theme-future .board .sq.dark,.theme-future .preview-board .sq.dark{background:linear-gradient(135deg,#354b91,#202b60)!important}
+
 /* Schach: Figuren und Brett-Themes bleiben unverändert; nur Menüs und Dialoge werden vereinheitlicht. */
 .menu button,.panel{border-radius:13px!important}
 .dialog{border-color:#8d7955!important}
