@@ -35,7 +35,7 @@ select{background:var(--panel);color:var(--text);border:1px solid var(--edge);bo
 .joker-card{background:linear-gradient(145deg,#fff,#f0e4c6);color:#542c8a}
 .joker-card .suit-big{font-size:52px}
 .current-label{text-align:center;color:#fff;font-size:12px;font-weight:800;letter-spacing:.13em;margin:0 0 10px;position:relative;z-index:1}
-.controls{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.controls{display:flex;flex-direction:column;gap:10px}.controls .choice{width:100%}.controls .joker-row{width:100%}
 .choice{border:1px solid #9e8655;border-radius:13px;background:linear-gradient(#dfc58b,#ae915a);color:#211a10;font-weight:900;font-size:18px;padding:15px 10px;box-shadow:0 4px 0 #17120c;transition:transform .12s,filter .12s}
 .choice:active,.primary:active{transform:translateY(2px);filter:brightness(.96);box-shadow:0 2px 0 #17120c}
 .choice:disabled{opacity:.4;cursor:not-allowed}
@@ -125,16 +125,15 @@ body[data-theme="cosmic"] .joker-card{background:radial-gradient(circle at cente
 <div class="card-area"><div id="currentCard" class="playing-card card-back" aria-label="Verdeckte Karte"></div><div id="nextCard" class="playing-card card-back hidden" aria-label="Nächste Karte"></div></div>
 </section>
 <div class="message" id="message" aria-live="polite">Tippe auf Start und rate die nächste Karte.</div>
-<div class="controls"><button class="choice" id="higher" disabled>↑ HÖHER</button><button class="choice" id="lower" disabled>↓ NIEDRIGER</button></div>
-<div class="joker-row"><div class="joker-chip"><div class="joker-mini">★</div><div><strong>Joker-Rettung</strong><small id="jokerStatus">Noch verfügbar</small></div></div><span id="deckCount">53 Karten im Deck</span></div>
-<div class="topline"><button class="primary" id="start">Spiel starten</button><button class="secondary" id="restart">Neue Runde</button></div>
+<div class="controls"><button class="choice" id="higher" disabled>↑ HÖHER</button><div class="joker-row"><div class="joker-chip"><div class="joker-mini">★</div><div><strong>Joker-Rettung</strong><small id="jokerStatus">Noch verfügbar</small></div></div><span id="deckCount">53 Karten im Deck</span></div><button class="choice" id="lower" disabled>↓ NIEDRIGER</button></div>
+<div class="topline"><button class="primary" id="start">Spiel starten</button></div>
 <footer class="footer">by Alp</footer>
 </main>
 <div class="overlay" id="overlay"><div class="dialog"><h2 id="dialogTitle">Spiel beendet</h2><p id="dialogText"></p><div class="dialog-actions"><button class="primary" id="again">Nochmal spielen</button><button class="secondary" id="close">Schließen</button></div></div></div>
 <script>
 (()=>{
 const $=id=>document.getElementById(id);
-const els={score:$('score'),best:$('best'),theme:$('theme'),current:$('currentCard'),next:$('nextCard'),label:$('cardLabel'),message:$('message'),higher:$('higher'),lower:$('lower'),joker:$('jokerStatus'),deck:$('deckCount'),start:$('start'),restart:$('restart'),overlay:$('overlay'),dialogTitle:$('dialogTitle'),dialogText:$('dialogText')};
+const els={score:$('score'),best:$('best'),theme:$('theme'),current:$('currentCard'),next:$('nextCard'),label:$('cardLabel'),message:$('message'),higher:$('higher'),lower:$('lower'),joker:$('jokerStatus'),deck:$('deckCount'),start:$('start'),overlay:$('overlay'),dialogTitle:$('dialogTitle'),dialogText:$('dialogText')};
 const suits=[{s:'♠',c:'black'},{s:'♥',c:'red'},{s:'♦',c:'red'},{s:'♣',c:'black'}];
 const symbols={1:'A',11:'J',12:'Q',13:'K'};
 let deck=[],current=null,score=0,best=0,jokerAvailable=true,started=false,finished=false,guess=null,waiting=false,freeRetry=false;
@@ -155,7 +154,7 @@ function choose(direction){if(!started||finished||waiting||!current)return;guess
 function resolveWithReplacement(direction){if(!deck.length){deck=makeDeck();updateDeck()}const c=deck.pop();updateDeck();if(c.joker){jokerAvailable=true;updateJoker();resolveWithReplacement(direction);return}const ok=c.value===current.value?null:(direction==='higher'?c.value>current.value:c.value<current.value);renderCard(els.current,c);current=c;els.label.textContent='AKTUELLE KARTE · '+cardName(current);if(ok===true){els.message.textContent='Joker beiseitegelegt. Du darfst erneut raten – ohne Punkt für diese Rettung.';guess=null;waiting=false;setButtons(true)}else if(ok===null){els.message.textContent='Gleicher Wert! Deine Auswahl bleibt bestehen.';waiting=false;setButtons(true)}else if(jokerAvailable){jokerAvailable=false;freeRetry=true;updateJoker();els.message.textContent='Dein Joker rettet dich. Erneut raten – der nächste richtige Versuch gibt keinen Punkt.';guess=null;waiting=false;setButtons(true)}else endGame()}
 function endGame(){finished=true;waiting=true;setButtons(false);els.message.textContent='Kein Joker mehr – deine Runde ist beendet.';els.dialogTitle.textContent='Runde beendet';els.dialogText.textContent='Du hast '+score+' Punkt'+(score===1?'':'e')+' erzielt. Dein Highscore liegt bei '+best+'.';els.overlay.classList.add('show');els.start.textContent='Spiel starten'}
 function closeDialog(){els.overlay.classList.remove('show')}
-els.higher.addEventListener('click',()=>choose('higher'));els.lower.addEventListener('click',()=>choose('lower'));els.start.addEventListener('click',start);els.restart.addEventListener('click',start);$('again').addEventListener('click',()=>{closeDialog();start()});$('close').addEventListener('click',closeDialog);
+els.higher.addEventListener('click',()=>choose('higher'));els.lower.addEventListener('click',()=>choose('lower'));els.start.addEventListener('click',start);$('again').addEventListener('click',()=>{closeDialog();start()});$('close').addEventListener('click',closeDialog);
 els.theme.addEventListener('change',()=>{document.body.dataset.theme=els.theme.value;try{localStorage.setItem('higherLowerTheme',els.theme.value)}catch(e){}});
 try{best=Number(localStorage.getItem(BEST_KEY)||0);const t=localStorage.getItem('higherLowerTheme');if(t&&['classic','cyber','cosmic'].includes(t)){els.theme.value=t;document.body.dataset.theme=t}}catch(e){}els.best.textContent=best;updateDeck();updateJoker();
 document.addEventListener('gesturestart',e=>e.preventDefault(),{passive:false});document.addEventListener('dblclick',e=>e.preventDefault(),{passive:false});
