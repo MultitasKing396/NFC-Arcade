@@ -57,9 +57,8 @@ footer{color:#999;font-size:11px;font-weight:650;letter-spacing:.04em;margin-top
 </div>
 <div class="actions"><button class="btn" id="start">Start</button><button class="btn secondary" id="reset">Neustart</button></div>
 <div class="pad" aria-label="Steuerkreuz">
- <button data-dir="up" aria-label="Drehen">↻</button><span class="empty"></span><span class="empty"></span>
- <button data-dir="left" aria-label="Links">←</button><span class="empty"></span><button data-dir="right" aria-label="Rechts">→</button>
- <span class="empty"></span><button data-dir="down" aria-label="Schneller fallen">↓</button><span class="empty"></span>
+ <button data-dir="left" aria-label="Stein nach links">←</button><button data-dir="up" aria-label="Stein drehen">⟳</button><button data-dir="right" aria-label="Stein nach rechts">→</button>
+ <span class="empty"></span><button data-dir="down" aria-label="Stein schneller nach unten">↓</button><span class="empty"></span>
 </div>
 <footer>Tetris · By Alp</footer>
 </main>
@@ -93,7 +92,7 @@ function draw(){ctx.clearRect(0,0,300,600);ctx.fillStyle='#090b14';ctx.fillRect(
 function block(c,x,y,color){c.save();c.shadowColor=color;c.shadowBlur=9;c.fillStyle=color;c.fillRect(x*S+2,y*S+2,S-4,S-4);c.shadowBlur=0;c.fillStyle='#ffffff55';c.fillRect(x*S+4,y*S+4,S-8,3);c.restore()}
 function drawNext(){nctx.clearRect(0,0,120,120);nctx.fillStyle='#090b14';nctx.fillRect(0,0,120,120);const m=next.m,sz=22,ox=(120-m[0].length*sz)/2,oy=(120-m.length*sz)/2;m.forEach((r,y)=>r.forEach((v,x)=>{if(v){nctx.save();nctx.shadowColor=colors[next.type];nctx.shadowBlur=9;nctx.fillStyle=colors[next.type];nctx.fillRect(ox+x*sz+2,oy+y*sz+2,sz-4,sz-4);nctx.restore()}}))}
 function action(d){if(d==='left')move(-1);if(d==='right')move(1);if(d==='up')rotate();if(d==='down')drop()}
-document.querySelectorAll('[data-dir]').forEach(b=>{b.addEventListener('pointerdown',e=>{e.preventDefault();action(b.dataset.dir);if(b.dataset.dir==='left'||b.dataset.dir==='right'||b.dataset.dir==='down'){b.repeatTimer=setInterval(()=>action(b.dataset.dir),125)}});const end=()=>{clearInterval(b.repeatTimer)};b.addEventListener('pointerup',end);b.addEventListener('pointerleave',end);b.addEventListener('pointercancel',end)});
+document.querySelectorAll('[data-dir]').forEach(b=>{b.addEventListener('pointerdown',e=>{e.preventDefault();try{b.setPointerCapture(e.pointerId)}catch(_){}action(b.dataset.dir);if(b.dataset.dir==='left'||b.dataset.dir==='right'||b.dataset.dir==='down'){const delay=b.dataset.dir==='down'?55:125;b.repeatTimer=setInterval(()=>action(b.dataset.dir),delay)}});const end=()=>{clearInterval(b.repeatTimer);b.repeatTimer=null};b.addEventListener('pointerup',end);b.addEventListener('pointerleave',end);b.addEventListener('pointercancel',end);b.addEventListener('lostpointercapture',end)});
 $('start').addEventListener('click',start);$('reset').addEventListener('click',reset);
 document.addEventListener('keydown',e=>{const map={ArrowLeft:'left',ArrowRight:'right',ArrowDown:'down',ArrowUp:'up',' ':'space'};const d=map[e.key];if(d){e.preventDefault();if(d==='space')hardDrop();else action(d)}if(e.key==='Enter'&&!active)start()});
 canvas.addEventListener('touchstart',e=>e.preventDefault(),{passive:false});
