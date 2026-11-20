@@ -33,7 +33,7 @@ select{background:var(--panel);color:var(--text);border:1px solid var(--edge);bo
 .deck-caption{position:absolute;top:calc(100% + 7px);left:0;right:0;text-align:center;color:#fff;font-size:10px;font-weight:850;letter-spacing:.12em}
 .card-area #currentCard{z-index:1}
 .card-area #nextCard{position:absolute;left:10px;top:50%;z-index:3;transform:translateY(-50%);display:flex}
-.card-area #nextCard.dealing{animation:dealCard .72s cubic-bezier(.2,.72,.25,1) forwards}
+.card-area #nextCard.dealing{animation:dealCard .684s cubic-bezier(.2,.72,.25,1) forwards}
 @keyframes dealCard{0%{transform:translate(0,-50%) rotateY(0deg);z-index:3}44%{transform:translate(calc(var(--move-x)*.44),-50%) rotateY(88deg)}56%{transform:translate(calc(var(--move-x)*.56),-50%) rotateY(88deg)}100%{transform:translate(var(--move-x),-50%) rotateY(0deg)}}
 .playing-card{width:min(39vw,142px);height:min(55vw,198px);max-height:198px;max-width:142px;min-height:165px;background:#fff;border-radius:13px;box-shadow:0 7px 14px #0006;color:#171717;position:relative;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid #ddd;transition:transform .25s ease}
 .playing-card.red{color:#c52632}.playing-card.black{color:#171717}
