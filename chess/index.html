@@ -17,6 +17,33 @@
 .preview-board .piece{width:88%;height:88%}
 .moving-piece{width:90%;height:90%}
 @media(prefers-reduced-motion:reduce){.moving-piece{transition:none!important}}
+
+/* Einheitliches NFC-Arcade / Mastermind-Design – reine Darstellung */
+:root{--brand-bg:#171717;--brand-panel:#242424;--brand-edge:#555;--brand-cream:#f1eadb;--brand-muted:#aaa;--brand-gold:#d8b66a}
+html,body{background:radial-gradient(ellipse at 50% 0,#333 0,#171717 65%)!important;color:var(--brand-cream)!important}
+body{font-family:system-ui,-apple-system,Segoe UI,sans-serif!important}
+.app{color:var(--brand-cream)}
+h1{font-family:Georgia,serif!important;color:#e7d7b3!important;text-shadow:0 2px 0 #6b5836!important;letter-spacing:.12em!important}
+h2{font-family:Georgia,serif;color:#e8d8b5}
+.panel,.stat,.stat,.settings,.side .panel,.theme-preview-wrap{background:linear-gradient(145deg,#2b2b2b,#202020)!important;border:1px solid #555!important;color:#c4bba9!important;box-shadow:0 4px 0 #090909}
+button,.btn,.miniAction,.sound,.sprint{border:1px solid #8d7955!important;border-radius:10px!important;background:linear-gradient(#d7bd83,#a88a53)!important;color:#211b12!important;font-weight:800!important;box-shadow:0 3px 0 #100e0b!important}
+button:active,.btn:active{transform:translateY(2px);box-shadow:0 1px 0 #100e0b!important}
+button:disabled{opacity:.4}
+select{border:1px solid #666!important;border-radius:9px!important;background:#171717!important;color:#f4ead6!important}
+footer,.byline,.sub.byline{display:block;text-align:center;color:#aaa!important;font-size:10px!important;font-weight:700!important;letter-spacing:.16em!important;text-transform:none!important;margin-top:auto!important;padding:8px 0 max(4px,env(safe-area-inset-bottom))!important}
+
+body{padding:env(safe-area-inset-top) 10px max(4px,env(safe-area-inset-bottom))!important}
+.app{display:flex;flex-direction:column;gap:9px;padding:8px 0 0!important}
+.top h1{font-size:clamp(30px,8vw,43px)!important}
+.intro strong{color:#e8d8b5}.sub{color:#aaa!important}
+.menu button,.panel{background:linear-gradient(145deg,#2b2b2b,#202020)!important;border:1px solid #555!important;box-shadow:0 4px 0 #090909}
+.ico{background:#d8b66a22!important;color:#d8b66a!important}
+.gamebar,.status,.note{color:#c4bba9!important}
+.board{border-color:#626262!important;box-shadow:0 5px 0 #090909!important}
+.theme-minimal{--bg:#171717;--panel:#242424;--panel2:#333;--text:#f1eadb;--muted:#aaa;--accent:#d8b66a}
+.theme-minimal .sq.light{background:#dedede}.theme-minimal .sq.dark{background:#555}
+.byline{margin-top:auto!important}
+
 </style>
 </head>
 <body>
@@ -50,8 +77,8 @@
 <div id="status" class="status" aria-live="polite">Wähle eine Figur.</div>
 <div id="board" class="board" aria-label="Schachbrett"></div>
 <div class="toolbar"><button id="undoBtn">↶ Zurück</button><span aria-hidden="true"></span><button id="newBtn">↻ Neu starten</button></div>
-<footer class="byline">by Alp</footer>
 </section>
+<footer class="byline">by Alp</footer>
 </main>
 <div id="modal" class="overlay hidden"><div id="dialog" class="dialog"></div></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
