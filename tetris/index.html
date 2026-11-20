@@ -12,11 +12,11 @@ body{background:#f4f4f4;color:#111;font-family:system-ui,-apple-system,sans-seri
 .app{width:min(100%,440px);max-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:5px}
 h1{font-size:33px;line-height:1.05;letter-spacing:-1.5px;margin:0;font-weight:850}
 .sub{color:#777;margin:0 0 3px;font-size:13px;font-weight:650;letter-spacing:.04em}
-.settings{display:flex;align-items:center;justify-content:center;gap:7px;margin:1px 0 3px;font-size:11px;color:#777}.settings select{border:1px solid #ddd;border-radius:9px;background:#fff;padding:5px 9px;font:600 12px system-ui;color:#222}.stats{width:min(100%,340px);display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin:2px 0 5px}
+.stats{width:min(100%,340px);display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin:2px 0 5px}
 .stat{background:#fff;border:1px solid #e7e7e7;border-radius:11px;padding:5px 3px;color:#888;font-size:10px}
 .stat b{display:block;color:#111;font-size:17px;font-variant-numeric:tabular-nums}
 .play-area{display:flex;align-items:flex-start;justify-content:center;gap:9px;width:100%}
-.board-wrap{position:relative;width:min( min(62vw,300px), calc((100dvh - 280px)*.5));max-width:300px;aspect-ratio:1/2;flex:0 1 300px}
+.board-wrap{position:relative;height:min(124vw,calc(100dvh - 350px),600px);width:auto;max-width:calc(100vw - 120px);aspect-ratio:1/2;flex:0 1 auto}
 canvas#board{width:100%;height:100%;display:block;background:#090b14;border:1px solid #25283a;border-radius:13px;box-shadow:0 8px 28px #00000018;touch-action:none}
 .side{width:82px;display:flex;flex-direction:column;gap:7px}
 .panel{background:#fff;border:1px solid #e7e7e7;border-radius:11px;padding:7px 4px;color:#888;font-size:10px}
@@ -30,14 +30,29 @@ footer{color:#999;font-size:11px;font-weight:650;letter-spacing:.04em;margin-top
 .overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;background:#090b14d9;border-radius:13px;color:white;font-weight:800;font-size:24px;gap:5px}
 .overlay small{font-size:12px;color:#c5c9df;font-weight:600}
 .hidden{display:none!important}
-@media(max-height:700px){.app{gap:2px}.stats{margin:0 0 2px}.actions{margin-top:2px}.sub{margin-bottom:0}}.stats{margin:0 0 2px}.actions{margin-top:2px}.pad{margin-top:4px;grid-template-rows:repeat(3,36px)}.pad button{font-size:18px}.sub{margin-bottom:0}}
+@media(max-height:740px){
+.app{gap:2px}
+h1{font-size:29px}
+.stats{margin:0 0 2px}
+.actions{margin-top:2px}
+.gesture-hint{margin-top:4px}
+.sub{margin-bottom:0}
+.board-wrap{height:min(124vw,calc(100dvh - 315px),600px)}
+.side{width:76px;gap:5px}
+.panel{padding:6px 3px;font-size:9px}
+#next{width:64px;height:64px}
+}
+@media(max-width:360px){
+.play-area{gap:6px}
+.side{width:70px}
+.board-wrap{height:min(calc(100vw - 100px),calc(100dvh - 315px),600px)}
+}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
 <main class="app">
 <h1>Tetris.</h1><p class="sub">By Alp</p>
-<div class="settings"><label for="difficulty">Schwierigkeit</label><select id="difficulty"><option value="easy">Einfach</option><option value="normal" selected>Normal</option><option value="hard">Schwer</option></select></div>
 <div class="stats">
  <div class="stat">PUNKTE<b id="score">0</b></div>
  <div class="stat">HIGHSCORE<b id="best">0</b></div>
@@ -48,6 +63,7 @@ footer{color:#999;font-size:11px;font-weight:650;letter-spacing:.04em;margin-top
  <aside class="side">
   <div class="panel">NÄCHSTER STEIN<canvas id="next" width="120" height="120"></canvas></div>
   <div class="panel">LEVEL<span class="level-val" id="level">1</span></div>
+  <div class="panel">SCHWIERIGKEIT<select id="difficulty" aria-label="Schwierigkeit" style="display:block;width:100%;margin:6px auto 0;border:1px solid #ddd;border-radius:8px;background:#fff;padding:5px 3px;font:600 11px system-ui;color:#222"><option value="easy">Einfach</option><option value="normal" selected>Normal</option><option value="hard">Schwer</option></select></div>
  </aside>
 </div>
 <div class="actions"><button class="btn" id="start">Start</button><button class="btn secondary" id="reset">Neustart</button></div>
