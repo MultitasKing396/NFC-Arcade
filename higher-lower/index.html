@@ -170,7 +170,7 @@ function spendJoker(){const i=jokerOwner();if(jokerCharges[i]<=0)return false;jo
 function setButtons(on){els.higher.disabled=!on;els.lower.disabled=!on;if(twoPlayer)setPlayerButtons(on)}
 function rankText(c){return c.joker?'Joker':c.label}
 function renderCard(el,c,back=false){const wasDealing=el.classList.contains('dealing');el.className='playing-card';if(wasDealing)el.classList.add('dealing');if(back){el.classList.add('card-back');el.innerHTML='';return}if(c.joker){el.classList.add('joker-card');el.innerHTML='<span class="corner">★<span>J</span></span><span class="suit-big">🃏</span><span class="corner bottom">★<span>J</span></span>';return}el.classList.add(c.suitClass);el.innerHTML='<span class="corner">'+c.label+'<span>'+c.suit+'</span></span><span class="suit-big">'+c.suit+'</span><span class="corner bottom">'+c.label+'<span>'+c.suit+'</span></span>'}
-function drawNext(){if(deck.length===0){els.message.textContent='Deck wird neu gemischt …';els.current.classList.add('shuffle');setTimeout(()=>{deck=makeDeck();updateDeck();els.current.classList.remove('shuffle');dealNext()},720);return}dealNext()}
+function drawNext(){if(deck.length===0){endGame();return}dealNext()}
 function animateDeal(c,onDone){
   renderCard(els.next,null,true);
   els.next.classList.remove('hidden','flip','dealing');
@@ -192,11 +192,54 @@ function animateDeal(c,onDone){
   });
 }
 function dealNext(){if(!deck.length)return;const c=deck.pop();updateDeck();if(c.joker){chargeJoker();els.message.textContent='Joker gezogen! Deine Joker-Rettung wurde aufgeladen.';drawNextAfterJoker();return}animateDeal(c,()=>{waiting=false;setButtons(true);els.label.textContent='AKTUELLE KARTE · '+cardName(current);if(guess){els.message.textContent='Gleicher Wert! Deine Auswahl bleibt bestehen – rate erneut.';setButtons(true)}})}
-function drawNextAfterJoker(){setTimeout(()=>{if(deck.length===0){deck=makeDeck();updateDeck()}dealNext()},450)}
+function drawNextAfterJoker(){setTimeout(()=>{if(deck.length===0){endGame();return}dealNext()},450)}
 function start(){closeDialog();restartArmed=false;activePlayer=1;playerScores=[0,0];$('scoreOne').textContent='0';$('scoreTwo').textContent='0';els.start.classList.remove('confirm');els.start.textContent='Neustarten';deck=makeDeck();current=null;score=0;jokerCharges=[0,0];started=true;finished=false;guess=null;waiting=false;freeRetry=false;els.score.textContent='0';updateJoker();updatePlayerTurn();updateDeck();setButtons(false);els.start.textContent='Neustarten';els.message.textContent='Die erste Karte wird aufgedeckt …';renderCard(els.current,null,true);els.label.textContent='DEINE STARTKARTE';drawNext()}
-function choose(direction){if(!started||finished||waiting||!current)return;guess=direction;waiting=true;setButtons(false);if(deck.length===0){deck=makeDeck();updateDeck()}const next=deck.pop();updateDeck();if(next.joker){chargeJoker();els.message.textContent='Joker gezogen! Deine Joker-Rettung wurde aufgeladen. Die Vorhersage bleibt offen.';setTimeout(()=>resolveWithReplacement(direction),550);return}const ok=mode==='color'?(next.suitClass===direction):(next.value===current.value?null:(direction==='higher'?next.value>current.value:next.value<current.value));animateDeal(next,()=>{els.current.classList.add(ok===true?'correct':ok===false?'wrong':'');els.label.textContent='AKTUELLE KARTE · '+cardName(current);if(ok===true){if(freeRetry){freeRetry=false;els.message.textContent='Joker-Rettung erfolgreich! Kein Punkt für diesen Versuch.'}else if(twoPlayer){playerScores[activePlayer-1]++;$('score'+(activePlayer===1?'One':'Two')).textContent=playerScores[activePlayer-1];els.message.textContent='Richtig! +1 Punkt.'}else{score++;els.score.textContent=score;if(score>best){best=score;els.best.textContent=best;try{localStorage.setItem(BEST_KEYS[mode],String(best))}catch(e){}}els.message.textContent='Richtig! +1 Punkt.'}guess=null;waiting=false;finishPlayerTurn();setButtons(true)}else if(ok===null){els.message.textContent='Gleicher Kartenwert! Deine Auswahl bleibt bestehen.';waiting=false;setButtons(true)}else if(spendJoker()){els.message.textContent='Leider falsch – dein eigener Joker rettet dich! Du darfst erneut raten, ohne Punkt.';guess=null;waiting=false;finishPlayerTurn();setButtons(true)}else{endGame()}})}
-function resolveWithReplacement(direction){if(!deck.length){deck=makeDeck();updateDeck()}const c=deck.pop();updateDeck();if(c.joker){chargeJoker();els.message.textContent='Joker gezogen! Deine Joker-Rettung wurde aufgeladen.';resolveWithReplacement(direction);return}const ok=mode==='color'?(c.suitClass===direction):(c.value===current.value?null:(direction==='higher'?c.value>current.value:c.value<current.value));renderCard(els.current,c);current=c;els.label.textContent='AKTUELLE KARTE · '+cardName(current);if(ok===true){els.message.textContent='Joker beiseitegelegt. Du darfst erneut raten – ohne Punkt für diese Rettung.';guess=null;waiting=false;setButtons(true)}else if(ok===null){els.message.textContent='Gleicher Wert! Deine Auswahl bleibt bestehen.';waiting=false;setButtons(true)}else if(spendJoker()){freeRetry=true;els.message.textContent='Dein Joker rettet dich. Erneut raten – der nächste richtige Versuch gibt keinen Punkt.';guess=null;waiting=false;finishPlayerTurn();setButtons(true)}else endGame()}
-function endGame(){finished=true;waiting=true;restartArmed=false;els.start.classList.remove('confirm');els.start.textContent='Spiel starten';setButtons(false);els.message.textContent='Kein Joker mehr – deine Runde ist beendet.';els.dialogTitle.textContent='Runde beendet';els.dialogText.textContent=twoPlayer?'Spieler 1: '+playerScores[0]+' Punkte · Spieler 2: '+playerScores[1]+' Punkte.':'Du hast '+score+' Punkt'+(score===1?'':'e')+' erzielt. Dein Highscore liegt bei '+best+'.';els.overlay.classList.add('show');els.start.textContent='Spiel starten'}
+function applyDuelOutcome(ok){
+  if(ok===true){
+    if(twoPlayer){playerScores[activePlayer-1]++;$('score'+(activePlayer===1?'One':'Two')).textContent=playerScores[activePlayer-1];els.message.textContent='Richtig! +1 Punkt.'}
+    else{score++;els.score.textContent=score;if(score>best){best=score;els.best.textContent=best;try{localStorage.setItem(BEST_KEYS[mode],String(best))}catch(e){}}els.message.textContent='Richtig! +1 Punkt.'}
+  }else if(ok===null){els.message.textContent='Gleicher Kartenwert! Kein Punkt – der andere Spieler ist an der Reihe.'}
+  else{
+    const rescued=spendJoker();
+    els.message.textContent=rescued?'Leider falsch – dein Joker wurde eingesetzt. Kein Punkt; der andere Spieler ist an der Reihe.':'Leider falsch! Kein Punkt – der andere Spieler ist an der Reihe.';
+  }
+  guess=null;waiting=false;
+  if(twoPlayer)finishPlayerTurn();
+  if(twoPlayer&&deck.length===0){endGame();return}
+  setButtons(true);
+}
+function choose(direction){
+  if(!started||finished||waiting||!current)return;
+  guess=direction;waiting=true;setButtons(false);
+  if(deck.length===0){endGame();return}
+  const next=deck.pop();updateDeck();
+  if(next.joker){chargeJoker();els.message.textContent='Joker gezogen! Joker aufgeladen – die Vorhersage bleibt offen.';setTimeout(()=>resolveWithReplacement(direction),450);return}
+  const ok=mode==='color'?(next.suitClass===direction):(next.value===current.value?null:(direction==='higher'?next.value>current.value:next.value<current.value));
+  animateDeal(next,()=>{els.current.classList.add(ok===true?'correct':ok===false?'wrong':'');els.label.textContent='AKTUELLE KARTE · '+cardName(current);applyDuelOutcome(ok)});
+}
+function resolveWithReplacement(direction){
+  if(!deck.length){endGame();return}
+  const c=deck.pop();updateDeck();
+  if(c.joker){chargeJoker();els.message.textContent='Joker gezogen! Joker aufgeladen.';resolveWithReplacement(direction);return}
+  const ok=mode==='color'?(c.suitClass===direction):(c.value===current.value?null:(direction==='higher'?c.value>current.value:c.value<current.value));
+  renderCard(els.current,c);current=c;els.label.textContent='AKTUELLE KARTE · '+cardName(current);
+  applyDuelOutcome(ok);
+}
+function endGame(){
+  if(finished)return;
+  finished=true;waiting=true;restartArmed=false;els.start.classList.remove('confirm');els.start.textContent='Spiel starten';setButtons(false);
+  if(twoPlayer){
+    const a=playerScores[0],b=playerScores[1];
+    els.dialogTitle.textContent=a>b?'Sieger: Spieler 1':b>a?'Sieger: Spieler 2':'Unentschieden!';
+    els.dialogText.textContent='Spieler 1: '+a+' Punkte · Spieler 2: '+b+' Punkte. Das Kartendeck ist vollständig durchgespielt.';
+    els.message.textContent='Match beendet – das Deck ist leer.';
+  }else{
+    els.dialogTitle.textContent='Spiel beendet';
+    els.dialogText.textContent='Du hast '+score+' Punkt'+(score===1?'':'e')+' erzielt. Dein Highscore liegt bei '+best+'.';
+    els.message.textContent='Das Kartendeck ist vollständig durchgespielt.';
+  }
+  els.overlay.classList.add('show');
+}
 function closeDialog(){els.overlay.classList.remove('show')}
 function requestStartOrRestart(){
   if(started&&!finished){
