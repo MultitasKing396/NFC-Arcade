@@ -8,7 +8,8 @@
 <style>
 :root{color-scheme:dark;--bg:#171717;--panel:#252525;--panel2:#303030;--edge:#595959;--gold:#d8b66a;--text:#f1eadb;--muted:#aaa397;--red:#c63d43;--black:#20232b;--felt:#174b3d}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,sans-serif}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,sans-serif;overflow:hidden;overscroll-behavior:none}
+body{touch-action:none}
 body{min-height:100dvh;padding:env(safe-area-inset-top) 14px env(safe-area-inset-bottom);display:flex;justify-content:center}
 button,select{font:inherit}
 button{touch-action:manipulation;cursor:pointer}
