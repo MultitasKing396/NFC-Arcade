@@ -45,6 +45,7 @@ select{background:var(--panel);color:var(--text);border:1px solid var(--edge);bo
 .joker-chip small{display:block;color:var(--muted)}
 .primary,.secondary{border:1px solid #8d7955;border-radius:11px;padding:11px 15px;font-weight:850}
 .primary{background:linear-gradient(#d8bd81,#aa8b53);color:#211b12;box-shadow:0 3px 0 #100e0b}
+.primary.confirm{background:#fff;color:#171717;border:2px solid #fff;box-shadow:0 3px 0 #bdbdbd}
 .secondary{background:var(--panel2);border-color:var(--edge);color:var(--text)}
 .message{min-height:22px;text-align:center;color:var(--muted);font-size:13px;font-weight:650}
 .footer{margin-top:auto;text-align:center;color:#aaa;font-size:10px;font-weight:800;letter-spacing:.17em;padding:10px 0 4px}
@@ -136,7 +137,7 @@ const $=id=>document.getElementById(id);
 const els={score:$('score'),best:$('best'),theme:$('theme'),current:$('currentCard'),next:$('nextCard'),label:$('cardLabel'),message:$('message'),higher:$('higher'),lower:$('lower'),joker:$('jokerStatus'),deck:$('deckCount'),start:$('start'),overlay:$('overlay'),dialogTitle:$('dialogTitle'),dialogText:$('dialogText')};
 const suits=[{s:'♠',c:'black'},{s:'♥',c:'red'},{s:'♦',c:'red'},{s:'♣',c:'black'}];
 const symbols={1:'A',11:'J',12:'Q',13:'K'};
-let deck=[],current=null,score=0,best=0,jokerAvailable=true,started=false,finished=false,guess=null,waiting=false,freeRetry=false;
+let deck=[],current=null,score=0,best=0,jokerAvailable=true,started=false,finished=false,guess=null,waiting=false,freeRetry=false,restartArmed=false;
 const BEST_KEY='higherLowerBest';
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 function makeDeck(){const d=[];for(const suit of suits)for(let v=1;v<=13;v++)d.push({value:v,suit:suit.s,suitClass:suit.c,label:symbols[v]||String(v),joker:false});d.push({joker:true,label:'JOKER'});return shuffle(d)}
@@ -149,18 +150,20 @@ function renderCard(el,c,back=false){el.className='playing-card';if(back){el.cla
 function drawNext(){if(deck.length===0){els.message.textContent='Deck wird neu gemischt …';els.current.classList.add('shuffle');setTimeout(()=>{deck=makeDeck();updateDeck();els.current.classList.remove('shuffle');dealNext()},720);return}dealNext()}
 function dealNext(){if(!deck.length)return;const c=deck.pop();updateDeck();if(c.joker){jokerAvailable=true;updateJoker();els.message.textContent='Joker gezogen! Du kannst ihn für einen späteren Fehler aufbewahren.';drawNextAfterJoker();return}renderCard(els.next,c);els.next.classList.remove('hidden');els.next.classList.add('flip');setTimeout(()=>{els.current.classList.remove('flip','correct','wrong');els.current.classList.add('flip');renderCard(els.current,c);els.current.classList.remove('card-back');els.next.classList.add('hidden');els.next.classList.remove('flip');current=c;waiting=false;setButtons(true);els.label.textContent='AKTUELLE KARTE · '+cardName(current);if(guess){els.message.textContent='Gleicher Wert! Deine Auswahl bleibt bestehen – rate erneut.';setButtons(true)}},230)}
 function drawNextAfterJoker(){setTimeout(()=>{if(deck.length===0){deck=makeDeck();updateDeck()}dealNext()},450)}
-function start(){closeDialog();deck=makeDeck();current=null;score=0;jokerAvailable=true;started=true;finished=false;guess=null;waiting=false;freeRetry=false;els.score.textContent='0';updateJoker();updateDeck();setButtons(false);els.start.textContent='Neustarten';els.message.textContent='Die erste Karte wird aufgedeckt …';renderCard(els.current,null,true);els.label.textContent='DEINE STARTKARTE';drawNext()}
+function start(){closeDialog();restartArmed=false;els.start.classList.remove('confirm');els.start.textContent='Neustarten';deck=makeDeck();current=null;score=0;jokerAvailable=true;started=true;finished=false;guess=null;waiting=false;freeRetry=false;els.score.textContent='0';updateJoker();updateDeck();setButtons(false);els.start.textContent='Neustarten';els.message.textContent='Die erste Karte wird aufgedeckt …';renderCard(els.current,null,true);els.label.textContent='DEINE STARTKARTE';drawNext()}
 function choose(direction){if(!started||finished||waiting||!current)return;guess=direction;waiting=true;setButtons(false);if(deck.length===0){deck=makeDeck();updateDeck()}const next=deck.pop();updateDeck();if(next.joker){jokerAvailable=true;updateJoker();els.message.textContent='Joker! Er wird beiseitegelegt. Deine Vorhersage bleibt offen.';setTimeout(()=>resolveWithReplacement(direction),550);return}const ok=next.value===current.value?null:(direction==='higher'?next.value>current.value:next.value<current.value);renderCard(els.next,next);els.next.classList.remove('hidden');els.next.classList.add('flip');setTimeout(()=>{renderCard(els.current,next);els.current.classList.add(ok===true?'correct':ok===false?'wrong':'');els.next.classList.add('hidden');els.next.classList.remove('flip');current=next;els.label.textContent='AKTUELLE KARTE · '+cardName(current);if(ok===true){if(freeRetry){freeRetry=false;els.message.textContent='Joker-Rettung erfolgreich! Kein Punkt für diesen Versuch.'}else{score++;els.score.textContent=score;if(score>best){best=score;els.best.textContent=best;try{localStorage.setItem(BEST_KEY,String(best))}catch(e){}}els.message.textContent='Richtig! +1 Punkt.'}guess=null;waiting=false;setButtons(true)}else if(ok===null){els.message.textContent='Gleicher Kartenwert! Deine Auswahl bleibt bestehen.';waiting=false;setButtons(true)}else if(jokerAvailable){els.message.textContent='Leider falsch – dein Joker rettet dich! Du darfst erneut raten, ohne Punkt.';jokerAvailable=false;updateJoker();guess=null;waiting=false;setButtons(true)}else{endGame()}},260)}
 function resolveWithReplacement(direction){if(!deck.length){deck=makeDeck();updateDeck()}const c=deck.pop();updateDeck();if(c.joker){jokerAvailable=true;updateJoker();resolveWithReplacement(direction);return}const ok=c.value===current.value?null:(direction==='higher'?c.value>current.value:c.value<current.value);renderCard(els.current,c);current=c;els.label.textContent='AKTUELLE KARTE · '+cardName(current);if(ok===true){els.message.textContent='Joker beiseitegelegt. Du darfst erneut raten – ohne Punkt für diese Rettung.';guess=null;waiting=false;setButtons(true)}else if(ok===null){els.message.textContent='Gleicher Wert! Deine Auswahl bleibt bestehen.';waiting=false;setButtons(true)}else if(jokerAvailable){jokerAvailable=false;freeRetry=true;updateJoker();els.message.textContent='Dein Joker rettet dich. Erneut raten – der nächste richtige Versuch gibt keinen Punkt.';guess=null;waiting=false;setButtons(true)}else endGame()}
-function endGame(){finished=true;waiting=true;setButtons(false);els.message.textContent='Kein Joker mehr – deine Runde ist beendet.';els.dialogTitle.textContent='Runde beendet';els.dialogText.textContent='Du hast '+score+' Punkt'+(score===1?'':'e')+' erzielt. Dein Highscore liegt bei '+best+'.';els.overlay.classList.add('show');els.start.textContent='Spiel starten'}
+function endGame(){finished=true;waiting=true;restartArmed=false;els.start.classList.remove('confirm');els.start.textContent='Spiel starten';setButtons(false);els.message.textContent='Kein Joker mehr – deine Runde ist beendet.';els.dialogTitle.textContent='Runde beendet';els.dialogText.textContent='Du hast '+score+' Punkt'+(score===1?'':'e')+' erzielt. Dein Highscore liegt bei '+best+'.';els.overlay.classList.add('show');els.start.textContent='Spiel starten'}
 function closeDialog(){els.overlay.classList.remove('show')}
 function requestStartOrRestart(){
   if(started&&!finished){
-    els.dialogTitle.textContent='Neu starten?';
-    els.dialogText.textContent='Möchtest du die laufende Runde wirklich beenden und von vorne anfangen? Dein aktueller Punktestand geht dabei verloren.';
-    $('again').textContent='Ja, neu starten';
-    $('close').textContent='Abbrechen';
-    els.overlay.classList.add('show');
+    if(!restartArmed){
+      restartArmed=true;
+      els.start.textContent='Sicher';
+      els.start.classList.add('confirm');
+      return;
+    }
+    start();
     return;
   }
   start();
