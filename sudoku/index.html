@@ -133,7 +133,7 @@ footer,.byline{color:#aaa!important}
 const $=id=>document.getElementById(id),boardEl=$('board'),difficulty=$('difficulty');
 let solution=[],puzzle=[],values=[],fixed=[],selected=-1,mistakes=0,seconds=0,completed=false,tick=null,toastTimer=null,clockPaused=false,hintArmed=false;
 const targets=[28,36,45,52,58],names=['Anfänger','Einfach','Mittel','Schwer','Meister'];
-function maxMistakes(){const level=Number(difficulty.value);return level<=1?10:level===2?5:3}
+function maxMistakes(){const level=Number(difficulty.value);return [10,7,5,3,1][level]??10}
 function hintsDisabled(){return Number(difficulty.value)>=3}
 function updateHintControl(){const b=$('hint');b.disabled=hintsDisabled();b.textContent=hintsDisabled()?'Hinweis deaktiviert':'Hinweis';b.classList.remove('hint-armed');hintArmed=false}
 const key='sudokuByAlpSaveV1';
