@@ -153,7 +153,7 @@ const els={score:$('score'),best:$('best'),theme:$('theme'),mode:$('mode'),gameT
 const suits=[{s:'♠',c:'black'},{s:'♥',c:'red'},{s:'♦',c:'red'},{s:'♣',c:'black'}];
 const symbols={1:'A',11:'J',12:'Q',13:'K'};
 function setMode(next){twoPlayer=next.endsWith('2');mode=twoPlayer?next.slice(0,-1):next;document.querySelector('.app').classList.toggle('duel-mode',twoPlayer);els.duelControls.classList.toggle('hidden',!twoPlayer);els.gameTitle.textContent='Guess the Card.';els.higher.textContent=mode==='higher'?'↑ HÖHER':'ROT';els.lower.textContent=mode==='higher'?'↓ NIEDRIGER':'SCHWARZ';els.higher.classList.toggle('red-choice',mode==='color');els.lower.classList.toggle('black-choice',mode==='color');els.controls.classList.toggle('color-mode',mode==='color');configureDuelButtons();try{best=Number(localStorage.getItem(BEST_KEYS[mode])||0)}catch(e){best=0}els.best.textContent=best;els.message.textContent=mode==='higher'?'Tippe auf Start und rate die nächste Karte.':'Tippe auf Start und rate, ob die nächste Karte rot oder schwarz ist.';}
-let deck=[],current=null,score=0,best=0,jokerCharges=[0,0],started=false,finished=false,guess=null,waiting=false,freeRetry=false,restartArmed=false,mode='higher',twoPlayer=false,activePlayer=1,playerScores=[0,0];
+let deck=[],current=null,score=0,best=0,jokerCharges=[0,0],started=false,finished=false,guess=null,waiting=false,freeRetry=false,restartArmed=false,mode='higher',twoPlayer=false,activePlayer=1,playerScores=[0,0],shootout=false,shootoutFirst=null;
 const BEST_KEYS={higher:'higherLowerBest',color:'redBlackBest'};
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 function makeDeck(){const d=[];for(const suit of suits)for(let v=1;v<=13;v++)d.push({value:v,suit:suit.s,suitClass:suit.c,label:symbols[v]||String(v),joker:false});d.push({joker:true,label:'JOKER'},{joker:true,label:'JOKER'});return shuffle(d)}
@@ -193,8 +193,9 @@ function animateDeal(c,onDone){
 }
 function dealNext(){if(!deck.length)return;const c=deck.pop();updateDeck();if(c.joker){chargeJoker();els.message.textContent='Joker gezogen! Deine Joker-Rettung wurde aufgeladen.';drawNextAfterJoker();return}animateDeal(c,()=>{waiting=false;setButtons(true);els.label.textContent='AKTUELLE KARTE · '+cardName(current);if(guess){els.message.textContent='Gleicher Wert! Deine Auswahl bleibt bestehen – rate erneut.';setButtons(true)}})}
 function drawNextAfterJoker(){setTimeout(()=>{if(deck.length===0){endGame();return}dealNext()},450)}
-function start(){closeDialog();restartArmed=false;activePlayer=1;playerScores=[0,0];$('scoreOne').textContent='0';$('scoreTwo').textContent='0';els.start.classList.remove('confirm');els.start.textContent='Neustarten';deck=makeDeck();current=null;score=0;jokerCharges=[0,0];started=true;finished=false;guess=null;waiting=false;freeRetry=false;els.score.textContent='0';updateJoker();updatePlayerTurn();updateDeck();setButtons(false);els.start.textContent='Neustarten';els.message.textContent='Die erste Karte wird aufgedeckt …';renderCard(els.current,null,true);els.label.textContent='DEINE STARTKARTE';drawNext()}
+function start(){closeDialog();restartArmed=false;shootout=false;shootoutFirst=null;activePlayer=1;playerScores=[0,0];$('scoreOne').textContent='0';$('scoreTwo').textContent='0';els.start.classList.remove('confirm');els.start.textContent='Neustarten';deck=makeDeck();current=null;score=0;jokerCharges=[0,0];started=true;finished=false;guess=null;waiting=false;freeRetry=false;els.score.textContent='0';updateJoker();updatePlayerTurn();updateDeck();setButtons(false);els.start.textContent='Neustarten';els.message.textContent='Die erste Karte wird aufgedeckt …';renderCard(els.current,null,true);els.label.textContent='DEINE STARTKARTE';drawNext()}
 function applyDuelOutcome(ok){
+  if(twoPlayer&&shootout){finishShootoutAttempt(ok);return}
   if(!twoPlayer&&ok===false){
     if(spendJoker()){els.message.textContent='Leider falsch – deine Joker-Rettung greift! Du darfst erneut raten, ohne Punkt.';guess=null;waiting=false;setButtons(true)}
     else endGame();
@@ -210,20 +211,54 @@ function applyDuelOutcome(ok){
   }
   guess=null;waiting=false;
   if(twoPlayer)finishPlayerTurn();
-  if(twoPlayer&&deck.length===0){endGame();return}
+  if(twoPlayer&&deck.length===0){
+    if(playerScores[0]===playerScores[1])beginShootout();
+    else endGame();
+    return;
+  }
   setButtons(true);
+}
+function beginShootout(){
+  shootout=true;shootoutFirst=null;activePlayer=1;deck=makeDeck();updateDeck();waiting=false;guess=null;
+  els.message.textContent='STECHEN! Sudden Death – Spieler 1 beginnt. Beide Spieler bekommen je einen Versuch.';
+  els.label.textContent='STECHEN · SPIELER 1';
+  updatePlayerTurn();setButtons(true);
+}
+function finishShootoutAttempt(ok){
+  const success=ok===true;
+  if(shootoutFirst===null){
+    shootoutFirst=success;activePlayer=2;waiting=false;guess=null;
+    els.message.textContent=success?'Spieler 1 trifft! Spieler 2 muss jetzt ebenfalls treffen.':'Spieler 1 verfehlt! Spieler 2 muss treffen, um das Stechen auszugleichen.';
+    els.label.textContent='STECHEN · SPIELER 2';
+    updatePlayerTurn();setButtons(true);return;
+  }
+  if(success!==shootoutFirst){
+    const winner=success?2:1;
+    els.dialogTitle.textContent='Sieger: Spieler '+winner;
+    els.dialogText.textContent='Stechen entschieden! Spieler 1: '+playerScores[0]+' Punkte · Spieler 2: '+playerScores[1]+' Punkte.';
+    finishMatch('Stechen entschieden – Spieler '+winner+' gewinnt!');
+    return;
+  }
+  shootoutFirst=null;activePlayer=1;waiting=false;guess=null;
+  if(deck.length===0){deck=makeDeck();updateDeck()}
+  els.message.textContent='Beide Spieler '+(success?'haben getroffen':'haben verfehlt')+' – Gleichstand! Nächste Stechen-Runde, Spieler 1 beginnt.';
+  els.label.textContent='STECHEN · SPIELER 1';
+  updatePlayerTurn();setButtons(true);
+}
+function finishMatch(message){
+  finished=true;waiting=true;restartArmed=false;els.start.classList.remove('confirm');els.start.textContent='Spiel starten';setButtons(false);els.message.textContent=message;els.overlay.classList.add('show');
 }
 function choose(direction){
   if(!started||finished||waiting||!current)return;
   guess=direction;waiting=true;setButtons(false);
-  if(deck.length===0){endGame();return}
+  if(deck.length===0){if(shootout){deck=makeDeck();updateDeck()}else{endGame();return}}
   const next=deck.pop();updateDeck();
   if(next.joker){chargeJoker();els.message.textContent='Joker gezogen! Joker aufgeladen – die Vorhersage bleibt offen.';setTimeout(()=>resolveWithReplacement(direction),450);return}
   const ok=mode==='color'?(next.suitClass===direction):(next.value===current.value?null:(direction==='higher'?next.value>current.value:next.value<current.value));
   animateDeal(next,()=>{els.current.classList.add(ok===true?'correct':ok===false?'wrong':'');els.label.textContent='AKTUELLE KARTE · '+cardName(current);applyDuelOutcome(ok)});
 }
 function resolveWithReplacement(direction){
-  if(!deck.length){endGame();return}
+  if(!deck.length){deck=makeDeck();updateDeck()}
   const c=deck.pop();updateDeck();
   if(c.joker){chargeJoker();els.message.textContent='Joker gezogen! Joker aufgeladen.';resolveWithReplacement(direction);return}
   const ok=mode==='color'?(c.suitClass===direction):(c.value===current.value?null:(direction==='higher'?c.value>current.value:c.value<current.value));
@@ -235,7 +270,8 @@ function endGame(){
   finished=true;waiting=true;restartArmed=false;els.start.classList.remove('confirm');els.start.textContent='Spiel starten';setButtons(false);
   if(twoPlayer){
     const a=playerScores[0],b=playerScores[1];
-    els.dialogTitle.textContent=a>b?'Sieger: Spieler 1':b>a?'Sieger: Spieler 2':'Unentschieden!';
+    if(a===b){beginShootout();return}
+    els.dialogTitle.textContent=a>b?'Sieger: Spieler 1':'Sieger: Spieler 2';
     els.dialogText.textContent='Spieler 1: '+a+' Punkte · Spieler 2: '+b+' Punkte. Das Kartendeck ist vollständig durchgespielt.';
     els.message.textContent='Match beendet – das Deck ist leer.';
   }else{
