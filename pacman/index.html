@@ -43,16 +43,29 @@ canvas{width:auto;height:100%;max-width:100%;max-height:100%;aspect-ratio:19/21;
 @media(max-height:620px){.app{gap:2px}h1{font-size:22px}.topline .sound{padding:3px 8px}.stat{padding:2px}.stat b{font-size:14px}.controls{grid-template-rows:repeat(2,27px)}.actions button{min-height:29px;padding:4px}.message{min-height:11px}}
 @media(min-width:600px){body{padding:8px}.app{max-width:470px}}
 
+
+/* Controller layout: pause/restart above, D-pad and sprint below */
+.topline{display:flex;align-items:center;justify-content:space-between;gap:5px}
+.topActions{display:flex;align-items:center;gap:5px}
+.topActions button{white-space:nowrap}
+.miniAction{padding:5px 9px;border-radius:9px;font-size:10px;min-height:28px}
+.controls{display:flex;align-items:center;justify-content:center;gap:clamp(18px,7vw,34px);height:clamp(94px,14vh,116px);flex:0 0 auto}
+.dpad{display:grid;grid-template-columns:repeat(3,clamp(43px,12vw,54px));grid-template-rows:repeat(3,clamp(28px,4.2vh,38px));gap:3px}
+.dpad button{font-size:20px;border-radius:10px}
+.dpad .up{grid-column:2;grid-row:1}.dpad .left{grid-column:1;grid-row:2}.dpad .down{grid-column:2;grid-row:3}.dpad .right{grid-column:3;grid-row:2}
+.controls .sprint{width:clamp(64px,18vw,78px);height:clamp(64px,18vw,78px);border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-size:24px;box-shadow:0 4px 0 #100f1b,0 0 14px #e9b56f35}
+.controls .sprint small{font-size:9px;font-weight:900;letter-spacing:.08em}
+@media(max-height:620px){.controls{height:84px}.dpad{grid-template-rows:repeat(3,25px);grid-template-columns:repeat(3,42px)}.controls .sprint{width:58px;height:58px}.miniAction{min-height:25px;padding:3px 7px;font-size:9px}}
+
 </style></head>
 <body><main class="app">
 <header><h1>PAC-MAN</h1><p>SOFT RETRO ARCADE · BY ALP</p></header>
-<div class="topline"><span id="levelLabel">LEVEL 1</span><button class="sound" id="sound">♫ TON AN</button></div>
+<div class="topline"><span id="levelLabel">LEVEL 1</span><div class="topActions"><button id="start" class="miniAction">Ⅱ PAUSE</button><button id="restart" class="miniAction">↻ NEU</button><button class="sound" id="sound">♫ TON AN</button></div></div>
 <section class="stats"><div class="stat">PUNKTE<b id="score">0</b></div><div class="stat">BEST<b id="best">0</b></div><div class="stat">LEBEN<b id="lives">● ● ●</b></div></section>
 <div class="frame"><canvas id="game" width="380" height="420" aria-label="Pac-Man Spielfeld"></canvas>
 <div class="overlay" id="overlay"><h2>PAC-MAN</h2><div class="ready">READY!</div><p>Iss alle Punkte, sammle Früchte und entkomme den vier Geistern. Power-Pellets machen sie verwundbar.</p><button class="primary" id="overlayBtn">SPIEL STARTEN</button></div></div>
 <div class="message" id="message">Wähle eine Richtung oder drücke Start.</div>
-<div class="controls" aria-label="Steuerkreuz"><button class="up" data-dir="up">▲</button><button class="left" data-dir="left">◀</button><button class="down" data-dir="down">▼</button><button class="right" data-dir="right">▶</button></div>
-<div class="actions"><button class="primary" id="start">▶ START</button><button class="sprint" id="sprint">⚡ SPRINT</button><button id="restart">↻ NEU</button></div>
+<div class="controls" aria-label="Steuerkreuz und Sprint"><div class="dpad"><button class="up" data-dir="up">▲</button><button class="left" data-dir="left">◀</button><button class="down" data-dir="down">▼</button><button class="right" data-dir="right">▶</button></div><button class="sprint" id="sprint">⚡<small>SPRINT</small></button></div>
 <div class="help">Pfeiltasten / WASD oder Steuerkreuz · Leertaste: Pause · Sprint: 1,5 Sek. · Power-Pellets schützen dich nicht vor jedem Risiko.</div>
 </main>
 <script>
