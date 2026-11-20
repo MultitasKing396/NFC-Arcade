@@ -55,7 +55,7 @@ button:disabled{opacity:.4;cursor:default}
 .guessRow .feedback{grid-template-columns:repeat(4,1fr);grid-template-rows:1fr;gap:3px;width:100%;max-width:74px}
 .guessRow .hint{width:11px;height:11px}
 .rowNum{font-size:9px;color:#888;width:16px}
-.guessMain{display:flex;align-items:center;gap:5px;min-width:0}
+.guessMain{display:flex;align-items:center;gap:5px;min-width:0}.guessMain .pegs{flex:1;width:100%;min-width:0}.guessMain .peg{width:100%;max-width:22px;justify-self:center}
 .paletteWrap{padding:10px 4px 2px}
 .paletteTitle{font-size:10px;color:#bdb3a2;text-align:center;margin-bottom:8px;letter-spacing:.08em}
 .palette{display:flex;justify-content:center;gap:clamp(8px,3vw,14px);flex-wrap:wrap}
@@ -169,7 +169,7 @@ button.peg:hover,button.swatch:hover{filter:brightness(1.08)!important}
 <div class="actions"><button id="checkBtn" disabled>CODE PRÜFEN</button><button id="clearBtn" class="secondary">LÖSCHEN</button></div>
 </div>
 <div id="note" class="note" aria-live="polite">Wähle eine Position und anschließend eine Farbe.</div>
-<div class="panel statsPanel" id="statsPanel"></div>
+
 </section>
 <section id="result" class="panel result hidden">
 <h2 id="resultTitle">Code geknackt!</h2><p id="resultText"></p><div class="secretReveal" id="reveal"></div>
@@ -197,7 +197,7 @@ function start(){
  $('roundInfo').textContent=(length===3?'LEICHT':length===4?'MITTEL':'SCHWER')+' · '+length+' POSITIONEN';
  $('best').textContent=stats.best.toLocaleString('de-DE');$('score').textContent='0';$('tries').textContent='0 / '+maxAttempts;
  $('secretPegs').style.setProperty('--slots',length);$('secretPegs').innerHTML=Array.from({length},()=>'<span class="peg"></span>').join('');
- renderRows();renderPalette();renderStats();message('Wähle eine Position und anschließend eine Farbe.');
+ renderRows();renderPalette();message('Wähle eine Position und anschließend eine Farbe.');
 }
 function message(s){$('note').textContent=s}
 function renderRows(){
@@ -235,11 +235,10 @@ function submit(){
  if(exact===length){won=true;gameOver=true;score=Math.max(100,(maxAttempts-activeRow)*100)*(length===3?1:length===4?2:3);stats.wins++;stats.totalGuesses+=activeRow+1;stats.rounds++;stats.best=Math.max(stats.best,score);save();$('score').textContent=score.toLocaleString('de-DE');}
  else if(activeRow===maxAttempts-1){gameOver=true;won=false;stats.losses++;stats.rounds++;stats.totalGuesses+=maxAttempts;save()}
  else activeRow++;
- renderRows();renderStats();
+ renderRows();
  if(gameOver)showResult();
  else{selected=0;renderRows();message('Hinweise: '+marks.filter(x=>x==='good').length+' richtige Position(en), '+marks.filter(x=>x==='color').length+' richtige Farbe(n).')}
 }
-function renderStats(){$('statsPanel').innerHTML='RUNDEN: '+stats.rounds+' · GEWONNEN: '+stats.wins+' · VERLOREN: '+stats.losses+' · Ø VERSUCHE: '+(stats.rounds?(stats.totalGuesses/stats.rounds).toFixed(1).replace('.',','):'–')}
 function showResult(){
  $('game').classList.add('hidden');$('result').classList.remove('hidden');
  $('resultTitle').textContent=won?'CODE GEKNACKT!':'LEIDER VERLOREN';
