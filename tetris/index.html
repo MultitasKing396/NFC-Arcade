@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#f4f4f4">
+<title>Tetris – By Alp</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;overscroll-behavior:none;touch-action:none}
+body{background:#f4f4f4;color:#111;font-family:system-ui,-apple-system,sans-serif;display:flex;align-items:center;justify-content:center;padding:10px}
+.app{width:min(100%,440px);max-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:5px}
+h1{font-size:33px;line-height:1.05;letter-spacing:-1.5px;margin:0;font-weight:850}
+.sub{color:#777;margin:0 0 3px;font-size:13px;font-weight:650;letter-spacing:.04em}
+.stats{width:min(100%,340px);display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin:2px 0 5px}
+.stat{background:#fff;border:1px solid #e7e7e7;border-radius:11px;padding:5px 3px;color:#888;font-size:10px}
+.stat b{display:block;color:#111;font-size:17px;font-variant-numeric:tabular-nums}
+.play-area{display:flex;align-items:flex-start;justify-content:center;gap:9px;width:100%}
+.board-wrap{position:relative;width:min( min(62vw,300px), calc((100dvh - 280px)*.5));max-width:300px;aspect-ratio:1/2;flex:0 1 300px}
+canvas#board{width:100%;height:100%;display:block;background:#090b14;border:1px solid #25283a;border-radius:13px;box-shadow:0 8px 28px #00000018;touch-action:none}
+.side{width:82px;display:flex;flex-direction:column;gap:7px}
+.panel{background:#fff;border:1px solid #e7e7e7;border-radius:11px;padding:7px 4px;color:#888;font-size:10px}
+#next{width:72px;height:72px;display:block;margin:4px auto 0;background:#090b14;border-radius:7px}
+.level-val{display:block;color:#111;font-size:19px;font-weight:800;margin-top:2px}
+.actions{display:flex;gap:8px;width:min(100%,340px);margin-top:5px}
+.btn{border:0;border-radius:12px;padding:10px 14px;font-weight:750;font-size:14px;background:#111;color:#fff;flex:1;touch-action:manipulation}
+.btn.secondary{background:#e8e8e8;color:#111}
+.pad{display:grid;grid-template-columns:repeat(3,48px);grid-template-rows:repeat(3,42px);gap:5px;margin:8px auto 0}
+.pad button{border:0;border-radius:11px;background:#e8e8e8;color:#111;font-size:20px;font-weight:850;touch-action:manipulation}
+.pad .empty{visibility:hidden}
+.pad [data-dir=up]{grid-column:2;grid-row:1}
+.pad [data-dir=left]{grid-column:1;grid-row:2}
+.pad [data-dir=right]{grid-column:3;grid-row:2}
+.pad [data-dir=down]{grid-column:2;grid-row:3}
+footer{color:#999;font-size:11px;font-weight:650;letter-spacing:.04em;margin-top:2px}
+.overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;background:#090b14d9;border-radius:13px;color:white;font-weight:800;font-size:24px;gap:5px}
+.overlay small{font-size:12px;color:#c5c9df;font-weight:600}
+.hidden{display:none!important}
+@media(max-height:700px){.app{gap:2px}.stats{margin:0 0 2px}.actions{margin-top:2px}.pad{margin-top:4px;grid-template-rows:repeat(3,36px)}.pad button{font-size:18px}.sub{margin-bottom:0}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main class="app">
+<h1>Tetris.</h1><p class="sub">By Alp</p>
+<div class="stats">
+ <div class="stat">PUNKTE<b id="score">0</b></div>
+ <div class="stat">HIGHSCORE<b id="best">0</b></div>
+ <div class="stat">LINIEN<b id="lines">0</b></div>
+</div>
+<div class="play-area">
+ <div class="board-wrap"><canvas id="board" width="300" height="600"></canvas><div class="overlay" id="overlay"><span id="overlayTitle">TETRIS</span><small id="overlayText">Drücke Start zum Spielen</small></div></div>
+ <aside class="side">
+  <div class="panel">NÄCHSTER STEIN<canvas id="next" width="120" height="120"></canvas></div>
+  <div class="panel">LEVEL<span class="level-val" id="level">1</span></div>
+ </aside>
+</div>
+<div class="actions"><button class="btn" id="start">Start</button><button class="btn secondary" id="reset">Neustart</button></div>
+<div class="pad" aria-label="Steuerkreuz">
+ <button data-dir="up" aria-label="Drehen">↻</button><span class="empty"></span><span class="empty"></span>
+ <button data-dir="left" aria-label="Links">←</button><span class="empty"></span><button data-dir="right" aria-label="Rechts">→</button>
+ <span class="empty"></span><button data-dir="down" aria-label="Schneller fallen">↓</button><span class="empty"></span>
+</div>
+<footer>Tetris · By Alp</footer>
+</main>
+<script>
+(()=>{
+const W=10,H=20,S=30,canvas=document.getElementById('board'),ctx=canvas.getContext('2d'),nextCanvas=document.getElementById('next'),nctx=nextCanvas.getContext('2d');
+const $=id=>document.getElementById(id);
+const shapes={
+ I:[[1,1,1,1]],O:[[1,1],[1,1]],T:[[0,1,0],[1,1,1]],S:[[0,1,1],[1,1,0]],Z:[[1,1,0],[0,1,1]],J:[[1,0,0],[1,1,1]],L:[[0,0,1],[1,1,1]]
+};
+const colors={I:'#36e7ff',O:'#ffe34d',T:'#c56bff',S:'#55f28c',Z:'#ff557c',J:'#5887ff',L:'#ff9b45'};
+let grid,piece,next,score,lines,level,best,active=false,paused=false,over=false,loop=null,last=0,dropCounter=0;
+const key='tetrisBest';
+function freshPiece(type){return {type,m:shapes[type].map(r=>r.slice()),x:Math.floor((W-shapes[type][0].length)/2),y:0}}
+function randomType(){return Object.keys(shapes)[Math.floor(Math.random()*7)]}
+function loadBest(){best=Number(localStorage.getItem(key)||0);$('best').textContent=best}
+function updateStats(){$('score').textContent=score;$('lines').textContent=lines;$('level').textContent=level;if(score>best){best=score;localStorage.setItem(key,best);$('best').textContent=best}}
+function reset(){stop();grid=Array.from({length:H},()=>Array(W).fill(''));score=0;lines=0;level=1;piece=freshPiece(randomType());next=freshPiece(randomType());active=false;paused=false;over=false;dropCounter=0;$('start').textContent='Start';$('overlayTitle').textContent='TETRIS';$('overlayText').textContent='Drücke Start zum Spielen';$('overlay').classList.remove('hidden');updateStats();draw();drawNext()}
+function stop(){if(loop!==null)cancelAnimationFrame(loop);loop=null}
+function start(){if(over)reset();if(active){paused=true;active=false;stop();$('start').textContent='Weiter';$('overlayTitle').textContent='PAUSE';$('overlayText').textContent='Tippe auf Weiter';$('overlay').classList.remove('hidden');return}paused=false;active=true;$('start').textContent='Pause';$('overlay').classList.add('hidden');last=0;loop=requestAnimationFrame(frame)}
+function frame(t){if(!active)return;if(!last)last=t;const delta=t-last;last=t;dropCounter+=delta;if(dropCounter>Math.max(90,850-(level-1)*65)){drop();dropCounter=0}draw();loop=requestAnimationFrame(frame)}
+function collide(p=piece,ox=0,oy=0,m=p.m){for(let y=0;y<m.length;y++)for(let x=0;x<m[y].length;x++)if(m[y][x]){const nx=p.x+x+ox,ny=p.y+y+oy;if(nx<0||nx>=W||ny>=H||(ny>=0&&grid[ny][nx]))return true}return false}
+function move(dx){if(!active)return;if(!collide(piece,dx,0))piece.x+=dx;draw()}
+function rotate(){if(!active)return;const m=piece.m[0].map((_,i)=>piece.m.map(row=>row[i]).reverse());for(const kick of [0,-1,1,-2,2])if(!collide(piece,0,0,m)){piece.m=m;piece.x+=kick;break}draw()}
+function drop(){if(!active)return;if(!collide(piece,0,1)){piece.y++;return}lock()}
+function hardDrop(){if(!active)return;while(!collide(piece,0,1))piece.y++;lock()}
+function lock(){piece.m.forEach((r,y)=>r.forEach((v,x)=>{if(v&&piece.y+y>=0)grid[piece.y+y][piece.x+x]=piece.type}));let cleared=0;for(let y=H-1;y>=0;y--)if(grid[y].every(Boolean)){grid.splice(y,1);grid.unshift(Array(W).fill(''));cleared++;y++}if(cleared){const pts=[0,100,300,500,800][cleared]||800;score+=pts*level;lines+=cleared;level=Math.floor(lines/10)+1;updateStats()}piece=next;piece.x=Math.floor((W-piece.m[0].length)/2);piece.y=0;next=freshPiece(randomType());drawNext();if(collide(piece)){gameOver()}}
+function gameOver(){active=false;over=true;stop();$('start').textContent='Nochmal';$('overlayTitle').textContent='GAME OVER';$('overlayText').textContent='Punkte: '+score+' · Tippe auf Nochmal';$('overlay').classList.remove('hidden')}
+function drawBlock(c,x,y,size,glow=true){if(!c)return;c.fillStyle=colors[x.type]||'#fff';}
+function draw(){ctx.clearRect(0,0,300,600);ctx.fillStyle='#090b14';ctx.fillRect(0,0,300,600);ctx.strokeStyle='#171b2b';ctx.lineWidth=1;for(let x=0;x<=W;x++){ctx.beginPath();ctx.moveTo(x*S,0);ctx.lineTo(x*S,600);ctx.stroke()}for(let y=0;y<=H;y++){ctx.beginPath();ctx.moveTo(0,y*S);ctx.lineTo(300,y*S);ctx.stroke()}for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(grid[y][x])block(ctx,x,y,colors[grid[y][x]]);if(piece){const ghost={...piece};while(!collide(ghost,0,1))ghost.y++;piece.m.forEach((r,y)=>r.forEach((v,x)=>{if(v){block(ctx,piece.x+x,piece.y+y,colors[piece.type]);}}));ghost.m.forEach((r,y)=>r.forEach((v,x)=>{if(v){const px=ghost.x+x,py=ghost.y+y;if(py>=0&&!grid[py][px]){ctx.strokeStyle=colors[ghost.type]+'88';ctx.lineWidth=1.5;ctx.strokeRect(px*S+4,py*S+4,S-8,S-8)}}}))}}
+function block(c,x,y,color){c.save();c.shadowColor=color;c.shadowBlur=9;c.fillStyle=color;c.fillRect(x*S+2,y*S+2,S-4,S-4);c.shadowBlur=0;c.fillStyle='#ffffff55';c.fillRect(x*S+4,y*S+4,S-8,3);c.restore()}
+function drawNext(){nctx.clearRect(0,0,120,120);nctx.fillStyle='#090b14';nctx.fillRect(0,0,120,120);const m=next.m,sz=22,ox=(120-m[0].length*sz)/2,oy=(120-m.length*sz)/2;m.forEach((r,y)=>r.forEach((v,x)=>{if(v){nctx.save();nctx.shadowColor=colors[next.type];nctx.shadowBlur=9;nctx.fillStyle=colors[next.type];nctx.fillRect(ox+x*sz+2,oy+y*sz+2,sz-4,sz-4);nctx.restore()}}))}
+function action(d){if(d==='left')move(-1);if(d==='right')move(1);if(d==='up')rotate();if(d==='down')drop()}
+document.querySelectorAll('[data-dir]').forEach(b=>{b.addEventListener('pointerdown',e=>{e.preventDefault();action(b.dataset.dir);if(b.dataset.dir==='left'||b.dataset.dir==='right'||b.dataset.dir==='down'){b.repeatTimer=setInterval(()=>action(b.dataset.dir),125)}});const end=()=>{clearInterval(b.repeatTimer)};b.addEventListener('pointerup',end);b.addEventListener('pointerleave',end);b.addEventListener('pointercancel',end)});
+$('start').addEventListener('click',start);$('reset').addEventListener('click',reset);
+document.addEventListener('keydown',e=>{const map={ArrowLeft:'left',ArrowRight:'right',ArrowDown:'down',ArrowUp:'up',' ':'space'};const d=map[e.key];if(d){e.preventDefault();if(d==='space')hardDrop();else action(d)}if(e.key==='Enter'&&!active)start()});
+canvas.addEventListener('touchstart',e=>e.preventDefault(),{passive:false});
+loadBest();reset();
+})();
+</script>
+</body></html>
