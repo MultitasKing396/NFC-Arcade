@@ -46,6 +46,15 @@ body{background:radial-gradient(ellipse at 50% 0,#333 0,#171717 65%)!important}
 .toolbar label{color:#c4bba9!important}
 .board-wrap,.board{border-color:#666!important}
 .cell{background:#242424!important;color:#f1eadb!important;border-color:#555!important}
+.board{border:2px solid #b89a62!important;gap:0!important}
+.cell{border-right:1px solid #555!important;border-bottom:1px solid #555!important}
+.cell:nth-child(3n){border-right:3px solid #b89a62!important}
+.cell:nth-child(n+19):nth-child(-n+27),
+.cell:nth-child(n+46):nth-child(-n+54){border-bottom:3px solid #b89a62!important}
+.cell:nth-child(9n){border-right:0!important}
+.cell:nth-child(n+73){border-bottom:0!important}
+.cell:nth-child(3n+1){border-left:0!important}
+
 .cell.selected,.cell.related{background:#55472d!important}
 footer{margin-top:auto!important}
 
