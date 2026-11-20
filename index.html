@@ -20,13 +20,13 @@ select{border:1px solid #666!important;border-radius:9px!important;background:#1
 footer,.byline,.sub.byline{display:block;text-align:center;color:#aaa!important;font-size:10px!important;font-weight:700!important;letter-spacing:.16em!important;text-transform:none!important;margin-top:auto!important;padding:8px 0 max(4px,env(safe-area-inset-bottom))!important}
 
 body{padding:12px 10px 8px!important}.app{min-height:100dvh;max-height:none!important;justify-content:flex-start!important;gap:8px;padding:8px 0 0}
-.brand{color:#aaa!important}.scores{color:#aaa!important}.scores b{color:#f3e8d2!important}
+.brand{display:none!important}.scores{color:#aaa!important}.scores b{color:#f3e8d2!important}
 canvas{border:2px solid #626262!important;border-radius:15px!important;box-shadow:0 5px 0 #090909!important}
 .settings{padding:8px 10px;border-radius:10px}.pad button{background:linear-gradient(#555,#333)!important;color:#eee!important;border-color:#777!important}
 footer{margin-top:auto!important;padding-bottom:max(12px,env(safe-area-inset-bottom))!important}
 
 </style></head><body><main class="app">
-<div class="top"><div class="brand">NFC ARCADE</div><div class="scores"><div>PUNKTE<b id="score">0</b></div><div>HIGHSCORE<b id="best">0</b></div></div></div>
+<div class="top"><div class="scores"><div>PUNKTE<b id="score">0</b></div><div>HIGHSCORE<b id="best">0</b></div></div></div>
 <h1>Snake.</h1>
 <div class="settings"><label for="difficulty">Schwierigkeit</label><select id="difficulty"><option value="easy">Einfach</option><option value="normal" selected>Normal</option><option value="hard">Schwer</option></select></div>
 <canvas id="game" width="600" height="480" aria-label="Snake Spielfeld"></canvas>
