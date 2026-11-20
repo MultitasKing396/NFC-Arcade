@@ -22,6 +22,27 @@ button:active{transform:translateY(2px);box-shadow:0 1px 0 #100f1b}.primary{back
 .actions{display:flex;gap:8px}.actions button{flex:1;padding:11px 7px;font-size:12px}.sprint{background:linear-gradient(#e9b56f,#a9665d);border-color:#f5d09b;color:#2d2033}.sprint:disabled{opacity:.45}
 .help{text-align:center;color:#b7aab6;font-size:10px;line-height:1.5}
 @media(min-width:600px){body{padding-top:24px}.controls{grid-template-columns:repeat(3,64px);grid-template-rows:repeat(2,50px)}}
+
+/* Compact, single-screen mobile layout */
+html,body{width:100%;height:100%;min-height:0;overflow:hidden;overscroll-behavior:none}
+body{height:100vh;height:100dvh;padding:max(4px,env(safe-area-inset-top)) 8px max(4px,env(safe-area-inset-bottom))}
+.app{width:min(100%,500px);height:100%;min-height:0;gap:clamp(3px,.65vh,7px)}
+header{flex:0 0 auto}h1{font-size:clamp(23px,5vh,34px);line-height:1.05;letter-spacing:.1em}
+header p{font-size:8px;margin-top:1px}.topline{flex:0 0 auto;font-size:10px}
+.sound{padding:5px 10px;font-size:10px}.stats{flex:0 0 auto;gap:5px}
+.stat{padding:4px;border-radius:9px;font-size:8px}.stat b{font-size:clamp(15px,2.8vh,19px)}
+.frame{flex:1 1 auto;min-height:0;display:flex;align-items:center;justify-content:center;padding:3px;overflow:hidden}
+canvas{width:auto;height:100%;max-width:100%;max-height:100%;aspect-ratio:19/21;object-fit:contain}
+.overlay{inset:3px;padding:12px}.overlay h2{font-size:clamp(23px,6vh,36px);margin-bottom:4px}
+.overlay p{font-size:11px;margin:3px 0 10px}.overlay .ready{font-size:13px;margin:3px 0 8px}
+.primary{padding:9px 18px}.message{flex:0 0 auto;min-height:14px;font-size:10px;line-height:1.2}
+.controls{flex:0 0 auto;grid-template-columns:repeat(3,48px);grid-template-rows:repeat(2,clamp(28px,4.2vh,38px));gap:3px}
+.controls button{font-size:17px;border-radius:9px}.actions{flex:0 0 auto;gap:5px}
+.actions button{min-height:34px;padding:6px 4px;font-size:10px;border-radius:9px}
+.help{display:none}button,canvas{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+@media(max-height:620px){.app{gap:2px}h1{font-size:22px}.topline .sound{padding:3px 8px}.stat{padding:2px}.stat b{font-size:14px}.controls{grid-template-rows:repeat(2,27px)}.actions button{min-height:29px;padding:4px}.message{min-height:11px}}
+@media(min-width:600px){body{padding:8px}.app{max-width:470px}}
+
 </style></head>
 <body><main class="app">
 <header><h1>PAC-MAN</h1><p>SOFT RETRO ARCADE · BY ALP</p></header>
@@ -36,6 +57,8 @@ button:active{transform:translateY(2px);box-shadow:0 1px 0 #100f1b}.primary{back
 </main>
 <script>
 (()=>{
+// Browser-Zoomgesten im Spielbereich unterbinden, soweit der Browser dies erlaubt.
+let lastTouchEnd=0;document.addEventListener('touchend',e=>{const now=Date.now();if(now-lastTouchEnd<300)e.preventDefault();lastTouchEnd=now},{passive:false});document.addEventListener('gesturestart',e=>e.preventDefault());document.addEventListener('touchmove',e=>{if(e.touches&&e.touches.length>1)e.preventDefault()},{passive:false});
 const canvas=document.getElementById('game'),ctx=canvas.getContext('2d'),$=id=>document.getElementById(id);
 const TILE=20,COLS=19,ROWS=21,BASE=[
 "###################",
