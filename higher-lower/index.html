@@ -72,7 +72,7 @@ select{background:var(--panel);color:var(--text);border:1px solid var(--edge);bo
 .app.duel-mode #playerOne{order:3;width:100%}
 .app.duel-mode .topline:has(#start){order:4}
 .app.duel-mode .footer{order:5}
-.app.duel-mode .current-label{font-size:10px;margin-bottom:6px}.app.duel-mode .topline:has(#start){justify-content:center}.app.duel-mode #start{width:100%;max-width:220px}.player-side.active .duel-choice:not(:disabled){filter:brightness(1.12);box-shadow:0 0 12px color-mix(in srgb,var(--gold) 55%,transparent),0 4px 0 #17120c}.player-side.inactive .duel-choice{filter:brightness(.48)}.message{min-height:22px;text-align:center;color:var(--muted);font-size:13px;font-weight:650}
+.app.duel-mode .current-label{font-size:10px;margin-bottom:6px}.app.duel-mode .topline:has(#start){justify-content:center;gap:10px}.app.duel-mode #start{width:auto;max-width:none;flex:1}.app.duel-mode #duelBackHome{display:inline-flex}#duelBackHome{display:none}.player-side.active .duel-choice:not(:disabled){filter:brightness(1.12);box-shadow:0 0 12px color-mix(in srgb,var(--gold) 55%,transparent),0 4px 0 #17120c}.player-side.inactive .duel-choice{filter:brightness(.48)}.message{min-height:22px;text-align:center;color:var(--muted);font-size:13px;font-weight:650}
 .footer{margin-top:auto;text-align:center;color:#aaa;font-size:10px;font-weight:800;letter-spacing:.17em;padding:10px 0 4px}
 .overlay{position:fixed;inset:0;background:#080808d9;backdrop-filter:blur(7px);display:none;align-items:center;justify-content:center;padding:22px;z-index:5}
 .overlay.show{display:flex}
@@ -164,7 +164,7 @@ body[data-theme="cosmic"] .joker-card{background:radial-gradient(circle at cente
 <div class="duel-controls hidden" id="duelControls"><div class="player-side" id="playerOne"><strong>SPIELER 1</strong><span class="player-score" id="scoreOne">0</span><small class="player-joker" id="jokerOne">0/2 Joker</small><div class="player-buttons"><button class="choice duel-choice" id="p1a" disabled></button><button class="choice duel-choice" id="p1b" disabled></button></div></div><div class="player-side" id="playerTwo"><strong>SPIELER 2</strong><span class="player-score" id="scoreTwo">0</span><small class="player-joker" id="jokerTwo">0/2 Joker</small><div class="player-buttons"><button class="choice duel-choice" id="p2a" disabled></button><button class="choice duel-choice" id="p2b" disabled></button></div></div></div>
 <div class="message" id="message" aria-live="polite">Tippe auf Start und rate die nächste Karte.</div>
 <div class="controls" id="controls"><button class="choice" id="higher" disabled>↑ HÖHER</button><div class="joker-row"><div class="joker-chip"><div class="joker-mini">★</div><div><strong>Joker-Rettung</strong><small id="jokerStatus">Noch verfügbar</small></div></div><span id="deckCount">53 Karten im Deck</span></div><button class="choice" id="lower" disabled>↓ NIEDRIGER</button></div>
-<div class="topline"><button class="primary" id="start">Spiel starten</button></div>
+<div class="topline"><button class="secondary" id="duelBackHome">← MENÜ</button><button class="primary" id="start">Spiel starten</button></div>
 <footer class="footer">by Alp</footer>
 </main>
 <div class="overlay" id="overlay"><div class="dialog"><h2 id="dialogTitle">Spiel beendet</h2><p id="dialogText"></p><div class="dialog-actions"><button class="primary" id="again">Nochmal spielen</button><button class="secondary" id="close">Schließen</button></div></div></div>
@@ -314,6 +314,12 @@ function finishShootoutAttempt(ok){
 function finishMatch(message){
   finished=true;waiting=true;restartArmed=false;els.start.classList.remove('confirm');els.start.textContent='Spiel starten';setButtons(false);els.message.textContent=message;els.overlay.classList.add('show');saveGameState();
 }
+function retrySameValue(direction){
+  guess=direction;waiting=false;
+  els.message.textContent='Gleicher Kartenwert! Deine Auswahl bleibt bestehen – die nächste Karte wird aufgedeckt …';
+  setButtons(false);saveGameState();
+  setTimeout(()=>choose(direction),450);
+}
 function choose(direction){
   if(!started||finished||waiting||!current)return;
   guess=direction;waiting=true;setButtons(false);
@@ -321,7 +327,7 @@ function choose(direction){
   const next=deck.pop();updateDeck();
   if(next.joker){chargeJoker();els.message.textContent='Joker gezogen! Joker aufgeladen – die Vorhersage bleibt offen.';setTimeout(()=>resolveWithReplacement(direction),450);return}
   const ok=mode==='color'?(next.suitClass===direction):(next.value===current.value?null:(direction==='higher'?next.value>current.value:next.value<current.value));
-  animateDeal(next,()=>{els.current.classList.add(ok===true?'correct':ok===false?'wrong':'');els.label.textContent='AKTUELLE KARTE · '+cardName(current);applyDuelOutcome(ok)});
+  animateDeal(next,()=>{els.current.classList.add(ok===true?'correct':ok===false?'wrong':'');els.label.textContent='AKTUELLE KARTE · '+cardName(current);if(ok===null){retrySameValue(direction);return}applyDuelOutcome(ok)});
 }
 function resolveWithReplacement(direction){
   if(!deck.length){deck=makeDeck();updateDeck()}
@@ -329,6 +335,7 @@ function resolveWithReplacement(direction){
   if(c.joker){chargeJoker();els.message.textContent='Joker gezogen! Joker aufgeladen.';resolveWithReplacement(direction);return}
   const ok=mode==='color'?(c.suitClass===direction):(c.value===current.value?null:(direction==='higher'?c.value>current.value:c.value<current.value));
   renderCard(els.current,c);current=c;els.label.textContent='AKTUELLE KARTE · '+cardName(current);
+  if(ok===null){retrySameValue(direction);return}
   applyDuelOutcome(ok);
 }
 function endGame(){
@@ -363,7 +370,8 @@ function requestStartOrRestart(){
 }
 els.higher.addEventListener('click',()=>choose(mode==='color'?'red':'higher'));els.lower.addEventListener('click',()=>choose(mode==='color'?'black':'lower'));$('p1a').addEventListener('click',()=>{if(twoPlayer&&activePlayer===1)choose(mode==='color'?'red':'higher')});$('p1b').addEventListener('click',()=>{if(twoPlayer&&activePlayer===1)choose(mode==='color'?'black':'lower')});$('p2a').addEventListener('click',()=>{if(twoPlayer&&activePlayer===2)choose(mode==='color'?'red':'higher')});$('p2b').addEventListener('click',()=>{if(twoPlayer&&activePlayer===2)choose(mode==='color'?'black':'lower')});els.start.addEventListener('click',requestStartOrRestart);
 document.querySelectorAll('[data-mode]').forEach(btn=>btn.addEventListener('click',()=>{setMode(btn.dataset.mode);$('home').classList.add('hidden');document.querySelector('.app').classList.add('playing');if(!restoreGameState(btn.dataset.mode))start()}));
-$('backHome').addEventListener('click',()=>{saveGameState();closeDialog();started=false;finished=false;document.querySelector('.app').classList.remove('playing','duel-mode');$('home').classList.remove('hidden');updateHomeStatuses();});
+$('backHome').addEventListener('click',returnHome);$('duelBackHome').addEventListener('click',returnHome);
+function returnHome(){saveGameState();closeDialog();started=false;finished=false;document.querySelector('.app').classList.remove('playing','duel-mode');$('home').classList.remove('hidden');updateHomeStatuses();}
 $('again').addEventListener('click',()=>{start();$('again').textContent='Nochmal spielen';$('close').textContent='Schließen'});
 $('close').addEventListener('click',()=>{closeDialog();$('again').textContent='Nochmal spielen';$('close').textContent='Schließen'});
 els.theme.addEventListener('change',()=>{document.body.dataset.theme=els.theme.value;try{localStorage.setItem('higherLowerTheme',els.theme.value)}catch(e){}});
