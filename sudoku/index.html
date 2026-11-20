@@ -31,7 +31,7 @@ footer{text-align:center;color:#92968c;font-size:10px;font-weight:700;letter-spa
 <div class="progress"><span id="progress"></span></div>
 <div class="board-wrap"><div class="board" id="board" role="grid" aria-label="Sudoku-Spielfeld"></div></div>
 <div class="numbers" id="numbers"></div>
-<div class="actions"><button class="btn light" id="erase">⌫ Löschen</button><button class="btn" id="hint">Hinweis</button><button class="btn light" id="restart">↻ Zurücksetzen</button></div>
+<div class="actions"><button class="btn light" id="erase">⌫ Löschen</button><button class="btn" id="hint">Hinweis</button></div>
 <footer>BY ALP</footer></main>
 <div class="toast" id="toast"></div>
 <div class="win hidden" id="win"><div class="win-card"><h2>Wunderbar gelöst!</h2><p id="wintext"></p><button class="btn" id="winnew">Neues Sudoku</button></div></div>
@@ -63,7 +63,7 @@ function restore(){try{let s=JSON.parse(localStorage.getItem(key));if(!s||s.leve
 function winGame(){completed=true;clockPaused=false;clearInterval(tick);let b=Number(localStorage.getItem(bestKey())||0);if(!b||seconds<b){localStorage.setItem(bestKey(),String(seconds));b=seconds}loadBest();$('wintext').textContent='Du hast das '+names[Number(difficulty.value)]+'-Sudoku in '+formatTime(seconds)+' gelöst – mit '+mistakes+' Fehlern. '+(seconds===b?'Neue Bestzeit!':'Deine Bestzeit: '+formatTime(b)+'.');$('win').classList.remove('hidden');save()}
 function newGame(){difficulty.value=difficulty.value;loadBest();makePuzzle(Number(difficulty.value))}
 $('numbers').innerHTML='';for(let n=1;n<=9;n++){let b=document.createElement('button');b.className='num';b.textContent=n;b.dataset.n=n;b.addEventListener('click',()=>input(n));$('numbers').append(b)}
-$('new').addEventListener('click',newGame);$('restart').addEventListener('click',()=>{values=puzzle.flat();mistakes=0;seconds=0;completed=false;clockPaused=false;selected=-1;startClock();save();render()});$('erase').addEventListener('click',clearCell);$('hint').addEventListener('click',hint);$('timeToggle').addEventListener('click',toggleClock);$('winnew').addEventListener('click',()=>{$('win').classList.add('hidden');newGame()});difficulty.addEventListener('change',()=>{loadBest();newGame()});
+$('new').addEventListener('click',newGame);$('erase').addEventListener('click',clearCell);$('hint').addEventListener('click',hint);$('timeToggle').addEventListener('click',toggleClock);$('winnew').addEventListener('click',()=>{$('win').classList.add('hidden');newGame()});difficulty.addEventListener('change',()=>{loadBest();newGame()});
 document.addEventListener('keydown',e=>{if(e.key>='1'&&e.key<='9')input(Number(e.key));if(e.key==='Backspace'||e.key==='Delete')clearCell();if(e.key.startsWith('Arrow')&&selected>=0){e.preventDefault();let r=Math.floor(selected/9),c=selected%9;if(e.key==='ArrowUp')r=Math.max(0,r-1);if(e.key==='ArrowDown')r=Math.min(8,r+1);if(e.key==='ArrowLeft')c=Math.max(0,c-1);if(e.key==='ArrowRight')c=Math.min(8,c+1);selected=r*9+c;render()}});
 if(!restore()){loadBest();makePuzzle(Number(difficulty.value))}else loadBest();
 })();
