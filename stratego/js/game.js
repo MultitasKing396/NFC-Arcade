@@ -187,7 +187,10 @@ function render(){
   const label=document.createElement("span");
   label.className="combat-callout-label";
   const opponentInfo=pendingAnimation.opponentType?RANKS[pendingAnimation.opponentType]:null;
-  label.textContent=pendingAnimation.special==="spy-marshal"?"SPION STÜRZT FELDMARSCHALL!":pendingAnimation.outcome==="both"?"GLEICHSTAND":opponentInfo?.rank>0?"STÄRKE "+opponentInfo.rank:opponentInfo?.name||"SIEG!";
+  const resultForPlayer=pendingAnimation.winner==="blue"?"win":pendingAnimation.winner==="red"?"loss":"draw";
+  callout.classList.add("combat-callout-"+resultForPlayer);
+  const opponentLabel=opponentInfo?.rank>0?"STÄRKE "+opponentInfo.rank:opponentInfo?.name||"SONDERFIGUR";
+  label.textContent=pendingAnimation.special==="spy-marshal"&&resultForPlayer==="win"?"SPION STÜRZT FELDMARSCHALL!":pendingAnimation.opponentType==="flag"?(resultForPlayer==="win"?"FLAGGE EROBERT":"DEINE FLAGGE EROBERT"):pendingAnimation.outcome==="both"?"GLEICHSTAND":resultForPlayer==="win"?"SIEG · "+opponentLabel+" BESIEGT":resultForPlayer==="loss"?"NIEDERLAGE · "+opponentLabel: "GLEICHSTAND";
   callout.append(label);
   calloutLayer.append(callout);
   boardWrap.append(calloutLayer);
