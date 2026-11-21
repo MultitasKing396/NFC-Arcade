@@ -29,7 +29,7 @@ function render(){
    const info=pieceInfo(p),el=document.createElement("div");
    el.className="piece "+p.side+(p.side==="red"&&!p.revealed?" hidden-rank":"");
    el.setAttribute("aria-label",p.side==="red"&&!p.revealed?"Gegnerische Figur":info.name);
-   el.innerHTML=pieceArt(p)+(p.side==="red"&&!p.revealed?"":`<span class="rank">${info.name}</span>`);
+   el.innerHTML=pieceArt(p);
    cell.append(el);
   }
   boardEl.append(cell);
@@ -37,7 +37,7 @@ function render(){
 }
 function clearSelection(){selected=null;validMoves=[];dragFrom=null;if(strengthEl)strengthEl.textContent="";render();}
 function choose(index){
- const p=board[index];if(!p||p.side!=="blue"||!legalMoves(board,index).length)return false;
+ const p=board[index];if(!p||p.side!=="blue")return false;
  selected=index;validMoves=legalMoves(board,index);render();setMessage(`Ausgewählt: ${pieceInfo(p).name}`);showSelectedStrength(p);return true;
 }
 function finishMove(from,to){
