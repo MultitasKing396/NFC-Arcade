@@ -1,6 +1,6 @@
 import {RANKS,LAKES,initialBoard,legalMoves,resolveCombat,sideHasMoves} from "./rules.js";
 const boardEl=document.querySelector("#board"),messageEl=document.querySelector("#message"),strengthEl=document.querySelector("#selectedStrength"),turnEl=document.querySelector("#turnStatus");
-const rulesModal=document.querySelector("#rulesModal");
+const rulesModal=document.querySelector("#rulesModal"),setupModal=document.querySelector("#setupModal");
 let board=initialBoard(),turn="blue",selected=null,validMoves=[],busy=false,dragPointer=null,dragFrom=null;
 const pieceInfo=p=>RANKS[p.type];
 function pieceArt(piece){
@@ -80,7 +80,15 @@ function endGame(winner){
  const banner=document.createElement("div");banner.className="result-banner";banner.innerHTML=`<div class="result-card"><div class="eyebrow">DIE SCHLACHT IST ENTSCHIEDEN</div><h2>${winner==="blue"?"SIEG":"NIEDERLAGE"}</h2><p>${winner==="blue"?"Deine Armee triumphiert.":"Deine Armee wurde besiegt."}</p><button class="gold-button" id="resultNew">Neue Partie</button></div>`;
  document.body.append(banner);banner.querySelector("#resultNew").addEventListener("click",()=>{banner.remove();newGame();});
 }
-function newGame(){board=initialBoard();selected=null;validMoves=[];busy=false;if(strengthEl)strengthEl.textContent="";setTurn("blue");setMessage("Wähle eine deiner Figuren aus.");render();}
+function openSetup(){setupModal.hidden=false;}
+function closeSetup(){setupModal.hidden=true;}
+function startConfiguredGame(){
+ const player=document.querySelector("#playerFormation").value;
+ const cpu=document.querySelector("#cpuFormation").value;
+ board=initialBoard(player,cpu);selected=null;validMoves=[];busy=false;dragPointer=null;dragFrom=null;
+ if(strengthEl)strengthEl.textContent="";
+ closeSetup();setTurn("blue");setMessage("Aufstellung bereit – wähle eine deiner Figuren aus.");render();
+}
 boardEl.addEventListener("pointerdown",e=>{
  const cell=e.target.closest(".cell");if(!cell||turn!=="blue"||busy)return;
  const index=Number(cell.dataset.index),p=board[index];
@@ -101,9 +109,13 @@ boardEl.addEventListener("click",e=>{
  if(selected!==null&&validMoves.includes(i))finishMove(selected,i);
  else if(board[i]?.side==="blue")choose(i);
 });
-document.querySelector("#newGameBtn").addEventListener("click",newGame);
+document.querySelector("#newGameBtn").addEventListener("click",openSetup);
+document.querySelector("#startGameBtn").addEventListener("click",startConfiguredGame);
+document.querySelector("#cancelSetup").addEventListener("click",closeSetup);
+document.querySelector("#closeSetup").addEventListener("click",closeSetup);
+setupModal.addEventListener("click",e=>{if(e.target===setupModal)closeSetup();});
 document.querySelector("#rulesBtn").addEventListener("click",()=>rulesModal.hidden=false);
 document.querySelector("#closeRules").addEventListener("click",()=>rulesModal.hidden=true);
 rulesModal.addEventListener("click",e=>{if(e.target===rulesModal)rulesModal.hidden=true;});
-document.addEventListener("keydown",e=>{if(e.key==="Escape")rulesModal.hidden=true;});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){rulesModal.hidden=true;closeSetup();}});
 render();
