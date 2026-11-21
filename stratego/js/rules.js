@@ -46,7 +46,7 @@ export function arrangeArmy(side,formation="balanced"){
 export function initialBoard(blueFormation="balanced",redFormation="balanced"){
  const board=Array(100).fill(null);
  const blue=arrangeArmy("blue",blueFormation),red=arrangeArmy("red",redFormation);
- for(let i=0;i<40;i++){board[60+i]=blue[i];board[i]=red[i];}
+ for(let i=0;i<40;i++){board[60+i]=blue[i];const redRow=Math.floor(i/10),redCol=i%10;board[(3-redRow)*10+redCol]=red[i];}
  return board;
 }
 export function isMovable(piece){return piece && !["bomb","flag"].includes(piece.type);}
