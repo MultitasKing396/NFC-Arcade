@@ -47,6 +47,10 @@ select{background:var(--panel);color:var(--text);border:1px solid var(--edge);bo
 .card-back:after{content:"♠";font-size:70px;text-shadow:0 2px 7px #000}
 .joker-card{background:linear-gradient(145deg,#fff,#f0e4c6);color:#542c8a}
 .joker-card .suit-big{font-size:52px}
+.joker-reveal{animation:jokerPop .46s cubic-bezier(.2,.8,.25,1) both;filter:drop-shadow(0 0 12px #f4d36b) drop-shadow(0 0 24px #b77cff)}
+@keyframes jokerPop{0%{transform:translateY(-50%) scale(1)}45%{transform:translateY(calc(-50% - 11px)) scale(1.09);filter:brightness(1.55) drop-shadow(0 0 18px #ffe58a) drop-shadow(0 0 30px #b77cff)}100%{transform:translateY(-50%) scale(1);filter:drop-shadow(0 0 12px #f4d36b) drop-shadow(0 0 24px #b77cff)}}
+@keyframes jokerCounterPop{0%{transform:scale(1)}45%{transform:scale(1.35);color:#ffe58a;text-shadow:0 0 12px #f4d36b}100%{transform:scale(1)}}
+.joker-counter-pop{animation:jokerCounterPop .42s ease-out}
 .current-label{text-align:center;color:#fff;font-size:12px;font-weight:800;letter-spacing:.13em;margin:0 0 10px;position:relative;z-index:1}
 .controls{display:flex;flex-direction:column;gap:10px}.controls .choice{width:100%}.controls .joker-row{width:100%}
 .controls.color-mode{display:grid;grid-template-columns:1fr 1fr;gap:10px}.controls.color-mode .choice{grid-row:1;min-height:58px}.controls.color-mode .joker-row{grid-column:1/-1;grid-row:2}
@@ -164,7 +168,7 @@ body[data-theme="cosmic"] .joker-card{background:radial-gradient(circle at cente
 </section>
 <div class="duel-controls hidden" id="duelControls"><div class="player-side" id="playerOne"><strong>SPIELER 1</strong><span class="player-score" id="scoreOne">0</span><small class="player-joker" id="jokerOne">0/2 Joker</small><div class="player-buttons"><button class="choice duel-choice" id="p1a" disabled></button><button class="choice duel-choice" id="p1b" disabled></button></div></div><div class="player-side" id="playerTwo"><strong>SPIELER 2</strong><span class="player-score" id="scoreTwo">0</span><small class="player-joker" id="jokerTwo">0/2 Joker</small><div class="player-buttons"><button class="choice duel-choice" id="p2a" disabled></button><button class="choice duel-choice" id="p2b" disabled></button></div></div></div>
 <div class="message" id="message" aria-live="polite">Tippe auf Start und rate die nächste Karte.</div>
-<div class="controls" id="controls"><button class="choice" id="higher" disabled>↑ HÖHER</button><div class="joker-row"><div class="joker-chip"><div class="joker-mini">★</div><div><strong>Joker-Rettung</strong><small id="jokerStatus">Noch verfügbar</small></div></div><span id="deckCount">53 Karten im Deck</span></div><button class="choice" id="lower" disabled>↓ NIEDRIGER</button></div>
+<div class="controls" id="controls"><button class="choice" id="higher" disabled>↑ HÖHER</button><div class="joker-row"><div class="joker-chip"><div class="joker-mini">★</div><div><strong>Joker gesammelt</strong><small id="jokerStatus">0/2 geladen</small></div></div><span id="deckCount">53 Karten im Deck</span></div><button class="choice" id="lower" disabled>↓ NIEDRIGER</button></div>
 <div class="topline"><button class="secondary" id="duelBackHome">← MENÜ</button><button class="primary" id="start">Spiel starten</button></div>
 <footer class="footer">by Alp</footer>
 </main>
@@ -175,7 +179,7 @@ const $=id=>document.getElementById(id);
 const els={score:$('score'),best:$('best'),theme:$('theme'),gameTitle:$('gameTitle'),controls:$('controls'),duelControls:$('duelControls'),current:$('currentCard'),next:$('nextCard'),area:document.querySelector('.card-area'),label:$('cardLabel'),message:$('message'),higher:$('higher'),lower:$('lower'),joker:$('jokerStatus'),deck:$('deckCount'),start:$('start'),overlay:$('overlay'),dialogTitle:$('dialogTitle'),dialogText:$('dialogText')};
 const suits=[{s:'♠',c:'black'},{s:'♥',c:'red'},{s:'♦',c:'red'},{s:'♣',c:'black'}];
 const symbols={1:'A',11:'J',12:'Q',13:'K'};
-function setMode(next){twoPlayer=next.endsWith('2');endless=next.endsWith('E');mode=twoPlayer?next.slice(0,-1):(endless?next.slice(0,-1):next);document.querySelector('.app').classList.toggle('duel-mode',twoPlayer);els.duelControls.classList.toggle('hidden',!twoPlayer);els.gameTitle.textContent='Guess the Card.';els.higher.textContent=mode==='higher'?'↑ HÖHER':'ROT';els.lower.textContent=mode==='higher'?'↓ NIEDRIGER':'SCHWARZ';els.higher.classList.toggle('red-choice',mode==='color');els.lower.classList.toggle('black-choice',mode==='color');els.controls.classList.toggle('color-mode',mode==='color');configureDuelButtons();try{best=Number(localStorage.getItem(bestKey())||0)}catch(e){best=0}els.best.textContent=best;els.message.textContent=endless?(mode==='higher'?'Endlos-Modus: Sammle Punkte bis alle 54 Karten durchgespielt sind.':'Endlos-Modus: Tippe Rot oder Schwarz und sammle Punkte bis zum Deckende.'):(mode==='higher'?'Tippe auf Start und rate die nächste Karte.':'Tippe auf Start und rate, ob die nächste Karte rot oder schwarz ist.');els.joker.closest('.joker-row').classList.toggle('hidden',endless);}
+function setMode(next){twoPlayer=next.endsWith('2');endless=next.endsWith('E');mode=twoPlayer?next.slice(0,-1):(endless?next.slice(0,-1):next);document.querySelector('.app').classList.toggle('duel-mode',twoPlayer);els.duelControls.classList.toggle('hidden',!twoPlayer);els.gameTitle.textContent='Guess the Card.';els.higher.textContent=mode==='higher'?'↑ HÖHER':'ROT';els.lower.textContent=mode==='higher'?'↓ NIEDRIGER':'SCHWARZ';els.higher.classList.toggle('red-choice',mode==='color');els.lower.classList.toggle('black-choice',mode==='color');els.controls.classList.toggle('color-mode',mode==='color');configureDuelButtons();try{best=Number(localStorage.getItem(bestKey())||0)}catch(e){best=0}els.best.textContent=best;els.message.textContent=endless?(mode==='higher'?'Endlos-Modus: Sammle Punkte bis alle 54 Karten durchgespielt sind.':'Endlos-Modus: Tippe Rot oder Schwarz und sammle Punkte bis zum Deckende.'):(mode==='higher'?'Tippe auf Start und rate die nächste Karte.':'Tippe auf Start und rate, ob die nächste Karte rot oder schwarz ist.');}
 let deck=[],current=null,score=0,best=0,jokerCharges=[0,0],started=false,finished=false,guess=null,waiting=false,freeRetry=false,restartArmed=false,mode='higher',twoPlayer=false,endless=false,activePlayer=1,playerScores=[0,0],shootout=false,shootoutFirst=null,shootoutOpener=1,shootoutFirstPlayer=1;
 const BEST_KEYS={higher:'higherLowerBest',color:'redBlackBest',higherE:'higherLowerEndlessBest',colorE:'redBlackEndlessBest'};
 function bestKey(){return twoPlayer?null:(mode+(endless?'E':'') in BEST_KEYS?BEST_KEYS[mode+(endless?'E':'')]:BEST_KEYS[mode])}
@@ -221,7 +225,7 @@ function finishPlayerTurn(){if(twoPlayer){activePlayer=activePlayer===1?2:1;upda
 function updateDeck(){els.deck.textContent=deck.length+' Karten im Deck';const badge=document.querySelector('.deck-top .deck-remaining');if(badge)badge.textContent=deck.length}
 function jokerOwner(){return twoPlayer?activePlayer-1:0}
 function updateJoker(){if(twoPlayer){$('jokerOne').textContent=jokerCharges[0]+'/2 Joker';$('jokerTwo').textContent=jokerCharges[1]+'/2 Joker';els.joker.textContent='Joker: '+jokerCharges[0]+' / '+jokerCharges[1]}else{els.joker.textContent=jokerCharges[0]+'/2 geladen'}}
-function chargeJoker(){const i=jokerOwner();jokerCharges[i]=Math.min(2,jokerCharges[i]+1);updateJoker()}
+function chargeJoker(){const i=jokerOwner();jokerCharges[i]=Math.min(2,jokerCharges[i]+1);updateJoker();const counter=twoPlayer?$('joker'+(i===0?'One':'Two')):els.joker;counter.classList.remove('joker-counter-pop');void counter.offsetWidth;counter.classList.add('joker-counter-pop');counter.addEventListener('animationend',()=>counter.classList.remove('joker-counter-pop'),{once:true})}
 function spendJoker(){const i=jokerOwner();if(jokerCharges[i]<=0)return false;jokerCharges[i]--;updateJoker();return true}
 function setButtons(on){els.higher.disabled=!on;els.lower.disabled=!on;if(twoPlayer)setPlayerButtons(on)}
 function rankText(c){return c.joker?'Joker':c.label}
@@ -247,8 +251,33 @@ function animateDeal(c,onDone){
     if(onDone)onDone();saveGameState();
   });
 }
-function dealNext(){if(!deck.length)return;const c=drawDistinctCard();if(!c)return;updateDeck();if(c.joker){chargeJoker();els.message.textContent='Joker gezogen! Deine Joker-Rettung wurde aufgeladen.';drawNextAfterJoker();return}animateDeal(c,()=>{waiting=false;setButtons(true);els.label.textContent='AKTUELLE KARTE · '+cardName(current);if(guess){els.message.textContent='Gleicher Wert! Deine Auswahl bleibt bestehen – rate erneut.';setButtons(true)}})}
-function drawNextAfterJoker(){setTimeout(()=>{if(deck.length===0){endGame();return}dealNext()},450)}
+function animateJokerReveal(onDone){
+  const joker={joker:true,label:'JOKER'};
+  renderCard(els.next,null,true);
+  els.next.classList.remove('hidden','flip','dealing','joker-reveal');
+  els.next.style.left='10px';els.next.style.right='auto';els.next.style.transform='';
+  void els.next.offsetWidth;
+  const travel=Math.max(0,els.area.clientWidth-els.next.offsetWidth-20);
+  els.next.style.setProperty('--move-x',travel+'px');
+  void els.next.offsetWidth;
+  els.next.classList.add('dealing');
+  const flipTimer=setTimeout(()=>renderCard(els.next,joker),350);
+  els.next.addEventListener('animationend',function finish(e){
+    if(e.animationName!=='dealCard')return;
+    els.next.removeEventListener('animationend',finish);clearTimeout(flipTimer);
+    els.next.classList.remove('dealing');
+    els.next.style.left='auto';els.next.style.right='10px';els.next.style.transform='translateY(-50%)';
+    els.next.classList.add('joker-reveal');
+    els.label.textContent='★ JOKER GEZOGEN! ★';
+    els.message.textContent='Joker! Du hast einen Joker gesammelt.';
+    setTimeout(()=>{
+      els.next.classList.remove('joker-reveal');els.next.classList.add('hidden');
+      els.next.style.left='10px';els.next.style.right='auto';els.next.style.transform='';
+      chargeJoker();saveGameState();if(onDone)onDone();
+    },470);
+  });
+}
+function dealNext(){if(!deck.length)return;const c=drawDistinctCard();if(!c)return;updateDeck();if(c.joker){animateJokerReveal(()=>{if(deck.length===0){endGame();return}dealNext()});return}animateDeal(c,()=>{waiting=false;setButtons(true);els.label.textContent='AKTUELLE KARTE · '+cardName(current);if(guess){els.message.textContent='Gleicher Wert! Deine Auswahl bleibt bestehen – rate erneut.';setButtons(true)}})}
 function start(){closeDialog();restartArmed=false;shootout=false;shootoutFirst=null;shootoutOpener=1;shootoutFirstPlayer=1;activePlayer=1;playerScores=[0,0];$('scoreOne').textContent='0';$('scoreTwo').textContent='0';els.start.classList.remove('confirm');els.start.textContent='Neustarten';deck=makeDeck();current=null;score=0;jokerCharges=[0,0];started=true;finished=false;guess=null;waiting=false;freeRetry=false;els.score.textContent='0';updateJoker();updatePlayerTurn();updateDeck();setButtons(false);els.start.textContent='Neustarten';els.message.textContent='Die erste Karte wird aufgedeckt …';renderCard(els.current,null,true);els.label.textContent='DEINE STARTKARTE';drawNext()}
 function applyDuelOutcome(ok){
   if(twoPlayer&&shootout){finishShootoutAttempt(ok);return}
@@ -327,18 +356,16 @@ function choose(direction){
   guess=direction;waiting=true;setButtons(false);
   if(deck.length===0){if(shootout){deck=makeDeck();updateDeck()}else{endGame();return}}
   const next=drawDistinctCard();if(!next){endGame();return}updateDeck();
-  if(next.joker){chargeJoker();els.message.textContent='Joker gezogen! Joker aufgeladen – die Vorhersage bleibt offen.';setTimeout(()=>resolveWithReplacement(direction),450);return}
+  if(next.joker){animateJokerReveal(()=>resolveWithReplacement(direction));return}
   const ok=mode==='color'?(next.suitClass===direction):(next.value===current.value?null:(direction==='higher'?next.value>current.value:next.value<current.value));
   animateDeal(next,()=>{els.current.classList.add(ok===true?'correct':ok===false?'wrong':'');els.label.textContent='AKTUELLE KARTE · '+cardName(current);if(ok===null){retrySameValue(direction);return}applyDuelOutcome(ok)});
 }
 function resolveWithReplacement(direction){
   if(!deck.length){deck=makeDeck();updateDeck()}
   const c=drawDistinctCard();if(!c){endGame();return}updateDeck();
-  if(c.joker){chargeJoker();els.message.textContent='Joker gezogen! Joker aufgeladen.';resolveWithReplacement(direction);return}
+  if(c.joker){animateJokerReveal(()=>resolveWithReplacement(direction));return}
   const ok=mode==='color'?(c.suitClass===direction):(c.value===current.value?null:(direction==='higher'?c.value>current.value:c.value<current.value));
-  renderCard(els.current,c);current=c;els.label.textContent='AKTUELLE KARTE · '+cardName(current);
-  if(ok===null){retrySameValue(direction);return}
-  applyDuelOutcome(ok);
+  animateDeal(c,()=>{els.label.textContent='AKTUELLE KARTE · '+cardName(current);if(ok===null){retrySameValue(direction);return}applyDuelOutcome(ok)});
 }
 function endGame(){
   if(finished)return;
