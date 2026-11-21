@@ -216,19 +216,46 @@ function cpuMoveScore(from,to){
  if(["marshal","general"].includes(attacker.type))score-=2;
  return score;
 }
+function expertThreatPenalty(move){
+ const simulated=board.slice(),attacker=simulated[move.from],defender=simulated[move.to];
+ if(defender){
+  const outcome=resolveCombat(attacker,defender);
+  if(outcome.result==="attacker"){simulated[move.to]=attacker;simulated[move.from]=null;}
+  else if(outcome.result==="defender"){simulated[move.from]=null;}
+  else{simulated[move.from]=null;simulated[move.to]=null;}
+ }else{simulated[move.to]=attacker;simulated[move.from]=null;}
+ let penalty=0;
+ for(let i=0;i<simulated.length;i++){
+  const hunter=simulated[i];if(!hunter||hunter.side!=="blue")continue;
+  for(const targetIndex of legalMoves(simulated,i,currentMode)){
+   const target=simulated[targetIndex];if(!target||target.side!=="red")continue;
+   const outcome=resolveCombat(hunter,target);
+   if(outcome.result==="attacker"){
+    const rank=RANKS[target.type]?.rank||0;
+    penalty+=12+rank*8+(["marshal","general"].includes(target.type)?35:0);
+   }else if(outcome.result==="both")penalty+=8;
+  }
+ }
+ return penalty;
+}
 function chooseCpuMove(options){
- const ranked=options.map(move=>({...move,score:cpuMoveScore(move.from,move.to)})).sort((a,b)=>b.score-a.score);
+ const ranked=options.map(move=>{
+  const base=cpuMoveScore(move.from,move.to);
+  const expertRisk=cpuDifficulty==="expert"?expertThreatPenalty(move)*1.35:0;
+  return {...move,score:base-expertRisk};
+ }).sort((a,b)=>b.score-a.score);
  if(cpuDifficulty==="easy"){
-  // Leicht: Die CPU sieht gute Züge, wählt aber bewusst aus einem breiteren Feld.
+  // Leicht: wählt bewusst aus einem breiteren Feld brauchbarer Züge.
   const pool=ranked.slice(0,Math.max(1,Math.ceil(ranked.length*.55)));
   return pool[Math.floor(Math.random()*pool.length)];
  }
- if(cpuDifficulty==="hard"){
-  // Schwer: bevorzugt den bestbewerteten Zug statt aus mehreren Top-Zügen zu losen.
-  return ranked[0];
+ if(cpuDifficulty==="normal"){
+  const top=ranked.slice(0,Math.min(3,ranked.length));
+  return top[Math.floor(Math.random()*top.length)];
  }
- const top=ranked.slice(0,Math.min(3,ranked.length));
- return top[Math.floor(Math.random()*top.length)];
+ // Schwer und Experte wählen den stärksten Zug; Experte bewertet zusätzlich
+ // die unmittelbaren gegnerischen Antwortmöglichkeiten nach jedem Kandidatenzug.
+ return ranked[0];
 }
 function cpuMove(){
  const options=[];
@@ -274,10 +301,10 @@ function updateResumeButton(){
  document.querySelector("#savedTurnStatus").textContent=turn==="blue"?"Dein Zug":"CPU am Zug";
  document.querySelector("#savedTurnStatus").classList.toggle("cpu-turn",turn==="red");
  document.querySelector("#savedArmyInfo").textContent=blueLeft+" deiner "+config.count+" Figuren übrig · "+redLeft+" Gegner";
- document.querySelector("#savedDifficultyInfo").textContent="CPU: "+({easy:"Leicht",normal:"Normal",hard:"Schwer"}[cpuDifficulty]||"Normal");
+ document.querySelector("#savedDifficultyInfo").textContent="CPU: "+({easy:"Leicht",normal:"Normal",hard:"Schwer",expert:"Experte"}[cpuDifficulty]||"Normal");
  document.querySelector("#savedFactionMark").textContent=({aurelia:"✦",shadow:"☾",iron:"⚒",sylvan:"❧",ash:"♨",storm:"ϟ"})[playerFaction]||"⚔";
 }
-function loadGameState(){try{const raw=localStorage.getItem(GAME_SAVE_KEY);if(!raw)return false;const state=JSON.parse(raw);if(state?.version!==1||!MODES[state.currentMode]||!Array.isArray(state.board)||state.board.length!==modeConfig(state.currentMode).size**2||!state.board.every(p=>p===null||(p&&typeof p.type==="string"&&(p.side==="blue"||p.side==="red"))))return false;currentMode=state.currentMode;setMode(currentMode);board=state.board;turn=state.turn==="red"?"red":"blue";playerFaction=FACTIONS[state.playerFaction]?state.playerFaction:"aurelia";cpuFaction=FACTIONS[state.cpuFaction]?state.cpuFaction:"shadow";cpuDifficulty=["easy","normal","hard"].includes(state.cpuDifficulty)?state.cpuDifficulty:"normal";setMessage(state.message||"Spielstand geladen.");hasSavedGame=true;updateResumeButton();return true;}catch(error){console.warn("Gespeicherter Spielstand ist ungültig.",error);return false;}}
+function loadGameState(){try{const raw=localStorage.getItem(GAME_SAVE_KEY);if(!raw)return false;const state=JSON.parse(raw);if(state?.version!==1||!MODES[state.currentMode]||!Array.isArray(state.board)||state.board.length!==modeConfig(state.currentMode).size**2||!state.board.every(p=>p===null||(p&&typeof p.type==="string"&&(p.side==="blue"||p.side==="red"))))return false;currentMode=state.currentMode;setMode(currentMode);board=state.board;turn=state.turn==="red"?"red":"blue";playerFaction=FACTIONS[state.playerFaction]?state.playerFaction:"aurelia";cpuFaction=FACTIONS[state.cpuFaction]?state.cpuFaction:"shadow";cpuDifficulty=["easy","normal","hard","expert"].includes(state.cpuDifficulty)?state.cpuDifficulty:"normal";setMessage(state.message||"Spielstand geladen.");hasSavedGame=true;updateResumeButton();return true;}catch(error){console.warn("Gespeicherter Spielstand ist ungültig.",error);return false;}}
 function resumeSavedGame(){if(!loadGameState())return;selected=null;validMoves=[];busy=turn==="red";showGameScreen();setTurn(turn);render();updateResumeButton();if(busy)window.setTimeout(cpuMove,500);}
 function openHomeRules(){rulesModal.hidden=false;}
 function openSettings(){applySettings();settingsModal.hidden=false;}
