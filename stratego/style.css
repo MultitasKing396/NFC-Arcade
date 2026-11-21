@@ -772,3 +772,352 @@
     scroll-behavior:auto;
   }
 }
+
+
+/* VARIANTE C · vollständiges 2.5D-Diorama */
+.board-wrap.isometric-board{
+  width:min(100%,900px);
+  aspect-ratio:1.32/1;
+  height:auto;
+  min-height:0;
+  padding:0;
+  display:block;
+  position:relative;
+  perspective:1500px;
+  transform-style:preserve-3d;
+  overflow:visible;
+  isolation:isolate;
+  border:0;
+  border-radius:0;
+  background:transparent!important;
+  box-shadow:none!important;
+  margin:8px auto 14px;
+}
+.board-wrap.isometric-board .diorama-plinth{
+  position:absolute;
+  z-index:0;
+  top:50%;
+  left:50%;
+  width:76%;
+  aspect-ratio:1;
+  border:clamp(5px,1vw,10px) solid #121820;
+  border-radius:7px;
+  background:
+    repeating-linear-gradient(0deg,#ffffff08 0 1px,transparent 1px 7px),
+    linear-gradient(145deg,#6e5940 0%,#3a3028 38%,#1c2028 100%);
+  transform:translate(-50%,-50%) translateY(15px) perspective(1500px) rotateX(53deg) rotateZ(45deg) scale(.96);
+  transform-origin:center;
+  box-shadow:
+    0 0 0 2px #070b10,
+    0 0 0 5px #b38a4d66,
+    0 12px 0 #090e14,
+    0 19px 0 #05090e,
+    0 30px 34px #000c,
+    inset 0 2px 3px #fff3,
+    inset 0 -7px 12px #000b;
+}
+.board-wrap.isometric-board .diorama-plinth:before{
+  content:"";
+  position:absolute;
+  inset:5px;
+  border:1px solid #e3c58b55;
+  border-radius:3px;
+  box-shadow:inset 0 0 0 2px #080d1355;
+  pointer-events:none;
+}
+.board-wrap.isometric-board .diorama-plinth:after{
+  content:"";
+  position:absolute;
+  inset:-8px;
+  border:1px solid #ffffff20;
+  border-radius:9px;
+  pointer-events:none;
+}
+.board-wrap.isometric-board .board{
+  position:absolute;
+  z-index:2;
+  top:50%;
+  left:50%;
+  width:72%;
+  height:auto;
+  aspect-ratio:1/1;
+  padding:5px;
+  gap:3px;
+  overflow:visible;
+  border:2px solid #111a21;
+  border-radius:5px;
+  background:#111923;
+  transform:translate(-50%,-50%) perspective(1500px) rotateX(53deg) rotateZ(45deg) scale(.94);
+  transform-origin:center;
+  transform-style:preserve-3d;
+  box-shadow:
+    0 5px 0 #101820,
+    0 9px 0 #0a1118,
+    0 13px 0 #060b11,
+    0 21px 28px #000c,
+    inset 0 1px 2px #ffffff22;
+  outline:1px solid #ffffff25;
+  outline-offset:5px;
+}
+.board-wrap.isometric-board .cell{
+  position:relative;
+  overflow:visible;
+  border-radius:2px;
+  border:1px solid #ffffff20;
+  transform:translateZ(2px);
+  transform-style:preserve-3d;
+  box-shadow:
+    0 2px 0 #17231f,
+    0 3px 0 #0c1515,
+    0 5px 5px #0008,
+    inset 0 1px 1px #ffffff22;
+}
+.board-wrap.isometric-board .cell:not(.lake){
+  background-image:
+    linear-gradient(145deg,#ffffff1b,transparent 43%),
+    linear-gradient(315deg,#00000024,transparent 55%),
+    repeating-linear-gradient(25deg,#ffffff05 0 1px,transparent 1px 6px);
+}
+.board-wrap.isometric-board .cell:nth-child(even):not(.lake){
+  filter:brightness(.94) saturate(.94);
+}
+.board-wrap.isometric-board .cell.selected{
+  outline:2px solid #fff1b4;
+  outline-offset:-3px;
+  box-shadow:0 0 0 2px #d9b765,0 0 18px #ffe7a477,inset 0 0 0 999px #fff4c022;
+}
+.board-wrap.isometric-board .cell.valid:before{
+  box-shadow:0 0 0 3px #ffffff33,0 0 12px #fff9;
+}
+.board-wrap.isometric-board .cell.target{
+  filter:brightness(1.2);
+  box-shadow:0 0 0 2px #ffe8a4,0 0 18px #f4c76baa,inset 0 0 0 999px #f4c76b22;
+}
+.board-wrap.isometric-board .cell.lake{
+  transform:translateZ(3px);
+  border-radius:3px;
+  border-width:1px;
+  box-shadow:
+    inset 0 2px 2px #e4f4e855,
+    inset 0 -5px 8px #07131eaa,
+    0 3px 0 #182831,
+    0 5px 0 #0a151d,
+    0 7px 8px #000b;
+}
+.board-wrap.isometric-board .piece{
+  z-index:4;
+  position:relative;
+  width:92%;
+  height:96%;
+  overflow:visible;
+  pointer-events:none;
+}
+.board-wrap.isometric-board .piece:before{
+  content:"";
+  position:absolute;
+  z-index:0;
+  left:17%;
+  bottom:1%;
+  width:66%;
+  height:17%;
+  border:1px solid #f4dfae88;
+  border-radius:50%;
+  background:
+    radial-gradient(ellipse at 35% 25%,#fff7d988 0 8%,transparent 42%),
+    linear-gradient(145deg,#8c7045,#423526 62%,#201c1a);
+  box-shadow:
+    0 3px 3px #000b,
+    0 0 0 2px #090e14,
+    inset 0 1px 2px #fff6,
+    inset 0 -3px 4px #000a;
+}
+.board-wrap.isometric-board .piece:after{
+  content:"";
+  position:absolute;
+  z-index:0;
+  left:25%;
+  bottom:7%;
+  width:50%;
+  height:3%;
+  border-radius:50%;
+  background:#0008;
+  filter:blur(3px);
+}
+.board-wrap.isometric-board .piece-upright{
+  position:relative;
+  z-index:1;
+  width:100%;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transform:translateZ(5px) rotateZ(-45deg) rotateX(-53deg) scale(.82);
+  transform-origin:50% 76%;
+  transform-style:preserve-3d;
+}
+.board-wrap.isometric-board .piece .miniature{
+  width:100%;
+  height:100%;
+  flex:1;
+  overflow:visible;
+  filter:drop-shadow(0 3px 2px #000b) drop-shadow(0 0 2px #fff2);
+}
+.board-wrap.isometric-board .piece.hidden-rank .piece-upright .miniature{
+  width:100%;
+  height:100%;
+  filter:drop-shadow(0 4px 3px #000c);
+}
+.board-wrap.isometric-board .piece-rank-badge{
+  top:2px;
+  right:2px;
+  z-index:5;
+  border-width:1px;
+  box-shadow:0 2px 5px #000d,0 0 0 1px #5d4825;
+}
+.board-wrap.isometric-board .environment-layer{
+  position:absolute;
+  z-index:3;
+  top:50%;
+  left:50%;
+  width:72%;
+  aspect-ratio:1;
+  transform:translate(-50%,-50%) perspective(1500px) rotateX(53deg) rotateZ(45deg) scale(.94);
+  transform-origin:center;
+  pointer-events:none;
+  overflow:hidden;
+  border-radius:4px;
+  mix-blend-mode:screen;
+  opacity:.42;
+}
+.board-wrap.isometric-board .environment-layer:before,
+.board-wrap.isometric-board .environment-layer:after{
+  content:"";
+  position:absolute;
+  inset:-8%;
+  pointer-events:none;
+  background-repeat:no-repeat;
+}
+.board-wrap.isometric-board[data-theme="forest"] .environment-layer:before{
+  opacity:.8;
+  background-image:
+    radial-gradient(ellipse 3px 8px at 12% 14%,#d6f0a9dd 0 48%,transparent 58%),
+    radial-gradient(ellipse 2px 6px at 34% 61%,#a8d887cc 0 48%,transparent 58%),
+    radial-gradient(ellipse 3px 7px at 58% 32%,#e1e9a8cc 0 48%,transparent 58%),
+    radial-gradient(ellipse 2px 6px at 82% 76%,#b2d98ccc 0 48%,transparent 58%),
+    radial-gradient(ellipse 2px 5px at 92% 21%,#d5e9a0cc 0 48%,transparent 58%);
+  background-size:100% 125%;
+  animation:isoForestDrift 10s linear infinite;
+}
+.board-wrap.isometric-board[data-theme="forest"] .environment-layer:after{
+  opacity:.34;
+  background:radial-gradient(ellipse at 20% 12%,#d9f5b455,transparent 36%),radial-gradient(ellipse at 78% 88%,#a8e0a044,transparent 40%);
+  animation:isoForestGlow 6s ease-in-out infinite alternate;
+}
+.board-wrap.isometric-board[data-theme="ice"] .environment-layer:before{
+  opacity:.9;
+  background-image:
+    radial-gradient(circle at 8% 12%,#ffffff 0 1.3px,transparent 2.4px),
+    radial-gradient(circle at 26% 72%,#e7fbff 0 1.4px,transparent 2.5px),
+    radial-gradient(circle at 48% 30%,#ffffff 0 1px,transparent 2px),
+    radial-gradient(circle at 69% 84%,#e7fbff 0 1.3px,transparent 2.5px),
+    radial-gradient(circle at 91% 47%,#ffffff 0 1.2px,transparent 2.3px),
+    radial-gradient(circle at 78% 18%,#d9f7ff 0 1px,transparent 2px);
+  background-size:100% 140%;
+  animation:isoSnowfall 8s linear infinite;
+}
+.board-wrap.isometric-board[data-theme="ice"] .environment-layer:after{
+  opacity:.45;
+  background:linear-gradient(112deg,transparent 30%,#e8fbff77 48%,transparent 62%);
+  background-size:220% 100%;
+  animation:isoIceGlint 6s ease-in-out infinite;
+}
+.board-wrap.isometric-board[data-theme="volcano"] .environment-layer:before{
+  opacity:.95;
+  background-image:
+    radial-gradient(circle at 12% 82%,#ffcb6b 0 1.3px,transparent 2.6px),
+    radial-gradient(circle at 33% 53%,#ff7440 0 1.5px,transparent 2.8px),
+    radial-gradient(circle at 57% 91%,#ffd27a 0 1.2px,transparent 2.5px),
+    radial-gradient(circle at 76% 42%,#ff8146 0 1.4px,transparent 2.8px),
+    radial-gradient(circle at 91% 73%,#ffd27a 0 1.2px,transparent 2.5px);
+  background-size:100% 130%;
+  animation:isoEmbers 5s ease-in-out infinite;
+}
+.board-wrap.isometric-board[data-theme="volcano"] .environment-layer:after{
+  opacity:.5;
+  background:radial-gradient(ellipse at 50% 100%,#ff7a3566 0,transparent 48%);
+  animation:isoLavaPulse 3.4s ease-in-out infinite alternate;
+}
+.board-wrap.isometric-board[data-theme="ruins"] .environment-layer:before{
+  opacity:.65;
+  background-image:
+    radial-gradient(circle at 14% 22%,#e8d7ad 0 1px,transparent 2px),
+    radial-gradient(circle at 38% 68%,#d5c7a4 0 1px,transparent 2px),
+    radial-gradient(circle at 63% 39%,#eee0be 0 1px,transparent 2px),
+    radial-gradient(circle at 86% 81%,#c9c0a5 0 1px,transparent 2px);
+  background-size:100% 130%;
+  animation:isoDust 13s linear infinite;
+}
+.board-wrap.isometric-board[data-theme="ruins"] .environment-layer:after{
+  opacity:.38;
+  background:linear-gradient(115deg,transparent 25%,#f1e2bd66 50%,transparent 72%);
+  background-size:240% 100%;
+  animation:isoSunbeam 10s ease-in-out infinite;
+}
+@keyframes isoForestDrift{0%{background-position:0 -10%}100%{background-position:7% 115%}}
+@keyframes isoForestGlow{from{opacity:.18;transform:translateX(-2%)}to{opacity:.5;transform:translateX(2%)}}
+@keyframes isoSnowfall{0%{background-position:0 -15%}100%{background-position:3% 120%}}
+@keyframes isoIceGlint{0%,100%{background-position:120% 0}50%{background-position:-30% 0}}
+@keyframes isoEmbers{0%,100%{background-position:0 10%;opacity:.3}50%{background-position:2% -25%;opacity:1}}
+@keyframes isoLavaPulse{from{opacity:.18}to{opacity:.55}}
+@keyframes isoDust{0%{background-position:0 0}100%{background-position:8% -20%}}
+@keyframes isoSunbeam{0%,100%{background-position:130% 0}50%{background-position:-30% 0}}
+.board-wrap.isometric-board[data-theme="forest"] .diorama-plinth{border-color:#243c29;background:repeating-linear-gradient(0deg,#d4e9a20a 0 1px,transparent 1px 6px),linear-gradient(145deg,#60794a,#2b4531 48%,#14251c)}
+.board-wrap.isometric-board[data-theme="ice"] .diorama-plinth{border-color:#a8d9e9;background:repeating-linear-gradient(135deg,#ffffff16 0 2px,transparent 2px 8px),linear-gradient(145deg,#b9e5ef,#527f96 50%,#1c3548)}
+.board-wrap.isometric-board[data-theme="volcano"] .diorama-plinth{border-color:#b45d3a;background:repeating-linear-gradient(25deg,#ffb06a0c 0 2px,transparent 2px 7px),linear-gradient(145deg,#754332,#472523 50%,#1c171b)}
+.board-wrap.isometric-board[data-theme="ruins"] .diorama-plinth{border-color:#a99a7a;background:repeating-linear-gradient(0deg,#e5d5b40d 0 1px,transparent 1px 7px),linear-gradient(145deg,#807663,#4b483e 50%,#252421)}
+.board-wrap.isometric-board[data-theme="forest"] .cell:not(.lake){background-color:#3d6041}
+.board-wrap.isometric-board[data-theme="ice"] .cell:not(.lake){background-color:#648da2}
+.board-wrap.isometric-board[data-theme="volcano"] .cell:not(.lake){background-color:#69473b}
+.board-wrap.isometric-board[data-theme="ruins"] .cell:not(.lake){background-color:#706653}
+.board-wrap.isometric-board[data-theme="ice"] .cell:not(.lake){box-shadow:0 2px 0 #45677b,0 3px 0 #263f50,0 5px 5px #0008,inset 0 1px 1px #fff8}
+.board-wrap.isometric-board[data-theme="volcano"] .cell:not(.lake){box-shadow:0 2px 0 #482d2b,0 3px 0 #271b20,0 5px 5px #0008,inset 0 1px 1px #ffc08a33}
+.board-wrap.isometric-board[data-theme="ruins"] .cell:not(.lake){box-shadow:0 2px 0 #514a3e,0 3px 0 #2c2a26,0 5px 5px #0008,inset 0 1px 1px #fff4}
+.board-wrap.isometric-board[data-theme="forest"] .cell:not(.lake){box-shadow:0 2px 0 #304a35,0 3px 0 #1c3025,0 5px 5px #0008,inset 0 1px 1px #d9f0ae33}
+.board-wrap.isometric-board[data-theme="ice"] .cell.lake{background:linear-gradient(145deg,#e8fcff 0%,#9bd8eb 28%,#5eabc8 58%,#244c66 100%)!important;border-color:#e1f8ff;box-shadow:inset 0 2px 3px #fff9,inset 0 -5px 8px #123448aa,0 3px 0 #4b7c93,0 5px 0 #1b3548,0 7px 8px #000b}
+.board-wrap.isometric-board[data-theme="volcano"] .cell.lake{background:radial-gradient(ellipse at 52% 48%,#fff09a 0%,#ffb347 13%,#ed642e 34%,#a52e28 63%,#421c22 100%)!important;border-color:#ffb46a;box-shadow:inset 0 0 10px #ffcf6555,0 3px 0 #713629,0 5px 0 #351d20,0 7px 8px #000b}
+.board-wrap.isometric-board[data-theme="forest"] .cell.lake{background:radial-gradient(ellipse at 38% 28%,#65b99b,#1c6254 52%,#0b2929)!important;border-color:#8cc8a4;box-shadow:inset 0 0 12px #071f1d99,0 3px 0 #1a5147,0 5px 0 #0b2929,0 7px 8px #000b}
+.board-wrap.isometric-board[data-theme="ruins"] .cell.lake{background:linear-gradient(145deg,#9aa995 0%,#526d68 38%,#344d4d 72%,#202f32 100%)!important;border-color:#c2c4a1;box-shadow:inset 0 0 12px #172b2b99,0 3px 0 #45564c,0 5px 0 #252f2d,0 7px 8px #000b}
+.board-wrap.isometric-board .combat-callout-layer{
+  top:50%!important;
+  left:50%!important;
+  width:72%!important;
+  height:auto!important;
+  aspect-ratio:1/1;
+  transform:translate(-50%,-50%) perspective(1500px) rotateX(53deg) rotateZ(45deg) scale(.94);
+  transform-origin:center;
+}
+.board-wrap.isometric-board .combat-callout-label{
+  transform:translateX(-50%) rotateZ(-45deg) rotateX(-53deg);
+}
+.board-wrap.isometric-board .legendary-counter{
+  transform:translateX(-50%) rotateZ(-45deg) rotateX(-53deg);
+}
+@media(max-width:620px){
+  .board-wrap.isometric-board{width:100%;aspect-ratio:1.24/1;margin:4px auto 9px}
+  .board-wrap.isometric-board .board{width:72%;gap:2px;padding:3px;transform:translate(-50%,-50%) perspective(1150px) rotateX(53deg) rotateZ(45deg) scale(.94)}
+  .board-wrap.isometric-board .diorama-plinth{width:76%;transform:translate(-50%,-50%) translateY(11px) perspective(1150px) rotateX(53deg) rotateZ(45deg) scale(.96)}
+  .board-wrap.isometric-board .environment-layer{width:72%;transform:translate(-50%,-50%) perspective(1150px) rotateX(53deg) rotateZ(45deg) scale(.94)}
+  .board-wrap.isometric-board .piece-upright{transform:translateZ(4px) rotateZ(-45deg) rotateX(-53deg) scale(.76)}
+  .board-wrap.isometric-board .cell{box-shadow:0 1px 0 #17231f,0 2px 0 #0c1515,0 3px 3px #0007,inset 0 1px 1px #ffffff22}
+  .board-wrap.isometric-board .piece:before{height:15%;bottom:2%}
+  .board-wrap.isometric-board .piece-rank-badge{width:clamp(10px,2.5vw,15px);height:clamp(10px,2.5vw,15px)}
+}
+@media (orientation:landscape) and (max-height:560px){
+  .board-wrap.isometric-board{width:min(calc(100svh - 150px),calc(100vw - 300px),850px);aspect-ratio:1.32/1;height:auto;max-width:none}
+}
+@media(prefers-reduced-motion:reduce){
+  .board-wrap.isometric-board .environment-layer:before,
+  .board-wrap.isometric-board .environment-layer:after{animation:none!important}
+}
+.no-game-animations .board-wrap.isometric-board .environment-layer:before,
+.no-game-animations .board-wrap.isometric-board .environment-layer:after{animation:none!important}
