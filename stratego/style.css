@@ -1160,3 +1160,48 @@
   }
   .board-wrap.isometric-board .piece .miniature{width:110%;height:110%}
 }
+
+/* STRATEGO DIORAMA REDESIGN · tabletop scale + low-poly scenery */
+.board-wrap.isometric-board{width:min(100%,940px);aspect-ratio:1.28/1;margin:10px auto 16px;overflow:visible;perspective:1800px;isolation:isolate}
+.board-wrap.isometric-board .diorama-plinth{width:82%;border-width:clamp(7px,1.35vw,13px);border-radius:9px;background:repeating-linear-gradient(0deg,#ffffff09 0 1px,transparent 1px 9px),linear-gradient(145deg,#85745a 0%,#4a4336 36%,#242a2c 72%,#12191d 100%);transform:translate(-50%,-50%) translateY(19px) perspective(1800px) rotateX(58deg) rotateZ(45deg) scale(.96);box-shadow:0 0 0 2px #090e11,0 0 0 5px #bba07177,0 13px 0 #0b1114,0 22px 0 #05090c,0 34px 40px #000d,inset 0 2px 4px #fff4,inset 0 -10px 16px #000b}
+.board-wrap.isometric-board .board{width:76%;transform:translate(-50%,-50%) perspective(1800px) rotateX(58deg) rotateZ(45deg) scale(.94);border:3px solid #151c1b;border-radius:5px;padding:5px;gap:3px;background:linear-gradient(145deg,#1d2924,#0c1514);box-shadow:0 5px 0 #101a18,0 10px 0 #09110f,0 16px 0 #050a09,0 26px 34px #000d,inset 0 1px 2px #fff3}
+.board-wrap.isometric-board .cell{border:1px solid #a9bc8a55;border-radius:3px;background:linear-gradient(145deg,#ffffff22,transparent 40%),linear-gradient(315deg,#0005,transparent 56%),repeating-linear-gradient(35deg,#ffffff08 0 1px,transparent 1px 7px),linear-gradient(145deg,#78905a 0%,#4c6844 48%,#304a36 100%);box-shadow:0 2px 0 #263b2b,0 4px 0 #17291f,0 6px 5px #0008,inset 0 1px 1px #ffffff44,inset 0 -2px 4px #10201699}
+.board-wrap.isometric-board .cell:nth-child(even):not(.lake){background:linear-gradient(145deg,#ffffff1c,transparent 42%),linear-gradient(315deg,#0005,transparent 56%),repeating-linear-gradient(35deg,#ffffff07 0 1px,transparent 1px 7px),linear-gradient(145deg,#718654 0%,#47613f 48%,#2c4533 100%)}
+.board-wrap.isometric-board .cell.selected{outline:2px solid #fff0ad;outline-offset:-3px;box-shadow:0 0 0 2px #e2bd62,0 0 20px #ffe8a477,inset 0 0 0 999px #ffe8a422}
+.board-wrap.isometric-board .cell.valid:before{content:"";position:absolute;z-index:6;width:18%;height:18%;border-radius:50%;background:#f7f2df;box-shadow:0 0 0 2px #26372c,0 0 12px #fff9}
+.board-wrap.isometric-board .cell.lake{background:radial-gradient(ellipse at 28% 20%,#d7f5dc77 0 4%,transparent 34%),repeating-linear-gradient(0deg,transparent 0 7px,#c3e7d422 8px 9px),linear-gradient(145deg,#5b9290,#285d60 48%,#153d44)!important;border:1px solid #9bd2c6;box-shadow:inset 0 2px 4px #effffb88,inset 0 -5px 8px #09262aaa,0 3px 0 #173c3d,0 6px 0 #0a2428,0 9px 8px #000b}
+.board-wrap.isometric-board .cell.lake:before{content:"";position:absolute;inset:12%;border:1px solid #d8fff055;border-radius:40% 60% 48% 52%;background:linear-gradient(145deg,#d7fff022,transparent 60%);box-shadow:inset 0 1px 4px #fff5}
+.board-wrap.isometric-board .piece{width:98%;height:100%;overflow:visible;transform-origin:50% 88%;filter:drop-shadow(0 3px 2px #000b)}
+.board-wrap.isometric-board .piece:before{left:10%;bottom:-1%;width:80%;height:19%;border:2px solid #e2c58a;border-radius:48%;background:radial-gradient(ellipse at 32% 22%,#fff9d9 0 6%,transparent 34%),linear-gradient(145deg,#b69a63 0%,#74603e 34%,#342c20 72%,#171916 100%);box-shadow:0 3px 2px #000c,0 0 0 2px #161a16,inset 0 2px 2px #fff8,inset 0 -4px 5px #000b}
+.board-wrap.isometric-board .piece:after{left:18%;bottom:5%;width:64%;height:5%;background:#000a;filter:blur(4px)}
+.board-wrap.isometric-board .piece-upright{width:112%;height:112%;transform:translateZ(8px) rotateZ(-45deg) rotateX(-58deg) scale(1.04);transform-origin:50% 82%}
+.board-wrap.isometric-board .piece .miniature{width:100%;height:100%;flex:none;overflow:visible;filter:drop-shadow(1px 0 0 #24251f) drop-shadow(2px 2px 0 #111611) drop-shadow(0 6px 4px #000c)}
+.board-wrap.isometric-board .piece-rank-badge{top:1%;right:2%;min-width:clamp(10px,2vw,18px);height:clamp(10px,2vw,18px);display:grid;place-items:center;border:1px solid #f7e2ad;border-radius:50%;background:linear-gradient(145deg,#f2d58a,#87622e);color:#241b10;font-size:clamp(7px,1vw,10px);font-weight:1000;box-shadow:0 2px 4px #000c}
+.board-wrap.isometric-board .terrain-dressing{position:absolute;z-index:1;top:50%;left:50%;width:91%;aspect-ratio:1;pointer-events:none;transform:translate(-50%,-50%) perspective(1800px) rotateX(58deg) rotateZ(45deg) scale(.94);transform-style:preserve-3d}
+.board-wrap.isometric-board .terrain-prop{position:absolute;display:block;width:9%;height:9%;transform-style:preserve-3d;filter:drop-shadow(0 5px 3px #0009)}
+.board-wrap.isometric-board .terrain-prop:before,.board-wrap.isometric-board .terrain-prop:after{content:"";position:absolute;display:block}
+.board-wrap.isometric-board .prop-a{left:4%;top:17%}.board-wrap.isometric-board .prop-b{right:3%;top:7%}.board-wrap.isometric-board .prop-c{right:2%;bottom:12%}.board-wrap.isometric-board .prop-d{left:1%;bottom:18%;width:13%;height:7%}.board-wrap.isometric-board .prop-e{right:17%;top:1%;width:7%;height:7%}.board-wrap.isometric-board .prop-f{left:13%;bottom:2%;width:8%;height:8%}
+.board-wrap.isometric-board .prop-rock:before{left:16%;bottom:8%;width:70%;height:64%;clip-path:polygon(10% 35%,35% 0,77% 9%,100% 54%,76% 100%,18% 91%,0 62%);background:linear-gradient(145deg,#b8ad8e 0 18%,#827b67 38%,#4b4b40 76%,#282e29);box-shadow:inset 4px 3px 0 #e2d5b1,inset -5px -4px 0 #242a25}
+.board-wrap.isometric-board .prop-rock:after{left:25%;bottom:57%;width:50%;height:14%;background:#d4c7a5;border-radius:50%;filter:blur(2px)}
+.board-wrap.isometric-board .prop-tree:before{left:43%;bottom:5%;width:18%;height:70%;background:linear-gradient(90deg,#33291d,#80613a 45%,#241d16);transform:translateZ(5px)}
+.board-wrap.isometric-board .prop-tree:after{left:4%;top:0;width:92%;height:70%;clip-path:polygon(50% 0,68% 22%,100% 38%,75% 50%,90% 72%,57% 65%,50% 100%,39% 67%,5% 78%,24% 51%,0 36%,34% 23%);background:linear-gradient(145deg,#b0bd75 0%,#617c48 42%,#263f2d 82%);border:1px solid #c0d092}
+.board-wrap.isometric-board .prop-column:before{left:24%;bottom:4%;width:52%;height:78%;border:2px solid #c8b994;border-radius:10px 10px 4px 4px;background:repeating-linear-gradient(90deg,#756b55 0 4px,#c9bb98 5px 8px,#8b8068 9px 11px);box-shadow:0 4px 0 #514a3c,0 7px 0 #292a25,inset 2px 0 2px #fff7}
+.board-wrap.isometric-board .prop-column:after{left:10%;bottom:76%;width:80%;height:13%;border-radius:4px;background:linear-gradient(180deg,#e4d6b3,#8e8166);box-shadow:0 3px 0 #4b463a}
+.board-wrap.isometric-board .prop-wall:before{inset:18% 0 8%;background:repeating-linear-gradient(90deg,#766e5c 0 18%,#c4b797 19% 22%,#8c816b 23% 43%);border:2px solid #d0c3a0;box-shadow:0 5px 0 #49483e,0 8px 0 #252a26,inset 0 3px 3px #fff6}
+.board-wrap.isometric-board[data-theme="ice"] .terrain-prop:before{filter:hue-rotate(145deg) saturate(.8) brightness(1.2)}
+.board-wrap.isometric-board[data-theme="volcano"] .terrain-prop:before{filter:hue-rotate(315deg) saturate(1.4) brightness(.8)}
+.board-wrap.isometric-board[data-theme="ruins"] .terrain-prop:before{filter:sepia(.3) saturate(.65)}
+.board-wrap.isometric-board .environment-layer{width:76%;transform:translate(-50%,-50%) perspective(1800px) rotateX(58deg) rotateZ(45deg) scale(.94);opacity:.19;mix-blend-mode:soft-light}
+.board-wrap.isometric-board .combat-callout-layer{width:76%!important;transform:translate(-50%,-50%) perspective(1800px) rotateX(58deg) rotateZ(45deg) scale(.94)}
+.board-wrap.isometric-board .combat-callout-label{transform:translateX(-50%) rotateZ(-45deg) rotateX(-58deg)}
+@media(max-width:620px){
+ .board-wrap.isometric-board{width:100%;aspect-ratio:1.16/1;margin:5px auto 12px}
+ .board-wrap.isometric-board .diorama-plinth{width:83%;transform:translate(-50%,-50%) translateY(13px) perspective(1300px) rotateX(58deg) rotateZ(45deg) scale(.96)}
+ .board-wrap.isometric-board .board{width:76%;gap:2px;padding:3px;transform:translate(-50%,-50%) perspective(1300px) rotateX(58deg) rotateZ(45deg) scale(.94)}
+ .board-wrap.isometric-board .terrain-dressing{width:92%;transform:translate(-50%,-50%) perspective(1300px) rotateX(58deg) rotateZ(45deg) scale(.94)}
+ .board-wrap.isometric-board .piece-upright{transform:translateZ(7px) rotateZ(-45deg) rotateX(-58deg) scale(1.02)}
+ .board-wrap.isometric-board .piece .miniature{width:100%;height:100%}
+ .board-wrap.isometric-board .environment-layer{width:76%;transform:translate(-50%,-50%) perspective(1300px) rotateX(58deg) rotateZ(45deg) scale(.94)}
+ .board-wrap.isometric-board .combat-callout-layer{transform:translate(-50%,-50%) perspective(1300px) rotateX(58deg) rotateZ(45deg) scale(.94)}
+}
+@media(prefers-reduced-motion:reduce){.board-wrap.isometric-board .terrain-prop{filter:none}}
