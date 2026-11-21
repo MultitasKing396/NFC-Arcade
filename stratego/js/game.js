@@ -165,8 +165,22 @@ function endGame(winner){
 function showGameScreen(){document.querySelector("#homeScreen").hidden=true;document.querySelector("#gameScreen").hidden=false;}
 function showHomeScreen(){saveGameState();document.querySelector("#gameScreen").hidden=true;document.querySelector("#homeScreen").hidden=false;updateResumeButton();}
 function saveGameState(){if(!board||!board.some(Boolean))return;try{const state={version:1,currentMode,board,turn,playerFaction,cpuFaction,message:messageEl.textContent};localStorage.setItem(GAME_SAVE_KEY,JSON.stringify(state));hasSavedGame=true;updateResumeButton();}catch(error){console.warn("Spielstand konnte nicht gespeichert werden.",error);}}
-function updateResumeButton(){const btn=document.querySelector("#homeResumeBtn");if(btn)btn.hidden=!hasSavedGame;}
-function loadGameState(){try{const raw=localStorage.getItem(GAME_SAVE_KEY);if(!raw)return false;const state=JSON.parse(raw);if(state?.version!==1||!MODES[state.currentMode]||!Array.isArray(state.board)||state.board.length!==modeConfig(state.currentMode).size**2||!state.board.every(p=>p===null||(p&&typeof p.type==="string"&&(p.side==="blue"||p.side==="red"))))return false;currentMode=state.currentMode;setMode(currentMode);board=state.board;turn=state.turn==="red"?"red":"blue";playerFaction=FACTIONS[state.playerFaction]?state.playerFaction:"aurelia";cpuFaction=FACTIONS[state.cpuFaction]?state.cpuFaction:"shadow";setMessage(state.message||"Spielstand geladen.");hasSavedGame=true;return true;}catch(error){console.warn("Gespeicherter Spielstand ist ungültig.",error);return false;}}
+function updateResumeButton(){
+ const card=document.querySelector("#savedGameCard"),btn=document.querySelector("#homeResumeBtn");
+ if(card)card.hidden=!hasSavedGame;
+ if(btn)btn.hidden=!hasSavedGame;
+ if(!hasSavedGame)return;
+ const faction=FACTIONS[playerFaction]||FACTIONS.aurelia,config=modeConfig(currentMode);
+ const blueLeft=board.filter(p=>p?.side==="blue").length;
+ const redLeft=board.filter(p=>p?.side==="red").length;
+ document.querySelector("#savedFactionName").textContent=faction.name;
+ document.querySelector("#savedModeName").textContent=config.label+" · "+config.size+" × "+config.size;
+ document.querySelector("#savedTurnStatus").textContent=turn==="blue"?"Dein Zug":"CPU am Zug";
+ document.querySelector("#savedTurnStatus").classList.toggle("cpu-turn",turn==="red");
+ document.querySelector("#savedArmyInfo").textContent=blueLeft+" deiner "+config.count+" Figuren übrig · "+redLeft+" Gegner";
+ document.querySelector("#savedFactionMark").textContent=({aurelia:"✦",shadow:"☾",iron:"⚒",sylvan:"❧",ash:"♨",storm:"ϟ"})[playerFaction]||"⚔";
+}
+function loadGameState(){try{const raw=localStorage.getItem(GAME_SAVE_KEY);if(!raw)return false;const state=JSON.parse(raw);if(state?.version!==1||!MODES[state.currentMode]||!Array.isArray(state.board)||state.board.length!==modeConfig(state.currentMode).size**2||!state.board.every(p=>p===null||(p&&typeof p.type==="string"&&(p.side==="blue"||p.side==="red"))))return false;currentMode=state.currentMode;setMode(currentMode);board=state.board;turn=state.turn==="red"?"red":"blue";playerFaction=FACTIONS[state.playerFaction]?state.playerFaction:"aurelia";cpuFaction=FACTIONS[state.cpuFaction]?state.cpuFaction:"shadow";setMessage(state.message||"Spielstand geladen.");hasSavedGame=true;updateResumeButton();return true;}catch(error){console.warn("Gespeicherter Spielstand ist ungültig.",error);return false;}}
 function resumeSavedGame(){if(!loadGameState())return;selected=null;validMoves=[];busy=turn==="red";showGameScreen();setTurn(turn);render();updateResumeButton();if(busy)window.setTimeout(cpuMove,500);}
 function openHomeRules(){rulesModal.hidden=false;}
 function openSettings(){settingsModal.hidden=false;}
