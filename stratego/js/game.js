@@ -4,22 +4,26 @@ const rulesModal=document.querySelector("#rulesModal"),setupModal=document.query
 let pendingAnimation=null;
 let setupFromHome=false;
 const SETTINGS_KEY="nfc-arcade-stratego-settings-v1";
-const DEFAULT_SETTINGS={sound:false,animations:true,speed:"normal"};
+const DEFAULT_SETTINGS={sound:false,animations:true,speed:"normal",theme:"forest"};
 let gameSettings={...DEFAULT_SETTINGS};
 let audioContext=null;
 function loadSettings(){
  try{const saved=JSON.parse(localStorage.getItem(SETTINGS_KEY)||"{}");gameSettings={...DEFAULT_SETTINGS,...saved};}catch{gameSettings={...DEFAULT_SETTINGS};}
  if(!["slow","normal","fast"].includes(gameSettings.speed))gameSettings.speed="normal";
+ if(!["forest","ice","volcano","ruins"].includes(gameSettings.theme))gameSettings.theme="forest";
  applySettings();
 }
 function saveSettings(){try{localStorage.setItem(SETTINGS_KEY,JSON.stringify(gameSettings));}catch(error){console.warn("Einstellungen konnten nicht gespeichert werden.",error);}}
 function applySettings(){
  document.body.classList.toggle("no-game-animations",!gameSettings.animations);
  document.documentElement.style.setProperty("--game-animation-speed",gameSettings.speed==="slow"?"1.35":gameSettings.speed==="fast"?"0.72":"1");
- const sound=document.querySelector("#settingSound"),animations=document.querySelector("#settingAnimations"),speed=document.querySelector("#settingSpeed");
+ const sound=document.querySelector("#settingSound"),animations=document.querySelector("#settingAnimations"),speed=document.querySelector("#settingSpeed"),theme=document.querySelector("#settingBattlefield");
+ boardEl.dataset.theme=gameSettings.theme;
+ if(boardEl.parentElement)boardEl.parentElement.dataset.theme=gameSettings.theme;
  if(sound)sound.checked=!!gameSettings.sound;
  if(animations)animations.checked=!!gameSettings.animations;
  if(speed)speed.value=gameSettings.speed;
+ if(theme)theme.value=gameSettings.theme;
 }
 function changeSetting(key,value){gameSettings[key]=value;saveSettings();applySettings();}
 function cpuDelay(){const factor=gameSettings.speed==="slow"?1.45:gameSettings.speed==="fast"?0.65:1;return (650+Math.random()*650)*factor;}
@@ -550,6 +554,7 @@ document.querySelector("#homeSettingsBtn").addEventListener("click",openSettings
 document.querySelector("#settingSound").addEventListener("change",e=>changeSetting("sound",e.target.checked));
 document.querySelector("#settingAnimations").addEventListener("change",e=>changeSetting("animations",e.target.checked));
 document.querySelector("#settingSpeed").addEventListener("change",e=>changeSetting("speed",e.target.value));
+document.querySelector("#settingBattlefield").addEventListener("change",e=>changeSetting("theme",e.target.value));
 document.querySelector("#closeSettings").addEventListener("click",()=>settingsModal.hidden=true);
 settingsModal.addEventListener("click",e=>{if(e.target===settingsModal)settingsModal.hidden=true;});
 document.querySelector("#homeRulesBtn").addEventListener("click",openHomeRules);
