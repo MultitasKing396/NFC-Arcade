@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#10131d">
 <title>Stratego – Fantasy Battlefield Edition</title>
-<link rel="stylesheet" href="style.css?v=20261121-22">
+<link rel="stylesheet" href="style.css?v=20261121-23">
 </head>
 <body>
 <div class="app-shell">
@@ -47,7 +47,7 @@
     </section>
     <section class="statusbar">
       <div class="player-label"><span class="army-dot blue"></span><div><b>Dein Königreich</b><small>Deine Armee</small></div></div>
-      <div class="turn-status" id="turnStatus">Dein Zug</div>
+      <div class="turn-stack"><div class="turn-status" id="turnStatus">Dein Zug</div><small class="combat-rule-status" id="combatRuleStatus">Daueraufdeckregel</small></div>
       <div class="player-label enemy"><div><b>CPU-Gegner</b><small>Unbekannte Armee</small></div><span class="army-dot red"></span></div>
     </section>
     <div class="board-wrap">
@@ -69,6 +69,7 @@
    <h3>Spielziel</h3><p>Finde und erobere die gegnerische Flagge. Alternativ gewinnst du, wenn dein Gegner keinen beweglichen Zug mehr ausführen kann.</p>
    <h3>Bewegung</h3><p>Bewege eine Figur pro Zug ein Feld waagerecht oder senkrecht. Späher dürfen beliebig weit geradeaus ziehen, solange der Weg frei ist. Figuren dürfen nicht diagonal ziehen oder über andere Figuren springen. Seen sind unpassierbar.</p>
    <h3>Kämpfe</h3><p>Ziehst du auf ein gegnerisches Feld, kommt es zum Kampf. Der höhere Rang gewinnt. Bei gleichem Rang werden beide Figuren entfernt. Bomben besiegen alle Angreifer außer Mineuren. Mineure entschärfen Bomben. Der Spion besiegt den Feldmarschall nur, wenn er ihn selbst angreift.</p>
+   <h3>Aufdeckregeln</h3><p><b>Klassischer Modus:</b> Nach dem Kampf wird der Rang einer überlebenden gegnerischen Figur wieder verdeckt. Merke dir, was du gesehen hast.</p><p><b>Daueraufdeckregel:</b> Gewinnt eine gegnerische Figur den Kampf und überlebt, bleibt ihr Rang dauerhaft sichtbar. Verliert sie, wird sie vom Spielfeld entfernt. Bei Gleichstand werden beide Figuren entfernt.</p>
    <h3>Besondere Figuren</h3><p><b>Bomben und Flagge:</b> unbeweglich. <b>Mineur:</b> besiegt Bomben. <b>Späher:</b> kann beliebig weit geradeaus ziehen. <b>Spion:</b> schlägt den Feldmarschall nur im Angriff.</p>
    <h3>Ränge</h3><p>Feldmarschall 10 · General 9 · Oberst 8 · Major 7 · Hauptmann 6 · Leutnant 5 · Unteroffizier 4 · Mineur 3 · Späher 2 · Spion 1.</p>
    <p class="note">Die Figuren deiner Armee sind sichtbar. Die Ränge der gegnerischen Figuren bleiben verborgen, bis sie an einem Kampf teilnehmen.</p>
@@ -147,6 +148,6 @@
   <div class="setup-actions"><button id="cancelManualSetup" class="secondary-button">Zurück</button><button id="confirmManualSetup" class="gold-button" disabled>Aufstellung übernehmen</button></div>
  </section>
 </div>
-<script type="module" src="js/game.js?v=20261121-22"></script>
+<script type="module" src="js/game.js?v=20261121-23"></script>
 </body>
 </html>
