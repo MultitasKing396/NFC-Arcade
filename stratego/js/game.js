@@ -39,8 +39,30 @@ function pieceArt(piece){
  ash:`<path d="M50 73Q28 59 42 47Q40 60 51 55Q58 48 56 41Q77 61 50 73z" fill="${dark}" stroke="${palette.crest}" stroke-width="2"/>`,
  storm:`<path d="m50 45 8 13-8 15-8-15z" fill="${dark}" stroke="${palette.crest}" stroke-width="2"/><path d="M50 48v22" stroke="${metal}" stroke-width="2"/>`
  }[piece.faction]||"";
+ const rankHead={
+ marshal:`<path d="M31 25 27 7 42 17 50 4 58 17 73 7 69 25z" fill="${metal}" stroke="#fff0bd" stroke-width="3" stroke-linejoin="round"/><circle cx="50" cy="9" r="3" fill="#fff4c4"/>`,
+ general:`<path d="M31 24Q23 2 43 12Q50-1 57 12Q77 2 69 24" fill="${mid}" stroke="${metal}" stroke-width="3"/><path d="M50 12v-8" stroke="#fff0bd" stroke-width="3"/>`,
+ colonel:`<path d="M34 24V9l9 8 7-12 7 12 9-8v15" fill="${dark}" stroke="${metal}" stroke-width="3"/>`,
+ captain:`<path d="M32 24Q29 6 50 8Q71 6 68 24L60 19 50 23 40 19z" fill="${mid}" stroke="${metal}" stroke-width="3"/>`,
+ lieutenant:`<path d="M33 25 37 8 50 15 63 8 67 25" fill="${dark}" stroke="${metal}" stroke-width="3"/>`,
+ sergeant:`<path d="M31 24 36 9 50 17 64 9 69 24" fill="${mid}" stroke="${metal}" stroke-width="2"/>`,
+ miner:`<path d="M30 27 35 9 65 9 70 27 62 33H38z" fill="${dark}" stroke="${metal}" stroke-width="3"/><path d="M37 16h26" stroke="${palette.crest}" stroke-width="3"/>`,
+ scout:`<path d="M26 30Q27 4 50 5Q73 4 74 30L62 24H38z" fill="${dark}" stroke="${metal}" stroke-width="2"/>`,
+ spy:`<path d="M27 29Q31 7 50 7Q69 7 73 29L61 23H39z" fill="${dark}" stroke="${palette.crest}" stroke-width="2"/><path d="M37 30h26" stroke="${palette.crest}" stroke-width="3"/>`
+ }[type]||"";
+ const rankInsignia={
+ marshal:`<path d="m50 42 5 9 10 1-8 7 2 10-9-5-9 5 2-10-8-7 10-1z" fill="#fff0b8" stroke="${metal}" stroke-width="2"/>`,
+ general:`<path d="M50 45v22m-9-17 9 5 9-5" stroke="${palette.crest}" stroke-width="4" fill="none" stroke-linecap="round"/>`,
+ colonel:`<path d="M39 49h22M39 57h22M39 65h22" stroke="${metal}" stroke-width="3" stroke-linecap="round"/>`,
+ captain:`<circle cx="50" cy="57" r="8" fill="${palette.crest}" stroke="${metal}" stroke-width="2"/>`,
+ lieutenant:`<path d="m50 48 9 9-9 9-9-9z" fill="${palette.crest}" stroke="${metal}" stroke-width="2"/>`,
+ sergeant:`<path d="M39 53h22M39 62h22" stroke="${palette.crest}" stroke-width="3"/>`,
+ miner:`<path d="M39 56h22M50 46v20" stroke="${metal}" stroke-width="3"/>`,
+ scout:`<path d="m40 57 10-10 10 10-10 10z" fill="${dark}" stroke="${palette.crest}" stroke-width="2"/>`,
+ spy:`<path d="M41 55q9-8 18 0v7q-9 8-18 0z" fill="${dark}" stroke="${palette.crest}" stroke-width="2"/><path d="M44 58h4m4 0h4" stroke="${metal}" stroke-width="2"/>`
+ }[type]||"";
  const weapon=type==="miner"?`<path d="M74 34 83 72M68 38l17-5-3 13-12-2" stroke="#e8d5b2" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>`:type==="scout"?`<path d="M76 36 86 76" stroke="#e8d5b2" stroke-width="4" stroke-linecap="round"/><path d="m81 70 5 9 2-11" fill="#e8d5b2"/>`:type==="spy"?`<path d="M75 39 86 72" stroke="#d6d9e1" stroke-width="3" stroke-linecap="round"/>`:`<path d="M76 35 84 76" stroke="#e8d5b2" stroke-width="4" stroke-linecap="round"/><path d="M78 42h9" stroke="${metal}" stroke-width="3"/>`;
- return `<svg class="miniature" viewBox="0 0 100 100" aria-hidden="true"><ellipse cx="50" cy="91" rx="29" ry="6" fill="#05080d" opacity=".45"/><path d="M24 83q3-19 12-26h28q10 8 13 26l-9 6H33z" fill="${dark}" stroke="${metal}" stroke-width="2"/><path d="M35 57 25 67l-7-6 8-16 13-3M65 57l10 10 8-6-8-17-13-3" fill="${mid}" stroke="${metal}" stroke-width="2"/><path d="M39 38q11-8 22 0l8 22-19 12-19-12z" fill="${mid}" stroke="${metal}" stroke-width="2"/><path d="m39 48 11 7 11-7M50 56v15" stroke="${metal}" stroke-width="2" fill="none"/>${armorOverlay}<circle cx="50" cy="29" r="15" fill="${light}" stroke="${metal}" stroke-width="3"/><path d="M37 29q13-11 26 0" stroke="${dark}" stroke-width="4" fill="none"/>${head}${factionHead}<path d="M42 34h5m7 0h5" stroke="${dark}" stroke-width="2" stroke-linecap="round"/>${weapon}${heraldry}<path d="M30 82h40" stroke="${metal}" stroke-width="3" stroke-linecap="round"/></svg>`;
+ return `<svg class="miniature" viewBox="0 0 100 100" aria-hidden="true"><ellipse cx="50" cy="91" rx="29" ry="6" fill="#05080d" opacity=".45"/><path d="M24 83q3-19 12-26h28q10 8 13 26l-9 6H33z" fill="${dark}" stroke="${metal}" stroke-width="2"/><path d="M35 57 25 67l-7-6 8-16 13-3M65 57l10 10 8-6-8-17-13-3" fill="${mid}" stroke="${metal}" stroke-width="2"/><path d="M39 38q11-8 22 0l8 22-19 12-19-12z" fill="${mid}" stroke="${metal}" stroke-width="2"/><path d="m39 48 11 7 11-7M50 56v15" stroke="${metal}" stroke-width="2" fill="none"/>${armorOverlay}<circle cx="50" cy="29" r="15" fill="${light}" stroke="${metal}" stroke-width="3"/><path d="M37 29q13-11 26 0" stroke="${dark}" stroke-width="4" fill="none"/>${head}${factionHead}${rankHead}<path d="M42 34h5m7 0h5" stroke="${dark}" stroke-width="2" stroke-linecap="round"/>${weapon}${heraldry}${rankInsignia}<path d="M30 82h40" stroke="${metal}" stroke-width="3" stroke-linecap="round"/></svg>`;
 }
 
 function setMessage(t){messageEl.textContent=t;}
