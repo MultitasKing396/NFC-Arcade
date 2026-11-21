@@ -412,7 +412,33 @@ function updateResumeButton(){
 }
 function loadGameState(){try{const raw=localStorage.getItem(GAME_SAVE_KEY);if(!raw)return false;const state=JSON.parse(raw);if(state?.version!==1||!MODES[state.currentMode]||!Array.isArray(state.board)||state.board.length!==modeConfig(state.currentMode).size**2||!state.board.every(p=>p===null||(p&&typeof p.type==="string"&&(p.side==="blue"||p.side==="red"))))return false;currentMode=state.currentMode;setMode(currentMode);combatRevealMode=state.combatRevealMode==="classic"?"classic":"daueraufdeckregel";setCombatRuleStatus();board=state.board;turn=state.turn==="red"?"red":"blue";playerFaction=FACTIONS[state.playerFaction]?state.playerFaction:"aurelia";cpuFaction=FACTIONS[state.cpuFaction]?state.cpuFaction:"shadow";cpuDifficulty=["easy","normal","hard","expert"].includes(state.cpuDifficulty)?state.cpuDifficulty:"normal";cpuIntel=state.cpuIntel&&typeof state.cpuIntel==="object"?{known:state.cpuIntel.known&&typeof state.cpuIntel.known==="object"?state.cpuIntel.known:{},moved:Array.isArray(state.cpuIntel.moved)?state.cpuIntel.moved:[]}: {known:{},moved:[]};playerPatterns={advances:0,attacks:0,scouts:0,miners:0,center:0,...(state.playerPatterns||{})};setMessage(state.message||"Spielstand geladen.");hasSavedGame=true;updateResumeButton();return true;}catch(error){console.warn("Gespeicherter Spielstand ist ungültig.",error);return false;}}
 function resumeSavedGame(){if(!loadGameState())return;selected=null;validMoves=[];busy=turn==="red";showGameScreen();setTurn(turn);render();updateResumeButton();if(busy)window.setTimeout(cpuMove,500);}
-function openHomeRules(){rulesModal.hidden=false;}
+function renderRulesRankList(){
+ const list=document.querySelector("#rulesRankList");if(!list||list.dataset.ready==="true")return;
+ list.innerHTML="";
+ for(const [type,info] of Object.entries(RANKS)){
+  const row=document.createElement("article");row.className="rules-rank-row";
+  const visual=document.createElement("div");visual.className="rules-rank-visual";
+  visual.innerHTML=pieceArt({side:"blue",faction:"aurelia",type,revealed:true});
+  const details=document.createElement("div");details.className="rules-rank-details";
+  const name=document.createElement("b");name.textContent=info.name;
+  const strength=document.createElement("span");strength.className="rules-rank-strength";
+  strength.textContent=info.rank>0?"Stärke "+info.rank:type==="bomb"?"Sonderfigur · unbeweglich":"Sonderfigur · unbeweglich";
+  details.append(name,strength);row.append(visual,details);
+  const badge=document.createElement("strong");badge.className="rules-rank-number";
+  badge.textContent=info.rank>0?String(info.rank):type==="bomb"?"B":"F";row.append(badge);
+  list.append(row);
+ }
+ list.dataset.ready="true";
+}
+function selectRulesTab(tab){
+ document.querySelectorAll("[data-rules-tab]").forEach(button=>{
+  const active=button.dataset.rulesTab===tab;button.classList.toggle("active",active);button.setAttribute("aria-selected",String(active));button.tabIndex=active?0:-1;
+ });
+ document.querySelectorAll("[data-rules-panel]").forEach(panel=>{
+  const active=panel.dataset.rulesPanel===tab;panel.classList.toggle("active",active);panel.hidden=!active;
+ });
+}
+function openHomeRules(){renderRulesRankList();selectRulesTab("basics");rulesModal.hidden=false;}
 function openSettings(){applySettings();settingsModal.hidden=false;}
 function openSetup(fromHome=false){setupFromHome=fromHome;setupModal.hidden=false;}
 function closeSetup(){setupModal.hidden=true;if(setupFromHome){document.querySelector("#homeScreen").hidden=false;document.querySelector("#gameScreen").hidden=true;}setupFromHome=false;}
@@ -486,6 +512,7 @@ document.querySelector("#cancelSetup").addEventListener("click",closeSetup);
 document.querySelector("#closeSetup").addEventListener("click",closeSetup);
 setupModal.addEventListener("click",e=>{if(e.target===setupModal)closeSetup();});
 document.querySelector("#rulesBtn").addEventListener("click",()=>rulesModal.hidden=false);
+document.querySelectorAll("[data-rules-tab]").forEach(button=>button.addEventListener("click",()=>selectRulesTab(button.dataset.rulesTab)));
 document.querySelector("#closeRules").addEventListener("click",()=>rulesModal.hidden=true);
 rulesModal.addEventListener("click",e=>{if(e.target===rulesModal)rulesModal.hidden=true;});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"){rulesModal.hidden=true;settingsModal.hidden=true;closeSetup();closeManualSetup();}});
