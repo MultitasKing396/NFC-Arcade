@@ -195,13 +195,13 @@ function finishMove(from,to){
   else {board[to]=null;board[from]=null;}
   setMessage(outcome.message);
   if(defender.type==="flag"&&outcome.result==="attacker"){
-   pendingAnimation={from,to,kind:animationKind,winner,outcome:outcome.result,faction:attacker.faction||"aurelia",revealType:survivor?.type||null};
+   pendingAnimation={from,to,kind:animationKind,winner,outcome:outcome.result,faction:attacker.faction||"aurelia",special:attacker.type==="spy"&&defender?.type==="marshal"&&outcome.result==="attacker"?"spy-marshal":null,revealType:survivor?.type||null};
    selected=null;validMoves=[];dragFrom=null;if(strengthEl)strengthEl.textContent="";
    render();busy=true;playSound("combat");window.setTimeout(()=>endGame("blue"),850);return;
   }
  }else{board[to]=attacker;board[from]=null;setMessage("Zug ausgeführt.");}
  const survivor=animationKind==="combat"?(winner==="blue"?attacker:winner==="red"?defender:null):null;
- pendingAnimation={from,to,kind:animationKind,winner,outcome:combatOutcome,faction:attacker.faction||"aurelia",revealType:survivor?.type||null};
+ pendingAnimation={from,to,kind:animationKind,winner,outcome:combatOutcome,faction:attacker.faction||"aurelia",special:attacker.type==="spy"&&defender?.type==="marshal"&&combatOutcome==="attacker"?"spy-marshal":null,revealType:survivor?.type||null};
  selected=null;validMoves=[];dragFrom=null;if(strengthEl)strengthEl.textContent="";
  playSound(animationKind==="combat"?"combat":"move");
  if(!sideHasMoves(board,"red",currentMode)){render();endGame("blue");return;}
@@ -398,12 +398,12 @@ function cpuMove(){
   else{board[move.to]=null;board[move.from]=null;}
   setMessage(result.message);
   if(defender.type==="flag"&&result.result==="attacker"){
-   pendingAnimation={from:move.from,to:move.to,kind:animationKind,winner,outcome:result.result,faction:attacker.faction||"shadow",revealType:survivor?.type||null};
+   pendingAnimation={from:move.from,to:move.to,kind:animationKind,winner,outcome:result.result,faction:attacker.faction||"shadow",special:attacker.type==="spy"&&defender?.type==="marshal"&&result.result==="attacker"?"spy-marshal":null,revealType:survivor?.type||null};
    busy=false;render();window.setTimeout(()=>endGame("red"),850);return;
   }
  }else{board[move.to]=attacker;board[move.from]=null;setMessage("Der CPU hat seinen Zug ausgeführt.");}
  const survivor=animationKind==="combat"?(winner==="red"?attacker:winner==="blue"?defender:null):null;
- pendingAnimation={from:move.from,to:move.to,kind:animationKind,winner,outcome:combatOutcome,faction:attacker.faction||"shadow",revealType:survivor?.type||null};
+ pendingAnimation={from:move.from,to:move.to,kind:animationKind,winner,outcome:combatOutcome,faction:attacker.faction||"shadow",special:attacker.type==="spy"&&defender?.type==="marshal"&&combatOutcome==="attacker"?"spy-marshal":null,revealType:survivor?.type||null};
  playSound(animationKind==="combat"?"combat":"move");
  busy=false;setTurn("blue");render();saveGameState();
  if(!sideHasMoves(board,"blue",currentMode))endGame("red");
