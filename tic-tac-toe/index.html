@@ -74,7 +74,7 @@ $('opponent').addEventListener('change',()=>{$('difficultyWrap').classList.toggl
 function fresh(){turn='X';over=false;winning=[];history=[];vanish={X:[],O:[]};board=Array(9).fill('');ultimate=Array.from({length:9},()=>Array(9).fill(''));nextBoard=-1;$('result').textContent='';$('note').textContent='';render()}
 function start(){opponent=$('opponent').value;difficulty=$('difficulty').value;$('home').classList.add('hidden');$('play').classList.remove('hidden');document.body.classList.add('playing');document.querySelector('.app').classList.add('playing');fresh();if(opponent==='ai'&&turn==='O')aiMove()}
 function back(){ $('play').classList.add('hidden');$('home').classList.remove('hidden');document.body.classList.remove('playing');document.querySelector('.app').classList.remove('playing');}
-$('start').addEventListener('click',start);$('back').addEventListener('click',back);$('menuBtn').addEventListener('click',back);$('restart').addEventListener('click',fresh);
+$('start').addEventListener('click',start);$('back').addEventListener('click',back);$('restart').addEventListener('click',fresh);
 function winner(b){for(const line of wins)if(b[line[0]]&&b[line[0]]===b[line[1]]&&b[line[1]]===b[line[2]])return {p:b[line[0]],line};return null}
 function finish(w,p){over=true;if(w){winning=w.line;$('result').textContent=w.p+' gewinnt!';}else{$('result').textContent='Unentschieden';}render()}
 function switchTurn(){turn=turn==='X'?'O':'X'}
@@ -98,7 +98,6 @@ function aiVanishing(){const sim=board.slice(),list=vanish.O.slice();if(list.len
 function placeVanishAI(i){const list=vanish.O;if(list.length===3)board[list.shift()]='';board[i]='O';list.push(i);const w=winner(board);if(w){finish(w);return}if(board.every(Boolean)){finish(null);return}switchTurn();render()}
 function aiUltimate(){const allowed=nextBoard===-1||winner(ultimate[nextBoard])||ultimate[nextBoard].every(Boolean)?openBoards():[nextBoard];for(const bi of allowed){let c=ultimate[bi];let ci=tacticalMove(c,'O');if(ci<0&&difficulty!=='easy')ci=tacticalMove(c,'X');if(ci>=0)return[bi,ci]}let opts=[];for(const bi of allowed)for(const ci of available(ultimate[bi]))opts.push([bi,ci]);if(!opts.length)return null;if(difficulty==='easy')return opts[Math.floor(Math.random()*opts.length)];return opts.find(x=>x[1]===4)||opts[Math.floor(Math.random()*opts.length)]}
 function placeUltimateAI(bi,ci){ultimate[bi][ci]='O';let mw=macroWinner();if(mw){finish(mw.p?{p:mw.p,line:mw.line}:null);return}nextBoard=ci;switchTurn();render()}
-renderStats();
 })();
 </script>
 </body></html>
