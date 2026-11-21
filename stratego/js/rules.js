@@ -24,7 +24,7 @@ function formationPriority(type,formation){
   balanced:{flag:20,bomb:19,marshal:18,general:17,colonel:16,major:15,captain:14,lieutenant:13,sergeant:12,miner:11,scout:10,spy:9},
   defensive:{flag:20,bomb:19,miner:18,marshal:17,general:16,colonel:15,major:14,captain:13,lieutenant:12,sergeant:11,scout:10,spy:9},
   offensive:{marshal:12,general:11,colonel:10,major:9,captain:8,lieutenant:7,sergeant:6,miner:5,scout:4,spy:3,bomb:1,flag:0},
-  bastion:{flag:0,bomb:2,miner:9,marshal:8,general:7,colonel:6,major:5,captain:4,lieutenant:3,sergeant:2,scout:1,spy:6},
+  bastion:{flag:20,bomb:19,miner:18,marshal:17,general:16,colonel:15,major:14,captain:13,lieutenant:12,sergeant:11,scout:10,spy:9},
   spearhead:{marshal:12,general:11,colonel:10,major:9,captain:8,lieutenant:7,sergeant:6,miner:5,scout:4,spy:3,bomb:1,flag:0}
  };
  return (priorities[formation]||priorities.balanced)[type]??0;
@@ -33,7 +33,7 @@ function slotPriority(index,formation){
  const row=Math.floor(index/10),col=index%10,center=4.5-Math.abs(col-4.5);
  if(formation==="defensive"||formation==="bastion")return row*10+center*.12;
  if(formation==="offensive"||formation==="spearhead")return (3-row)*10+center*.08;
- return (3-row)*5+center*.25;
+ return row*5+center*.25;
 }
 export function arrangeArmy(side,formation="balanced"){
  const army=shuffle(makeArmy(side));
