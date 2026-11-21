@@ -213,7 +213,7 @@ function render(){
    legendary.style.top="auto";legendary.style.bottom="-17px";
    callout.append(legendary);
   }
-  if(pendingAnimation.special!=="spy-marshal"&&pendingAnimation.winner&&pendingAnimation.revealType&&RANKS[pendingAnimation.revealType]){
+  if(pendingAnimation.special!=="spy-marshal"&&pendingAnimation.winner&&pendingAnimation.revealType&&RANKS[pendingAnimation.revealType]&&(pendingAnimation.winner==="blue"||combatRevealMode==="daueraufdeckregel")){
    const reveal=document.createElement("span");
    const revealedInfo=RANKS[pendingAnimation.revealType];
    reveal.className="combat-reveal-badge";
