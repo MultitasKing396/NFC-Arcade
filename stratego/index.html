@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#10131d">
 <title>Stratego – Fantasy Battlefield Edition</title>
-<link rel="stylesheet" href="style.css?v=20261121-17">
+<link rel="stylesheet" href="style.css?v=20261121-18">
 </head>
 <body>
 <div class="app-shell">
@@ -24,7 +24,7 @@
         <div class="saved-card-heading"><span>✦</span><b>DEINE LAUFENDE SCHLACHT</b><span class="saved-card-status" id="savedTurnStatus">Gespeichert</span></div>
         <div class="saved-card-main">
           <div class="saved-faction-mark" id="savedFactionMark">⚔</div>
-          <div class="saved-card-details"><strong id="savedFactionName">Aurelia</strong><span id="savedModeName">Klassisch · 10 × 10</span><small id="savedArmyInfo">Deine Armee wartet auf dich</small></div>
+          <div class="saved-card-details"><strong id="savedFactionName">Aurelia</strong><span id="savedModeName">Klassisch · 10 × 10</span><small id="savedArmyInfo">Deine Armee wartet auf dich</small><small id="savedDifficultyInfo">CPU: Normal</small></div>
         </div>
         <button id="homeResumeBtn" class="gold-button home-start">Schlacht fortsetzen <span aria-hidden="true">↗</span></button>
       </section>
@@ -111,6 +111,7 @@
   <div class="setup-side">
    <div class="setup-side-title"><span class="army-dot red"></span><div><b>CPU-Gegner</b><small>Wähle die gegnerische Fraktion</small></div></div>
    <label for="cpuFaction">Fraktion</label><select id="cpuFaction"><option value="shadow">Schattenlegion · Dunkelheit</option><option value="aurelia">Aurelia · Lichtreich</option><option value="iron">Eisenbund · Stahl und Disziplin</option><option value="sylvan">Sylvanische Wacht · Natur</option><option value="ash">Aschenzirkel · Feuer</option><option value="storm">Sturmklan · Sturm und Eis</option></select>
+   <label for="cpuDifficulty">Schwierigkeitsgrad</label><select id="cpuDifficulty"><option value="easy">Leicht · lockere Taktik</option><option value="normal" selected>Normal · taktisch</option><option value="hard">Schwer · konsequent</option></select>
    <label for="cpuFormation">Taktik des Gegners</label>
    <select id="cpuFormation">
     <option value="balanced">Ausgewogen – Zufallsaufstellung</option>
@@ -141,6 +142,6 @@
   <div class="setup-actions"><button id="cancelManualSetup" class="secondary-button">Zurück</button><button id="confirmManualSetup" class="gold-button" disabled>Aufstellung übernehmen</button></div>
  </section>
 </div>
-<script type="module" src="js/game.js?v=20261121-17"></script>
+<script type="module" src="js/game.js?v=20261121-18"></script>
 </body>
 </html>
