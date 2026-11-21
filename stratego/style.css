@@ -1127,7 +1127,7 @@
 .board-wrap.isometric-board .board{touch-action:manipulation}
 .board-wrap.isometric-board .cell{cursor:pointer;-webkit-tap-highlight-color:transparent}
 .board-wrap.isometric-board .piece-upright{
-  transform:translateZ(7px) rotateZ(-45deg) rotateX(-53deg) scale(1.04);
+  transform:translateZ(7px) rotateZ(-45deg) rotateX(-53deg) scale(1.12);
   transform-origin:50% 78%;
   filter:drop-shadow(0 2px 1px #000b);
 }
@@ -1142,7 +1142,7 @@
   filter:
     drop-shadow(1px 0 0 #191a1c)
     drop-shadow(2px 1px 0 #111315)
-    drop-shadow(3px 2px 1px #080a0d)
+    drop-shadow(3px 2px 1px #080a0d) drop-shadow(4px 3px 2px #050608)
     drop-shadow(0 5px 4px #000c)
     drop-shadow(0 0 2px #fff3);
 }
@@ -1156,7 +1156,7 @@
 }
 @media(max-width:620px){
   .board-wrap.isometric-board .piece-upright{
-    transform:translateZ(6px) rotateZ(-45deg) rotateX(-53deg) scale(.98);
+    transform:translateZ(6px) rotateZ(-45deg) rotateX(-53deg) scale(1.06);
   }
   .board-wrap.isometric-board .piece .miniature{width:110%;height:110%}
 }
