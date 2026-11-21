@@ -19,10 +19,34 @@ export function makeArmy(side){
  return pieces;
 }
 export function shuffle(items){const a=[...items];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
-export function initialBoard(){
+function formationPriority(type,formation){
+ const priorities={
+  balanced:{flag:0,bomb:1,marshal:10,general:9,colonel:8,major:7,captain:6,lieutenant:5,sergeant:4,miner:3,scout:2,spy:1},
+  defensive:{flag:0,bomb:1,miner:8,marshal:7,general:6,colonel:5,major:4,captain:3,lieutenant:2,sergeant:1,scout:0,spy:5},
+  offensive:{marshal:12,general:11,colonel:10,major:9,captain:8,lieutenant:7,sergeant:6,miner:5,scout:4,spy:3,bomb:1,flag:0},
+  bastion:{flag:0,bomb:2,miner:9,marshal:8,general:7,colonel:6,major:5,captain:4,lieutenant:3,sergeant:2,scout:1,spy:6},
+  spearhead:{marshal:12,general:11,colonel:10,major:9,captain:8,lieutenant:7,sergeant:6,miner:5,scout:4,spy:3,bomb:1,flag:0}
+ };
+ return (priorities[formation]||priorities.balanced)[type]??0;
+}
+function slotPriority(index,formation){
+ const row=Math.floor(index/10),col=index%10,center=4.5-Math.abs(col-4.5);
+ if(formation==="defensive"||formation==="bastion")return row*10+center*.12;
+ if(formation==="offensive"||formation==="spearhead")return (3-row)*10+center*.08;
+ return (3-row)*5+center*.25;
+}
+export function arrangeArmy(side,formation="balanced"){
+ const army=shuffle(makeArmy(side));
+ const types=army.sort((a,b)=>formationPriority(b.type,formation)-formationPriority(a.type,formation));
+ const slots=Array.from({length:40},(_,i)=>i).sort((a,b)=>slotPriority(b,formation)-slotPriority(a,formation));
+ const arranged=Array(40);
+ slots.forEach((slot,i)=>{arranged[slot]=types[i];});
+ return arranged;
+}
+export function initialBoard(blueFormation="balanced",redFormation="balanced"){
  const board=Array(100).fill(null);
- const blue=shuffle(makeArmy("blue")),red=shuffle(makeArmy("red"));
- for(let i=0;i<40;i++){board[60+i]=blue[i];board[0+i]=red[i];}
+ const blue=arrangeArmy("blue",blueFormation),red=arrangeArmy("red",redFormation);
+ for(let i=0;i<40;i++){board[60+i]=blue[i];board[i]=red[i];}
  return board;
 }
 export function isMovable(piece){return piece && !["bomb","flag"].includes(piece.type);}
