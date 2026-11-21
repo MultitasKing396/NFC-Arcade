@@ -33,3 +33,6 @@
 .piece.hidden-rank{background:transparent!important}
 .piece.hidden-rank .miniature{width:94%;height:94%;filter:drop-shadow(0 2px 3px #000a)}
 @media(max-width:620px){.piece .rank{font-size:clamp(5px,1.35vw,7px)}.piece .miniature{height:83%}}
+
+.selection-info{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-width:0}.selection-info #message{font-size:12px;color:#c2cad8;line-height:1.4}.selection-info #selectedStrength{display:inline-flex;align-items:center;padding:5px 9px;border:1px solid #b08b4e88;border-radius:7px;background:#2b261e;color:var(--gold);font-size:11px;font-weight:900;white-space:nowrap}
+@media(max-width:620px){.selection-info{gap:6px}.selection-info #message{font-size:10px}.selection-info #selectedStrength{font-size:10px;padding:4px 7px}}
