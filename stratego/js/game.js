@@ -3,6 +3,17 @@ const boardEl=document.querySelector("#board"),messageEl=document.querySelector(
 const rulesModal=document.querySelector("#rulesModal");
 let board=initialBoard(),turn="blue",selected=null,validMoves=[],busy=false,dragPointer=null,dragFrom=null;
 const pieceInfo=p=>RANKS[p.type];
+function pieceArt(piece){
+ const enemy=piece.side==="red",light=enemy?"#f3a092":"#a9d6ff",mid=enemy?"#a94c4b":"#3979b7",dark=enemy?"#542c37":"#1d426b",metal=enemy?"#d7a16e":"#f4cf79";
+ if(enemy&&!piece.revealed)return `<svg class="miniature" viewBox="0 0 100 100" aria-hidden="true"><ellipse cx="50" cy="91" rx="29" ry="6" fill="#05080d" opacity=".45"/><path d="M50 8 78 20v28c0 20-12 34-28 43C34 82 22 68 22 48V20z" fill="#542c37" stroke="#f0b3a2" stroke-width="3"/><path d="M50 16 69 24v23c0 14-8 25-19 32-11-7-19-18-19-32V24z" fill="#a94c4b"/><path d="m50 28 5 12 13 1-10 8 3 13-11-7-11 7 3-13-10-8 13-1z" fill="#f4cf79" stroke="#ffe7b0" stroke-width="2"/></svg>`;
+ const type=piece.type;
+ if(type==="bomb")return `<svg class="miniature" viewBox="0 0 100 100" aria-hidden="true"><ellipse cx="50" cy="90" rx="27" ry="6" fill="#05080d" opacity=".45"/><g fill="${dark}" stroke="${metal}" stroke-width="3"><path d="M50 12 57 27 73 20 69 37 87 43 73 54 82 70 63 69 57 88 45 73 29 84 31 64 12 58 27 46 17 30 37 32z"/><circle cx="50" cy="51" r="22" fill="${mid}"/></g><path d="M50 14c0-7 8-9 13-7" fill="none" stroke="#e8d6b4" stroke-width="5" stroke-linecap="round"/><path d="m64 6 5-4" stroke="#f4c76b" stroke-width="3"/></svg>`;
+ if(type==="flag")return `<svg class="miniature" viewBox="0 0 100 100" aria-hidden="true"><ellipse cx="50" cy="91" rx="27" ry="6" fill="#05080d" opacity=".45"/><path d="M50 16v70" stroke="${metal}" stroke-width="5" stroke-linecap="round"/><path d="M53 18 84 27 65 43 53 39z" fill="${light}" stroke="${metal}" stroke-width="2"/><path d="M53 18 84 27 65 43 53 39z" fill="${mid}" opacity=".6"/><path d="m64 25 3 6 6 1-5 4 1 6-5-3-5 3 1-6-5-4 6-1z" fill="${metal}"/><path d="M34 87h32" stroke="${metal}" stroke-width="5" stroke-linecap="round"/></svg>`;
+ const head=type==="marshal"?'<path d="m35 24 4-12 10 8 10-8 6 12-5 8H40z" fill="#f4cf79" stroke="#fff0bd" stroke-width="2"/>':type==="general"?'<path d="M47 18q-8-17 9-16 4 10-2 18" fill="#f4cf79" stroke="#fff0bd" stroke-width="2"/>':type==="scout"?'<path d="M29 30q4-26 22-26t22 26l-9-5H38z" fill="${dark}" stroke="${metal}" stroke-width="2"/>':type==="spy"?'<path d="M29 30q3-25 21-25t21 25l-8-5H37z" fill="${dark}" stroke="${metal}" stroke-width="2"/>':'<path d="m31 27 5-15h28l5 15-8 7H39z" fill="${mid}" stroke="${metal}" stroke-width="2"/>';
+ const weapon=type==="miner"?'<path d="M74 34 83 72M68 38l17-5-3 13-12-2" stroke="#e8d5b2" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>':type==="scout"?'<path d="M76 36 86 76" stroke="#e8d5b2" stroke-width="4" stroke-linecap="round"/><path d="m81 70 5 9 2-11" fill="#e8d5b2"/>':type==="spy"?'<path d="M75 39 86 72" stroke="#d6d9e1" stroke-width="3" stroke-linecap="round"/>':'<path d="M76 35 84 76" stroke="#e8d5b2" stroke-width="4" stroke-linecap="round"/><path d="M78 42h9" stroke="${metal}" stroke-width="3"/>';
+ return `<svg class="miniature" viewBox="0 0 100 100" aria-hidden="true"><ellipse cx="50" cy="91" rx="29" ry="6" fill="#05080d" opacity=".45"/><path d="M24 83q3-19 12-26h28q10 8 13 26l-9 6H33z" fill="${dark}" stroke="${metal}" stroke-width="2"/><path d="M35 57 25 67l-7-6 8-16 13-3M65 57l10 10 8-6-8-17-13-3" fill="${mid}" stroke="${metal}" stroke-width="2"/><path d="M39 38q11-8 22 0l8 22-19 12-19-12z" fill="${mid}" stroke="${metal}" stroke-width="2"/><path d="m39 48 11 7 11-7M50 56v15" stroke="${metal}" stroke-width="2" fill="none"/><circle cx="50" cy="29" r="15" fill="${light}" stroke="${metal}" stroke-width="3"/><path d="M37 29q13-11 26 0" stroke="${dark}" stroke-width="4" fill="none"/>${head}<path d="M42 34h5m7 0h5" stroke="${dark}" stroke-width="2" stroke-linecap="round"/>${weapon}<path d="M30 82h40" stroke="${metal}" stroke-width="3" stroke-linecap="round"/></svg>`;
+}
+
 function setMessage(t){messageEl.textContent=t;}
 function setTurn(t){turn=t;turnEl.textContent=t==="blue"?"Dein Zug":"CPU denkt nach …";turnEl.classList.toggle("cpu",t==="red");}
 function render(){
@@ -16,7 +27,8 @@ function render(){
   if(p){
    const info=pieceInfo(p),el=document.createElement("div");
    el.className="piece "+p.side+(p.side==="red"&&!p.revealed?" hidden-rank":"");
-   el.innerHTML=p.side==="red"&&!p.revealed?'<span class="sigil">♜</span>':`<span class="sigil">${info.sigil}</span><span class="rank">${info.name}</span><span class="value">${info.value}</span>`;
+   el.setAttribute("aria-label",p.side==="red"&&!p.revealed?"Gegnerische Figur":info.name);
+   el.innerHTML=pieceArt(p)+(p.side==="red"&&!p.revealed?"":`<span class="rank">${info.name}</span>`);
    cell.append(el);
   }
   boardEl.append(cell);
