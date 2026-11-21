@@ -1,8 +1,8 @@
-import {RANKS,LAKES,initialBoard,legalMoves,resolveCombat,sideHasMoves} from "./rules.js";
+import {RANKS,MODES,modeConfig,armyCount,setupRows,lakeSet,setMode,initialBoard,legalMoves,resolveCombat,sideHasMoves} from "./rules.js";
 const boardEl=document.querySelector("#board"),messageEl=document.querySelector("#message"),strengthEl=document.querySelector("#selectedStrength"),turnEl=document.querySelector("#turnStatus");
 const rulesModal=document.querySelector("#rulesModal"),setupModal=document.querySelector("#setupModal"),manualSetupModal=document.querySelector("#manualSetupModal");
-let board=initialBoard(),turn="blue",selected=null,validMoves=[],busy=false,dragPointer=null,dragFrom=null;
-let manualSlots=Array(40).fill(null),manualReserve={},manualSelectedType=null,manualMovingIndex=null,activeSaveSlot=0;
+let currentMode="classic";setMode(currentMode);let board=initialBoard("balanced","balanced",currentMode),turn="blue",selected=null,validMoves=[],busy=false,dragPointer=null,dragFrom=null;
+let manualSlots=Array(armyCount(currentMode)).fill(null),manualReserve={},manualSelectedType=null,manualMovingIndex=null,activeSaveSlot=0;
 const pieceInfo=p=>RANKS[p.type];
 function pieceArt(piece){
  const enemy=piece.side==="red",light=enemy?"#f3a092":"#a9d6ff",mid=enemy?"#a94c4b":"#3979b7",dark=enemy?"#542c37":"#1d426b",metal=enemy?"#d7a16e":"#f4cf79";
@@ -20,9 +20,9 @@ function showSelectedStrength(piece){if(!strengthEl)return;const info=pieceInfo(
 function setTurn(t){turn=t;turnEl.textContent=t==="blue"?"Dein Zug":"CPU denkt nach …";turnEl.classList.toggle("cpu",t==="red");}
 function render(){
  boardEl.innerHTML="";
- for(let i=0;i<100;i++){
+ const size=modeConfig(currentMode).size,lakes=lakeSet(currentMode);boardEl.style.gridTemplateColumns=`repeat(${size},minmax(0,1fr))`;boardEl.style.gridTemplateRows=`repeat(${size},minmax(0,1fr))`;\n for(let i=0;i<board.length;i++){
   const cell=document.createElement("div");cell.className="cell";cell.dataset.index=i;
-  if(LAKES.has(i))cell.classList.add("lake");
+  if(lakes.has(i))cell.classList.add("lake");
   if(i===selected)cell.classList.add("selected");
   if(validMoves.includes(i))cell.classList.add("valid");
   const p=board[i];
@@ -39,7 +39,7 @@ function render(){
 function clearSelection(){selected=null;validMoves=[];dragFrom=null;if(strengthEl)strengthEl.textContent="";render();}
 function choose(index){
  const p=board[index];if(!p||p.side!=="blue")return false;
- selected=index;validMoves=legalMoves(board,index);render();setMessage(`Ausgewählt: ${pieceInfo(p).name}`);showSelectedStrength(p);return true;
+ selected=index;validMoves=legalMoves(board,index,currentMode);render();setMessage(`Ausgewählt: ${pieceInfo(p).name}`);showSelectedStrength(p);return true;
 }
 function finishMove(from,to){
  if(from===null||!validMoves.includes(to)||busy){clearSelection();return;}
@@ -60,7 +60,7 @@ function finishMove(from,to){
 }
 function cpuMove(){
  const options=[];
- for(let i=0;i<100;i++){const p=board[i];if(p?.side==="red")for(const to of legalMoves(board,i))options.push({from:i,to});}
+ for(let i=0;i<board.length;i++){const p=board[i];if(p?.side==="red")for(const to of legalMoves(board,i,currentMode))options.push({from:i,to});}
  if(!options.length){endGame("blue");return;}
  const move=options[Math.floor(Math.random()*options.length)],attacker=board[move.from],defender=board[move.to];
  if(defender){
@@ -83,20 +83,20 @@ function endGame(winner){
 }
 function openSetup(){setupModal.hidden=false;}
 function closeSetup(){setupModal.hidden=true;}
-const SAVE_KEY="nfc-arcade-stratego-formations-v1";
-function readSavedFormations(){try{return JSON.parse(localStorage.getItem(SAVE_KEY)||"[]");}catch{return [];}}
-function writeSavedFormations(items){try{localStorage.setItem(SAVE_KEY,JSON.stringify(items));return true;}catch{return false;}}
+const SAVE_KEY=()=>`nfc-arcade-stratego-formations-${currentMode}-v1`;
+function readSavedFormations(){try{return JSON.parse(localStorage.getItem(SAVE_KEY())||"[]");}catch{return [];}}
+function writeSavedFormations(items){try{localStorage.setItem(SAVE_KEY(),JSON.stringify(items));return true;}catch{return false;}}
 function savedFormations(){const a=readSavedFormations();return Array.from({length:3},(_,i)=>a[i]||null);}
 function updateSaveLabels(){savedFormations().forEach((s,i)=>{const el=document.querySelector("#saveStatus"+i);if(el)el.textContent=s?"Gespeichert":"Leer";});}
-function resetManualPlacement(){manualSlots=Array(40).fill(null);manualReserve={};for(const [type,info] of Object.entries(RANKS))manualReserve[type]=info.count;manualSelectedType=null;manualMovingIndex=null;activeSaveSlot=0;renderManualSetup();}
+function resetManualPlacement(){manualSlots=Array(armyCount(currentMode)).fill(null);manualReserve={};for(const [type,count] of Object.entries(modeConfig(currentMode).counts))manualReserve[type]=count;manualSelectedType=null;manualMovingIndex=null;activeSaveSlot=0;renderManualSetup();}
 function renderManualSetup(){
  const grid=document.querySelector("#manualBoard"),palette=document.querySelector("#manualPalette");grid.innerHTML="";palette.innerHTML="";
- for(let i=0;i<40;i++){const p=manualSlots[i],cell=document.createElement("button");cell.type="button";cell.className="manual-cell"+(p?" occupied":"")+(manualMovingIndex===i?" moving":"");
+ const size=modeConfig(currentMode).size;grid.style.gridTemplateColumns=`repeat(${size},minmax(0,1fr))`;grid.style.aspectRatio=`${size}/${setupRows(currentMode)}`;\n for(let i=0;i<manualSlots.length;i++){const p=manualSlots[i],cell=document.createElement("button");cell.type="button";cell.className="manual-cell"+(p?" occupied":"")+(manualMovingIndex===i?" moving":"");
   cell.innerHTML=p?("<span class=\"manual-piece\">"+RANKS[p.type].sigil+"</span><small>"+RANKS[p.type].name+"</small>"):"<span class=\"empty-mark\">＋</span>";
   cell.addEventListener("click",()=>placeManualCell(i));grid.append(cell);}
- for(const [type,info] of Object.entries(RANKS)){const count=manualReserve[type]||0,btn=document.createElement("button");btn.type="button";btn.className="palette-piece"+(manualSelectedType===type?" active":"")+(count===0?" exhausted":"");btn.disabled=count===0;
+ for(const [type,countAvailable] of Object.entries(modeConfig(currentMode).counts)){const info=RANKS[type],count=manualReserve[type]||0,btn=document.createElement("button");btn.type="button";btn.className="palette-piece"+(manualSelectedType===type?" active":"")+(count===0?" exhausted":"");btn.disabled=count===0;
   btn.innerHTML="<span>"+info.sigil+"</span><b>"+info.name+"</b><small>"+count+" übrig</small>";btn.addEventListener("click",()=>{manualSelectedType=type;manualMovingIndex=null;renderManualSetup();});palette.append(btn);}
- const placed=manualSlots.filter(Boolean).length;document.querySelector("#manualProgress").textContent=placed+" / 40 platziert";
+ const placed=manualSlots.filter(Boolean).length;document.querySelector("#manualProgress").textContent=placed+" / "+armyCount(currentMode)+" platziert";
  document.querySelector("#manualSelected").textContent=manualMovingIndex!==null?"Figur zum Verschieben gewählt":manualSelectedType?RANKS[manualSelectedType].name+" ausgewählt":"Keine Figur ausgewählt";
  document.querySelector("#confirmManualSetup").disabled=placed!==40;updateSaveLabels();
 }
@@ -107,11 +107,11 @@ function placeManualCell(index){
 }
 function openManualSetup(){closeSetup();resetManualPlacement();manualSetupModal.hidden=false;}
 function closeManualSetup(){manualSetupModal.hidden=true;}
-function saveManualFormation(){const placed=manualSlots.filter(Boolean).length;if(placed!==40)return;const slots=savedFormations();const old=slots[activeSaveSlot];if(old&&!confirm("Diesen Speicherplatz zuerst leeren, bevor du ihn neu belegst."))return;if(old)return;slots[activeSaveSlot]={name:["Formation Alpha","Formation Beta","Formation Charlie"][activeSaveSlot],types:manualSlots.map(p=>p.type)};if(!writeSavedFormations(slots)){alert("Speichern ist in diesem Browser nicht verfügbar.");return;}updateSaveLabels();}
-function loadManualFormation(index){const saved=savedFormations()[index];if(!saved)return;if(manualSlots.some(Boolean)&&!confirm("Die aktuelle Aufstellung durch diese Formation ersetzen?"))return;manualSlots=saved.types.map(type=>({type}));manualReserve={};for(const [type,info] of Object.entries(RANKS))manualReserve[type]=info.count;manualSlots.forEach(p=>manualReserve[p.type]--);manualSelectedType=null;manualMovingIndex=null;activeSaveSlot=index;renderManualSetup();}
+function saveManualFormation(){const placed=manualSlots.filter(Boolean).length;if(placed!==armyCount(currentMode))return;const slots=savedFormations();const old=slots[activeSaveSlot];if(old&&!confirm("Diesen Speicherplatz zuerst leeren, bevor du ihn neu belegst."))return;if(old)return;slots[activeSaveSlot]={name:["Formation Alpha","Formation Beta","Formation Charlie"][activeSaveSlot],types:manualSlots.map(p=>p.type)};if(!writeSavedFormations(slots)){alert("Speichern ist in diesem Browser nicht verfügbar.");return;}updateSaveLabels();}
+function loadManualFormation(index){const saved=savedFormations()[index];if(!saved)return;if(manualSlots.some(Boolean)&&!confirm("Die aktuelle Aufstellung durch diese Formation ersetzen?"))return;manualSlots=saved.types.map(type=>({type}));manualReserve={};for(const [type,count] of Object.entries(modeConfig(currentMode).counts))manualReserve[type]=count;manualSlots.forEach(p=>manualReserve[p.type]--);manualSelectedType=null;manualMovingIndex=null;activeSaveSlot=index;renderManualSetup();}
 function clearManualFormation(){const slots=savedFormations();if(!slots[activeSaveSlot])return;if(!confirm("Diesen Speicherplatz wirklich leeren?"))return;slots[activeSaveSlot]=null;writeSavedFormations(slots);updateSaveLabels();}
-function confirmManualPlacement(){if(manualSlots.some(p=>!p))return;const player=manualSlots.map((p,i)=>({...p,id:"blue-manual-"+i,side:"blue",revealed:false}));const cpuFormation=document.querySelector("#cpuFormation").value;board=initialBoard("balanced",cpuFormation);for(let i=0;i<40;i++)board[60+i]=player[i];selected=null;validMoves=[];busy=false;dragPointer=null;dragFrom=null;if(strengthEl)strengthEl.textContent="";closeManualSetup();setTurn("blue");setMessage("Deine manuelle Aufstellung ist bereit.");render();}
-function startConfiguredGame(){const player=document.querySelector("#playerFormation").value;const cpu=document.querySelector("#cpuFormation").value;if(player==="manual"){openManualSetup();return;}board=initialBoard(player,cpu);selected=null;validMoves=[];busy=false;dragPointer=null;dragFrom=null;if(strengthEl)strengthEl.textContent="";closeSetup();setTurn("blue");setMessage("Aufstellung bereit – wähle eine deiner Figuren aus.");render();}
+function confirmManualPlacement(){if(manualSlots.some(p=>!p))return;const player=manualSlots.map((p,i)=>({...p,id:"blue-manual-"+i,side:"blue",revealed:false}));const cpuFormation=document.querySelector("#cpuFormation").value;board=initialBoard("balanced",cpuFormation,currentMode);const n=modeConfig(currentMode).size,start=(n-setupRows(currentMode))*n;for(let i=0;i<player.length;i++)board[start+i]=player[i];selected=null;validMoves=[];busy=false;dragPointer=null;dragFrom=null;if(strengthEl)strengthEl.textContent="";closeManualSetup();setTurn("blue");setMessage("Deine manuelle Aufstellung ist bereit.");render();}
+function startConfiguredGame(){const chosen=document.querySelector("#gameMode").value;currentMode=MODES[chosen]?chosen:"classic";setMode(currentMode);const player=document.querySelector("#playerFormation").value;const cpu=document.querySelector("#cpuFormation").value;if(player==="manual"){openManualSetup();return;}board=initialBoard(player,cpu,currentMode);selected=null;validMoves=[];busy=false;dragPointer=null;dragFrom=null;if(strengthEl)strengthEl.textContent="";closeSetup();setTurn("blue");setMessage("Aufstellung bereit – wähle eine deiner Figuren aus.");render();}
 boardEl.addEventListener("pointerdown",e=>{
  const cell=e.target.closest(".cell");if(!cell||turn!=="blue"||busy)return;
  const index=Number(cell.dataset.index),p=board[index];
