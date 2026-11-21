@@ -84,7 +84,7 @@ function endGame(winner){
 }
 function openSetup(){setupModal.hidden=false;}
 function closeSetup(){setupModal.hidden=true;}
-const SAVE_KEY=()=>`nfc-arcade-stratego-formations-${currentMode}-v1`;
+const SAVE_KEY=()=>currentMode==="classic"?"nfc-arcade-stratego-formations-v1":`nfc-arcade-stratego-formations-${currentMode}-v1`;
 function readSavedFormations(){try{return JSON.parse(localStorage.getItem(SAVE_KEY())||"[]");}catch{return [];}}
 function writeSavedFormations(items){try{localStorage.setItem(SAVE_KEY(),JSON.stringify(items));return true;}catch{return false;}}
 function savedFormations(){const a=readSavedFormations();return Array.from({length:3},(_,i)=>a[i]||null);}
