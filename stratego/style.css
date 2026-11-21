@@ -298,7 +298,7 @@
 @keyframes winStorm{0%{filter:brightness(1)}18%{filter:brightness(2) drop-shadow(0 0 8px #8befff)}38%{filter:brightness(.9)}58%{filter:brightness(1.8) drop-shadow(0 0 7px #8befff)}100%{filter:brightness(1.1)}}
 .spy-marshal-counter{z-index:7;isolation:isolate}
 .spy-marshal-counter:after{border:3px solid #fff2b2!important;border-radius:50%!important;box-shadow:0 0 10px #fff,0 0 24px #e7bd54,0 0 42px #a77de8!important;animation:legendaryBurst calc(.95s * var(--game-animation-speed,1)) cubic-bezier(.12,.8,.2,1) both!important}
-.spy-marshal-counter:before{content:"";position:absolute;z-index:5;inset:-8%;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#fff8d5 0, #e9bd5b88 22%,#9b75d455 48%,transparent 72%);animation:legendaryFlash calc(.85s * var(--game-animation-speed,1)) ease-out both}
+.cell.spy-marshal-counter:before{content:"";position:absolute;z-index:5;inset:-8%;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#fff8d5 0, #e9bd5b88 22%,#9b75d455 48%,transparent 72%);animation:legendaryFlash calc(.85s * var(--game-animation-speed,1)) ease-out both}
 .legendary-counter{position:absolute;z-index:12;left:50%;top:-17px;transform:translateX(-50%);padding:5px 7px;border:1px solid #ffe8a1;border-radius:7px;background:linear-gradient(120deg,#38264f,#6d4d22);color:#fff2c7;font-size:clamp(6px,1.35vw,9px);font-weight:1000;letter-spacing:.04em;white-space:nowrap;text-shadow:0 1px 3px #000;box-shadow:0 0 12px #e6bf65aa;pointer-events:none;animation:legendaryLabel calc(1.25s * var(--game-animation-speed,1)) cubic-bezier(.2,.8,.2,1) both}
 @keyframes legendaryBurst{0%{opacity:1;transform:scale(.25) rotate(-35deg)}55%{opacity:1;transform:scale(1.28) rotate(12deg)}100%{opacity:0;transform:scale(1.65) rotate(35deg)}}
 @keyframes legendaryFlash{0%{opacity:0;transform:scale(.2)}22%{opacity:1}100%{opacity:0;transform:scale(1.65)}}
@@ -559,3 +559,7 @@
  .board-wrap{border-width:2px}
  .board-wrap[data-theme="forest"],.board-wrap[data-theme="ice"],.board-wrap[data-theme="volcano"],.board-wrap[data-theme="ruins"]{border-width:2px}
 }
+
+
+/* Ergebnisdialog respektiert ebenfalls die Betriebssystem-Einstellung für reduzierte Bewegung. */
+@media(prefers-reduced-motion:reduce){.result-banner,.result-card{animation:none!important}}
