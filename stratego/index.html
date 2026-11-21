@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#10131d">
 <title>Stratego – Fantasy Battlefield Edition</title>
-<link rel="stylesheet" href="style.css?v=20261121-2">
+<link rel="stylesheet" href="style.css?v=20261121-3">
 </head>
 <body>
 <div class="app-shell">
@@ -54,7 +54,8 @@
   <button class="modal-close" id="closeSetup" aria-label="Schließen">×</button>
   <div class="eyebrow">VORBEREITUNG DER SCHLACHT</div>
   <h2 id="setupTitle">Stelle deine Armee auf</h2>
-  <p class="setup-intro">Wähle für beide Seiten eine Aufstellung. Die Figuren bleiben klassisch: 40 Einheiten pro Armee.</p>
+  <p class="setup-intro">Wähle zuerst die Größe der Schlacht und anschließend die Aufstellungen beider Seiten.</p>
+  <div class="setup-side"><label for="gameMode">Spielgröße</label><select id="gameMode"><option value="quick">Blitzgefecht · 6 × 6 · 12 Figuren</option><option value="small">Schnellgefecht · 8 × 8 · 24 Figuren</option><option value="classic" selected>Klassisch · 10 × 10 · 40 Figuren</option><option value="large">Große Schlacht · 12 × 12 · 48 Figuren</option></select></div>
   <div class="setup-side">
    <div class="setup-side-title"><span class="army-dot blue"></span><div><b>Dein Königreich</b><small>Deine Aufstellung</small></div></div>
    <label for="playerFormation">Taktik wählen</label>
@@ -86,8 +87,8 @@
 <div class="modal-backdrop" id="manualSetupModal" hidden>
  <section class="modal manual-setup-modal" role="dialog" aria-modal="true" aria-labelledby="manualSetupTitle">
   <button class="modal-close" id="closeManualSetup" aria-label="Schließen">×</button>
-  <div class="eyebrow">DEINE ARMEE · MANUELLE AUFSTELLUNG</div><h2 id="manualSetupTitle">Platziere deine 40 Figuren</h2>
-  <p class="setup-intro">Wähle unten eine Figur und tippe auf ein freies Feld in deinen vier Startreihen. Bereits platzierte Figuren kannst du antippen und verschieben.</p>
+  <div class="eyebrow">DEINE ARMEE · MANUELLE AUFSTELLUNG</div><h2 id="manualSetupTitle">Platziere deine Armee</h2>
+  <p class="setup-intro">Wähle unten eine Figur und tippe auf ein freies Feld in deinem Aufstellungsbereich. Bereits platzierte Figuren kannst du antippen und verschieben.</p>
   <div class="manual-progress"><strong id="manualProgress">0 / 40 platziert</strong><span id="manualSelected">Keine Figur ausgewählt</span></div>
   <div class="manual-board-wrap"><div id="manualBoard" class="manual-board"></div></div>
   <div class="manual-palette" id="manualPalette"></div>
@@ -99,6 +100,6 @@
   <div class="setup-actions"><button id="cancelManualSetup" class="secondary-button">Zurück</button><button id="confirmManualSetup" class="gold-button" disabled>Aufstellung übernehmen</button></div>
  </section>
 </div>
-<script type="module" src="js/game.js?v=20261121-2"></script>
+<script type="module" src="js/game.js?v=20261121-3"></script>
 </body>
 </html>
