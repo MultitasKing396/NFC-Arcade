@@ -164,15 +164,28 @@ function render(){
     rankMark.title=info.rank>0?"Stärke "+info.rank:info.name;
     el.append(rankMark);
    }
-   if(pendingAnimation?.to===i&&pendingAnimation.kind==="combat"&&pendingAnimation.revealType){
-    const reveal=document.createElement("span");reveal.className="combat-reveal-badge";
-    const revealInfo=RANKS[pendingAnimation.revealType];
-    reveal.textContent=revealInfo?.rank>0?"STÄRKE "+revealInfo.rank:revealInfo?.name||"ENTHÜLLT";
-    el.append(reveal);
-   }
    cell.append(el);
   }
   boardEl.append(cell);
+ }
+ const boardWrap=boardEl.parentElement;
+ boardWrap.querySelector(".combat-callout-layer")?.remove();
+ if(pendingAnimation?.kind==="combat"&&pendingAnimation.to!=null){
+  const calloutLayer=document.createElement("div");
+  calloutLayer.className="combat-callout-layer";
+  calloutLayer.style.gridTemplateColumns=`repeat(${size},minmax(0,1fr))`;
+  calloutLayer.style.gridTemplateRows=`repeat(${size},minmax(0,1fr))`;
+  const callout=document.createElement("div");
+  callout.className="combat-callout";
+  callout.style.gridColumn=String((pendingAnimation.to%size)+1);
+  callout.style.gridRow=String(Math.floor(pendingAnimation.to/size)+1);
+  const label=document.createElement("span");
+  label.className="combat-callout-label";
+  const revealInfo=pendingAnimation.revealType?RANKS[pendingAnimation.revealType]:null;
+  label.textContent=revealInfo?.rank>0?"STÄRKE "+revealInfo.rank:revealInfo?.name||"SIEG!";
+  callout.append(label);
+  calloutLayer.append(callout);
+  boardWrap.append(calloutLayer);
  }
  pendingAnimation=null;
 }
