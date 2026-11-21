@@ -187,6 +187,7 @@ function render(){
   calloutLayer.style.gridTemplateRows=`repeat(${size},minmax(0,1fr))`;
   const callout=document.createElement("div");
   callout.className="combat-callout";
+  if(pendingAnimation.attackerType==="marshal"||pendingAnimation.opponentType==="marshal")callout.classList.add("combat-callout-marshal");
   callout.style.gridColumn=String((pendingAnimation.to%size)+1);
   callout.style.gridRow=String(Math.floor(pendingAnimation.to/size)+1);
   const label=document.createElement("span");
