@@ -337,3 +337,28 @@
 @keyframes eliteStagger{0%{transform:translateX(0) rotate(0)}18%{transform:translateX(-4px) rotate(-5deg);filter:brightness(1.8)}36%{transform:translateX(4px) rotate(5deg)}58%{transform:translateX(-2px) rotate(-2deg)}100%{transform:translateX(0) rotate(0)}}
 .no-game-animations .cell.combat-elite .piece.combat-winner,.no-game-animations .cell.combat-elite .piece.combat-survivor{animation:none!important}
 @media(prefers-reduced-motion:reduce){.cell.combat-elite .piece.combat-winner,.cell.combat-elite .piece.combat-survivor{animation:none!important}}
+
+
+/* Schritt 4: vier rein kosmetische Schlachtfeld-Stimmungen – Spielregeln bleiben unverändert. */
+.board-wrap[data-theme="forest"]{border-color:#66815b99;background:linear-gradient(145deg,#28362b,#141f1b);box-shadow:0 18px 50px #0008,inset 0 1px #c4e0a018}
+.board-wrap[data-theme="forest"] .board{background:#101a16}
+.board-wrap[data-theme="forest"] .cell:not(.lake){background:linear-gradient(145deg,#526d4e,#304a39)}
+.board-wrap[data-theme="forest"] .cell:nth-child(even):not(.lake){background:linear-gradient(145deg,#496344,#293f32)}
+.board-wrap[data-theme="ice"]{border-color:#8cc5dcaa;background:linear-gradient(145deg,#263d50,#142431);box-shadow:0 18px 50px #0009,inset 0 1px #e4f8ff22}
+.board-wrap[data-theme="ice"] .board{background:#102333}
+.board-wrap[data-theme="ice"] .cell:not(.lake){background:linear-gradient(145deg,#9bbdca,#557f94);border-color:#d9f4ff44}
+.board-wrap[data-theme="ice"] .cell:nth-child(even):not(.lake){background:linear-gradient(145deg,#86adbf,#496f86)}
+.board-wrap[data-theme="ice"] .cell:not(.lake):after{background:linear-gradient(135deg,#ffffff55,transparent 58%)}
+.board-wrap[data-theme="ice"] .cell.lake{background:radial-gradient(ellipse at 35% 25%,#b2e4f2,#4c829e 68%,#24465b);border-color:#d6f6ff99}
+.board-wrap[data-theme="volcano"]{border-color:#b65d3d99;background:linear-gradient(145deg,#43271f,#1c171b);box-shadow:0 18px 50px #0009,inset 0 1px #ffb07b18}
+.board-wrap[data-theme="volcano"] .board{background:#1a1114}
+.board-wrap[data-theme="volcano"] .cell:not(.lake){background:linear-gradient(145deg,#65443a,#382a2b);border-color:#f4a06b33}
+.board-wrap[data-theme="volcano"] .cell:nth-child(even):not(.lake){background:linear-gradient(145deg,#51372f,#2d2328)}
+.board-wrap[data-theme="volcano"] .cell:not(.lake):after{background:linear-gradient(135deg,#ffb27a18,transparent 55%)}
+.board-wrap[data-theme="volcano"] .cell.lake{background:radial-gradient(ellipse at 45% 40%,#f38a43,#9b392c 55%,#431f24);border-color:#ffb06a99}
+.board-wrap[data-theme="ruins"]{border-color:#b7a58a99;background:linear-gradient(145deg,#3a3835,#201f20);box-shadow:0 18px 50px #0009,inset 0 1px #fff2dc18}
+.board-wrap[data-theme="ruins"] .board{background:#211f1d}
+.board-wrap[data-theme="ruins"] .cell:not(.lake){background:linear-gradient(145deg,#827966,#554f45);border-color:#e2d3b544}
+.board-wrap[data-theme="ruins"] .cell:nth-child(even):not(.lake){background:linear-gradient(145deg,#716a5d,#49443e)}
+.board-wrap[data-theme="ruins"] .cell:not(.lake):after{background:linear-gradient(135deg,#fff0d522,transparent 55%)}
+.board-wrap[data-theme="ruins"] .cell.lake{background:radial-gradient(ellipse at 35% 25%,#718a8c,#344b50 65%,#202e32);border-color:#a8c7c788}
