@@ -140,3 +140,21 @@
 .piece{position:relative}
 .piece-rank-badge{position:absolute;top:2px;right:2px;z-index:3;width:clamp(10px,2.5vw,15px);height:clamp(10px,2.5vw,15px);display:grid;place-items:center;border:1px solid #f8df9b;border-radius:50%;background:linear-gradient(145deg,#fff0bf,#c99b48);box-shadow:0 1px 4px #000b;color:#352719;font-family:Arial,sans-serif;font-size:clamp(7px,1.7vw,10px);font-weight:900;line-height:1;text-shadow:none;pointer-events:none}
 @media(max-width:420px){.piece-rank-badge{top:1px;right:1px;width:10px;height:10px;font-size:7px;border-width:.7px}}
+
+
+/* Version 16: persönliche Sound-, Animations- und Tempo-Einstellungen. */
+.settings-group{display:flex;flex-direction:column;gap:0;margin-top:18px;border:1px solid #ffffff20;border-radius:11px;background:#11172288;overflow:hidden}
+.setting-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px 14px;border-bottom:1px solid #ffffff18;color:#f0e4cd}
+.setting-row:last-of-type{border-bottom:0}
+.setting-row span{display:flex;flex-direction:column;gap:4px;min-width:0}
+.setting-row b{font-size:13px}
+.setting-row small{font-size:10px;line-height:1.4;color:#9da9bb}
+.setting-row input[type=checkbox]{width:21px;height:21px;flex:0 0 21px;accent-color:#d6b66d}
+.setting-speed select{width:auto;min-width:125px;max-width:45%;font-size:12px}
+.settings-note{margin:0;padding:0 14px 14px;color:#8f9aac;font-size:10px;line-height:1.45}
+.no-game-animations .cell.selected .piece,.no-game-animations .cell.move-origin .piece,.no-game-animations .cell.move-arrival .piece,.no-game-animations .cell.combat-impact,.no-game-animations .cell.combat-impact .piece,.no-game-animations .piece.moving-piece,.no-game-animations .piece.attack-piece{animation:none!important;filter:none!important}
+.no-game-animations .home-hero,.no-game-animations .home-emblem,.no-game-animations .result-banner,.no-game-animations .result-card{animation:none!important}
+.cell.selected .piece{animation-duration:calc(.42s * var(--game-animation-speed,1))}
+.cell.move-origin .piece{animation-duration:calc(.24s * var(--game-animation-speed,1))}
+.cell.move-arrival .piece,.piece.moving-piece{animation-duration:calc(.34s * var(--game-animation-speed,1))}
+.cell.combat-impact,.cell.combat-impact .piece,.piece.attack-piece{animation-duration:calc(.42s * var(--game-animation-speed,1))}
