@@ -3,6 +3,41 @@ const boardEl=document.querySelector("#board"),messageEl=document.querySelector(
 const rulesModal=document.querySelector("#rulesModal"),setupModal=document.querySelector("#setupModal"),manualSetupModal=document.querySelector("#manualSetupModal"),settingsModal=document.querySelector("#settingsModal");
 let pendingAnimation=null;
 let setupFromHome=false;
+const SETTINGS_KEY="nfc-arcade-stratego-settings-v1";
+const DEFAULT_SETTINGS={sound:false,animations:true,speed:"normal"};
+let gameSettings={...DEFAULT_SETTINGS};
+let audioContext=null;
+function loadSettings(){
+ try{const saved=JSON.parse(localStorage.getItem(SETTINGS_KEY)||"{}");gameSettings={...DEFAULT_SETTINGS,...saved};}catch{gameSettings={...DEFAULT_SETTINGS};}
+ if(!["slow","normal","fast"].includes(gameSettings.speed))gameSettings.speed="normal";
+ applySettings();
+}
+function saveSettings(){try{localStorage.setItem(SETTINGS_KEY,JSON.stringify(gameSettings));}catch(error){console.warn("Einstellungen konnten nicht gespeichert werden.",error);}}
+function applySettings(){
+ document.body.classList.toggle("no-game-animations",!gameSettings.animations);
+ document.documentElement.style.setProperty("--game-animation-speed",gameSettings.speed==="slow"?"1.35":gameSettings.speed==="fast"?"0.72":"1");
+ const sound=document.querySelector("#settingSound"),animations=document.querySelector("#settingAnimations"),speed=document.querySelector("#settingSpeed");
+ if(sound)sound.checked=!!gameSettings.sound;
+ if(animations)animations.checked=!!gameSettings.animations;
+ if(speed)speed.value=gameSettings.speed;
+}
+function changeSetting(key,value){gameSettings[key]=value;saveSettings();applySettings();}
+function cpuDelay(){const factor=gameSettings.speed==="slow"?1.45:gameSettings.speed==="fast"?0.65:1;return (650+Math.random()*650)*factor;}
+function playSound(kind){
+ if(!gameSettings.sound)return;
+ try{
+  const AudioCtor=window.AudioContext||window.webkitAudioContext;if(!AudioCtor)return;
+  if(!audioContext)audioContext=new AudioCtor();
+  if(audioContext.state==="suspended")audioContext.resume();
+  const now=audioContext.currentTime,osc=audioContext.createOscillator(),gain=audioContext.createGain();
+  const notes=kind==="combat"?[180,115]:kind==="win"?[440,660,880]:[330,440];
+  osc.type=kind==="combat"?"triangle":"sine";osc.frequency.setValueAtTime(notes[0],now);
+  if(notes.length>1)osc.frequency.exponentialRampToValueAtTime(notes[1],now+(kind==="combat"?.13:.09));
+  gain.gain.setValueAtTime(.0001,now);gain.gain.exponentialRampToValueAtTime(kind==="combat"?.075:.045,now+.015);gain.gain.exponentialRampToValueAtTime(.0001,now+.22);
+  osc.connect(gain);gain.connect(audioContext.destination);osc.start(now);osc.stop(now+.23);
+ }catch(error){console.warn("Sound konnte nicht abgespielt werden.",error);}
+}
+
 const GAME_SAVE_KEY="nfc-arcade-stratego-current-game-v1";
 let hasSavedGame=false;
 let currentMode="classic";setMode(currentMode);let board=initialBoard("balanced","balanced",currentMode),turn="blue",selected=null,validMoves=[],busy=false,dragPointer=null,dragFrom=null;
@@ -141,9 +176,10 @@ function finishMove(from,to){
  }else{board[to]=attacker;board[from]=null;setMessage("Zug ausgeführt.");}
  pendingAnimation={from,to,kind:animationKind,winner};
  selected=null;validMoves=[];dragFrom=null;if(strengthEl)strengthEl.textContent="";
+ playSound(animationKind==="combat"?"combat":"move");
  if(!sideHasMoves(board,"red",currentMode)){render();endGame("blue");return;}
  setTurn("red");busy=true;render();saveGameState();
- window.setTimeout(cpuMove,650+Math.random()*650);
+ window.setTimeout(cpuMove,cpuDelay());
 }
 function cpuMove(){
  const options=[];
@@ -161,10 +197,12 @@ function cpuMove(){
   if(defender.type==="flag"&&result.result==="attacker"){pendingAnimation={from:move.from,to:move.to,kind:animationKind,winner};busy=false;render();endGame("red");return;}
  }else{board[move.to]=attacker;board[move.from]=null;setMessage("Der CPU hat seinen Zug ausgeführt.");}
  pendingAnimation={from:move.from,to:move.to,kind:animationKind,winner};
+ playSound(animationKind==="combat"?"combat":"move");
  busy=false;setTurn("blue");render();saveGameState();
  if(!sideHasMoves(board,"blue",currentMode))endGame("red");
 }
 function endGame(winner){
+ playSound("win");
  busy=true;try{localStorage.removeItem(GAME_SAVE_KEY);}catch{}hasSavedGame=false;updateResumeButton();setTurn("blue");turnEl.textContent=winner==="blue"?"Sieg!":"Niederlage";
  setMessage(winner==="blue"?"Du hast gewonnen! Die gegnerische Flagge ist gefallen.":"Du hast verloren. Deine Flagge wurde erobert.");
  const banner=document.createElement("div");banner.className="result-banner";banner.innerHTML=`<div class="result-card"><div class="eyebrow">DIE SCHLACHT IST ENTSCHIEDEN</div><h2>${winner==="blue"?"SIEG":"NIEDERLAGE"}</h2><p>${winner==="blue"?"Deine Armee triumphiert.":"Deine Armee wurde besiegt."}</p><button class="gold-button" id="resultNew">Neue Partie</button></div>`;
@@ -191,7 +229,7 @@ function updateResumeButton(){
 function loadGameState(){try{const raw=localStorage.getItem(GAME_SAVE_KEY);if(!raw)return false;const state=JSON.parse(raw);if(state?.version!==1||!MODES[state.currentMode]||!Array.isArray(state.board)||state.board.length!==modeConfig(state.currentMode).size**2||!state.board.every(p=>p===null||(p&&typeof p.type==="string"&&(p.side==="blue"||p.side==="red"))))return false;currentMode=state.currentMode;setMode(currentMode);board=state.board;turn=state.turn==="red"?"red":"blue";playerFaction=FACTIONS[state.playerFaction]?state.playerFaction:"aurelia";cpuFaction=FACTIONS[state.cpuFaction]?state.cpuFaction:"shadow";setMessage(state.message||"Spielstand geladen.");hasSavedGame=true;updateResumeButton();return true;}catch(error){console.warn("Gespeicherter Spielstand ist ungültig.",error);return false;}}
 function resumeSavedGame(){if(!loadGameState())return;selected=null;validMoves=[];busy=turn==="red";showGameScreen();setTurn(turn);render();updateResumeButton();if(busy)window.setTimeout(cpuMove,500);}
 function openHomeRules(){rulesModal.hidden=false;}
-function openSettings(){settingsModal.hidden=false;}
+function openSettings(){applySettings();settingsModal.hidden=false;}
 function openSetup(fromHome=false){setupFromHome=fromHome;setupModal.hidden=false;}
 function closeSetup(){setupModal.hidden=true;if(setupFromHome){document.querySelector("#homeScreen").hidden=false;document.querySelector("#gameScreen").hidden=true;}setupFromHome=false;}
 const SAVE_KEY=()=>currentMode==="classic"?"nfc-arcade-stratego-formations-v1":`nfc-arcade-stratego-formations-${currentMode}-v1`;
@@ -248,6 +286,9 @@ document.querySelector("#newGameBtn").addEventListener("click",showHomeScreen);
 document.querySelector("#homeStartBtn").addEventListener("click",()=>openSetup(true));
 document.querySelector("#homeResumeBtn").addEventListener("click",resumeSavedGame);
 document.querySelector("#homeSettingsBtn").addEventListener("click",openSettings);
+document.querySelector("#settingSound").addEventListener("change",e=>changeSetting("sound",e.target.checked));
+document.querySelector("#settingAnimations").addEventListener("change",e=>changeSetting("animations",e.target.checked));
+document.querySelector("#settingSpeed").addEventListener("change",e=>changeSetting("speed",e.target.value));
 document.querySelector("#closeSettings").addEventListener("click",()=>settingsModal.hidden=true);
 settingsModal.addEventListener("click",e=>{if(e.target===settingsModal)settingsModal.hidden=true;});
 document.querySelector("#homeRulesBtn").addEventListener("click",openHomeRules);
@@ -266,5 +307,6 @@ rulesModal.addEventListener("click",e=>{if(e.target===rulesModal)rulesModal.hidd
 document.addEventListener("keydown",e=>{if(e.key==="Escape"){rulesModal.hidden=true;settingsModal.hidden=true;closeSetup();closeManualSetup();}});
 window.addEventListener("pagehide",saveGameState);
 window.addEventListener("beforeunload",saveGameState);
+loadSettings();
 if(loadGameState()){updateResumeButton();setTurn(turn);}else{try{localStorage.removeItem(GAME_SAVE_KEY);}catch{}hasSavedGame=false;updateResumeButton();}
 render();
