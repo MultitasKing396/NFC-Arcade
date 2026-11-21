@@ -173,6 +173,11 @@ function render(){
  if(pendingAnimation?.kind==="combat"&&pendingAnimation.to!=null){
   const calloutLayer=document.createElement("div");
   calloutLayer.className="combat-callout-layer";
+  const boardStyle=getComputedStyle(boardEl);
+  calloutLayer.style.top=(boardEl.offsetTop+boardEl.clientTop+parseFloat(boardStyle.paddingTop||0))+"px";
+  calloutLayer.style.left=(boardEl.offsetLeft+boardEl.clientLeft+parseFloat(boardStyle.paddingLeft||0))+"px";
+  calloutLayer.style.width=boardEl.clientWidth-parseFloat(boardStyle.paddingLeft||0)-parseFloat(boardStyle.paddingRight||0)+"px";
+  calloutLayer.style.height=boardEl.clientHeight-parseFloat(boardStyle.paddingTop||0)-parseFloat(boardStyle.paddingBottom||0)+"px";
   calloutLayer.style.gridTemplateColumns=`repeat(${size},minmax(0,1fr))`;
   calloutLayer.style.gridTemplateRows=`repeat(${size},minmax(0,1fr))`;
   const callout=document.createElement("div");
