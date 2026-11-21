@@ -222,3 +222,36 @@
 .cell.selected .piece.idle-piece,.cell.move-origin .piece.idle-piece,.cell.move-arrival .piece.idle-piece,.cell.combat-impact .piece.idle-piece{animation:none}
 .no-game-animations .piece.idle-piece,.no-game-animations .piece.idle-piece .miniature{animation:none!important}
 @media(prefers-reduced-motion:reduce){.piece.idle-piece,.piece.idle-piece .miniature{animation:none!important}}
+
+
+/* Faction signatures: restrained living details on the illustrated miniatures. */
+.piece .faction-mantle{transform-box:fill-box;transform-origin:50% 18%;animation:mantleSway 5.2s ease-in-out infinite}
+.piece.faction-aurelia .faction-mantle{animation-duration:4.6s}
+.piece.faction-shadow .faction-mantle{transform-origin:50% 12%;animation:shadowCloak 4.1s ease-in-out infinite}
+.piece.faction-sylvan .faction-mantle{animation:leafBreath 4.8s ease-in-out infinite}
+.piece.faction-ash .faction-mantle{animation:emberCloak 2.7s ease-in-out infinite}
+.piece.faction-storm .faction-mantle{animation:stormCloak 3.7s ease-in-out infinite}
+.piece.faction-iron .faction-armor{animation:ironGleam 5.6s ease-in-out infinite}
+.piece.faction-aurelia .faction-armor{animation:goldGleam 4.9s ease-in-out infinite}
+.piece.faction-shadow .faction-armor{animation:shadowPulse 3.8s ease-in-out infinite}
+.piece.faction-sylvan .faction-armor{animation:leafGleam 4.4s ease-in-out infinite}
+.piece.faction-ash .faction-armor{animation:emberGlow 2.2s ease-in-out infinite}
+.piece.faction-storm .faction-armor{animation:stormGleam 3.2s ease-in-out infinite}
+@keyframes mantleSway{0%,100%{transform:rotate(0deg)}50%{transform:rotate(1.4deg)}}
+@keyframes shadowCloak{0%,100%{transform:skewX(0deg) translateY(0)}50%{transform:skewX(-1.8deg) translateY(1px)}}
+@keyframes leafBreath{0%,100%{transform:rotate(-.5deg) scale(1)}50%{transform:rotate(1.2deg) scale(1.012)}}
+@keyframes emberCloak{0%,100%{filter:brightness(1)}35%{filter:brightness(1.12)}62%{filter:brightness(.97)}}
+@keyframes stormCloak{0%,88%,100%{transform:translateX(0)}91%{transform:translateX(-.8px)}94%{transform:translateX(.8px)}}
+@keyframes ironGleam{0%,72%,100%{opacity:1;filter:brightness(1)}80%{opacity:1;filter:brightness(1.22)}}
+@keyframes goldGleam{0%,100%{filter:brightness(1)}48%{filter:brightness(1.13)}}
+@keyframes shadowPulse{0%,100%{filter:drop-shadow(0 0 0 transparent)}50%{filter:drop-shadow(0 0 2px #c7a6ed88)}}
+@keyframes leafGleam{0%,100%{filter:brightness(1)}50%{filter:brightness(1.13) saturate(1.12)}}
+@keyframes emberGlow{0%,100%{filter:brightness(1)}50%{filter:brightness(1.18) drop-shadow(0 0 2px #f18b4c88)}}
+@keyframes stormGleam{0%,78%,100%{filter:brightness(1)}83%{filter:brightness(1.3)}87%{filter:brightness(1.02)}}
+.piece.idle-piece .faction-mantle,.piece.idle-piece .faction-armor{animation-play-state:running}
+.cell.selected .piece .faction-mantle,.cell.selected .piece .faction-armor,
+.cell.move-origin .piece .faction-mantle,.cell.move-origin .piece .faction-armor,
+.cell.move-arrival .piece .faction-mantle,.cell.move-arrival .piece .faction-armor,
+.cell.combat-impact .piece .faction-mantle,.cell.combat-impact .piece .faction-armor{animation-play-state:paused}
+.no-game-animations .piece .faction-mantle,.no-game-animations .piece .faction-armor{animation:none!important}
+@media(prefers-reduced-motion:reduce){.piece .faction-mantle,.piece .faction-armor{animation:none!important}}
