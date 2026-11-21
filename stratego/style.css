@@ -88,3 +88,27 @@
 @keyframes pieceAttack{0%{transform:translateX(-5px) scale(.92)}35%{transform:translateX(5px) scale(1.12)}65%{transform:translateX(-2px) scale(1.04)}100%{transform:translateX(0) scale(1)}}
 @keyframes combatCell{0%{filter:brightness(1)}35%{filter:brightness(1.8)}100%{filter:brightness(1)}}
 @media(prefers-reduced-motion:reduce){.cell.selected .piece,.cell.move-origin .piece,.cell.move-arrival .piece,.cell.combat-impact,.cell.combat-impact .piece,.piece.moving-piece,.piece.attack-piece{animation:none!important;filter:none!important}}
+
+
+/* Stratego landing page – separates Hauptmenü from the actual battlefield. */
+.home-screen{max-width:920px;margin:0 auto;padding:clamp(24px,6vh,64px) 16px 28px}
+.home-hero{position:relative;overflow:hidden;min-height:390px;padding:clamp(28px,7vw,64px) 22px;border:1px solid #a9874b88;border-radius:20px;background:radial-gradient(ellipse at 50% 0,#514027 0,#252b38 48%,#151b27 100%);box-shadow:0 22px 70px #0007;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.home-hero:before,.home-hero:after{content:"";position:absolute;width:240px;height:240px;border:1px solid #d2ae6b22;border-radius:50%;pointer-events:none}
+.home-hero:before{top:-160px;left:-100px}.home-hero:after{bottom:-190px;right:-90px}
+.home-emblem{width:76px;height:76px;display:grid;place-items:center;border:1px solid #d5b36d;border-radius:50%;background:#171d28;color:#f2d18b;font-size:42px;box-shadow:0 0 35px #d5a94a33;margin-bottom:22px}
+.home-hero .eyebrow{color:#d8b66f;letter-spacing:.24em;font-size:10px}
+.home-hero h1{font-family:Georgia,serif;font-size:clamp(42px,10vw,76px);line-height:.95;letter-spacing:.12em;color:#f4e5c3;margin:18px 0;text-shadow:0 5px 20px #0009}
+.home-hero h1 span{font-size:.48em;letter-spacing:.32em;color:#d9b66f}
+.home-hero p{max-width:440px;color:#c4ccda;font-size:14px;line-height:1.65;margin:4px 0 25px}
+.home-start{min-width:min(270px,100%);padding:15px 24px;font-size:15px;letter-spacing:.04em;box-shadow:0 8px 24px #0005}
+.home-start span{margin-left:12px;font-size:20px}
+.home-rules{margin-top:14px;padding:9px 14px;border:1px solid #ffffff24;border-radius:8px;background:#ffffff08;color:#d6dce7;font:inherit;font-size:12px}
+.home-rules:active,.home-start:active{transform:translateY(1px)}
+.home-highlights{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:18px 0}
+.home-highlights article{min-width:0;display:flex;flex-direction:column;align-items:center;text-align:center;gap:7px;padding:18px 12px;border:1px solid #ffffff18;border-radius:12px;background:linear-gradient(145deg,#222b39,#171e2a)}
+.home-highlights article>span{font-size:24px;color:#d8b66f}
+.home-highlights b{font-size:12px;color:#f0e4cd}
+.home-highlights small{font-size:10px;line-height:1.5;color:#9da9bb}
+.home-footer{text-align:center;color:#8d99ab;font-size:10px;letter-spacing:.08em;padding:8px}
+@media(max-width:620px){.home-screen{padding:24px 10px}.home-hero{min-height:370px;padding:30px 18px}.home-highlights{gap:7px}.home-highlights article{padding:13px 7px}.home-highlights b{font-size:10px}.home-highlights small{font-size:9px}}
+@media(prefers-reduced-motion:no-preference){.home-hero{animation:homeReveal .55s ease-out both}.home-emblem{animation:homeGlow 3s ease-in-out infinite alternate}@keyframes homeReveal{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}@keyframes homeGlow{to{box-shadow:0 0 48px #d5a94a66;transform:scale(1.035)}}}
