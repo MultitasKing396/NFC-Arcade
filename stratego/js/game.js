@@ -199,15 +199,21 @@ function render(){
   callout.style.gridRow=String(Math.floor(pendingAnimation.to/size)+1);
   const label=document.createElement("span");
   label.className="combat-callout-label";
-  if(pendingAnimation.special==="spy-marshal")label.classList.add("legendary-counter");
   const defeatedType=pendingAnimation.outcome==="attacker"?pendingAnimation.opponentType:pendingAnimation.outcome==="defender"?pendingAnimation.attackerType:null;
   const opponentInfo=defeatedType?RANKS[defeatedType]:null;
   const resultForPlayer=pendingAnimation.winner==="blue"?"win":pendingAnimation.winner==="red"?"loss":"draw";
   callout.classList.add("combat-callout-"+resultForPlayer);
   const opponentLabel=opponentInfo?.rank>0?"STÄRKE "+opponentInfo.rank:opponentInfo?.name||"SONDERFIGUR";
-  label.textContent=pendingAnimation.special==="spy-marshal"&&resultForPlayer==="win"?"SPION STÜRZT FELDMARSCHALL!":pendingAnimation.opponentType==="flag"?(resultForPlayer==="win"?"FLAGGE EROBERT":"DEINE FLAGGE EROBERT"):pendingAnimation.outcome==="both"?"GLEICHSTAND":resultForPlayer==="win"?"SIEG · "+opponentLabel+" BESIEGT":resultForPlayer==="loss"?"NIEDERLAGE · "+opponentLabel: "GLEICHSTAND";
+  label.textContent=pendingAnimation.special==="spy-marshal"&&resultForPlayer==="win"?"SIEG · FELDMARSCHALL BESIEGT":pendingAnimation.opponentType==="flag"?(resultForPlayer==="win"?"FLAGGE EROBERT":"DEINE FLAGGE EROBERT"):pendingAnimation.outcome==="both"?"GLEICHSTAND":resultForPlayer==="win"?"SIEG · "+opponentLabel+" BESIEGT":resultForPlayer==="loss"?"NIEDERLAGE · "+opponentLabel: "GLEICHSTAND";
   callout.append(label);
-  if(pendingAnimation.winner&&pendingAnimation.revealType&&RANKS[pendingAnimation.revealType]){
+  if(pendingAnimation.special==="spy-marshal"){
+   const legendary=document.createElement("span");
+   legendary.className="legendary-counter";
+   legendary.textContent="SPION STÜRZT FELDMARSCHALL!";
+   legendary.style.top="auto";legendary.style.bottom="-17px";
+   callout.append(legendary);
+  }
+  if(pendingAnimation.special!=="spy-marshal"&&pendingAnimation.winner&&pendingAnimation.revealType&&RANKS[pendingAnimation.revealType]){
    const reveal=document.createElement("span");
    const revealedInfo=RANKS[pendingAnimation.revealType];
    reveal.className="combat-reveal-badge";
