@@ -108,6 +108,14 @@ function render(){
    el.className="piece "+p.side+(p.side==="red"&&!p.revealed?" hidden-rank":"")+(pendingAnimation?.to===i&&pendingAnimation.kind==="combat"&&pendingAnimation.winner===p.side?" attack-piece":"")+(pendingAnimation?.to===i&&pendingAnimation.kind==="move"?" moving-piece":"");
    el.setAttribute("aria-label",p.side==="red"&&!p.revealed?"Gegnerische Figur":info.name);
    el.innerHTML=pieceArt(p);
+   if(p.side==="blue"){
+    const rankMark=document.createElement("span");
+    rankMark.className="piece-rank-badge";
+    rankMark.textContent=info.rank>0?String(info.rank):p.type==="bomb"?"B":"F";
+    rankMark.setAttribute("aria-label",info.rank>0?"Stärke "+info.rank:p.type==="bomb"?"Bombe":"Flagge");
+    rankMark.title=info.rank>0?"Stärke "+info.rank:info.name;
+    el.append(rankMark);
+   }
    cell.append(el);
   }
   boardEl.append(cell);
