@@ -323,3 +323,17 @@
 .combat-callout-win .combat-callout-label{border-color:#9bdc9b;background:linear-gradient(135deg,#102c24f7,#1e4935f7);color:#e5ffe9;box-shadow:0 3px 13px #000c,0 0 13px #65d58a66}
 .combat-callout-loss .combat-callout-label{border-color:#e18a83;background:linear-gradient(135deg,#351b24f7,#54232bf7);color:#ffe7e3;box-shadow:0 3px 13px #000c,0 0 13px #ed686866}
 .combat-callout-draw .combat-callout-label{border-color:#c4cbd8;background:linear-gradient(135deg,#222b39f7,#394354f7);color:#f0f4ff;box-shadow:0 3px 13px #000c,0 0 13px #b9c8e666}
+
+
+/* Schritt 2: besondere, aber kurze Kampfsequenzen für Elite-Ränge (8–10). */
+.cell.combat-elite{isolation:isolate;box-shadow:inset 0 0 0 2px #f4d58a99,0 0 13px #e9c36a88;background-image:radial-gradient(circle,#ffe6a955 0,transparent 76%)}
+.cell.combat-elite:after{border-width:3px;border-color:#fff0b0;box-shadow:0 0 10px #ffe49a,0 0 20px #d6a844,inset 0 0 9px #fff0b0}
+.cell.combat-elite .piece.combat-winner{animation:eliteVictory calc(.78s * var(--game-animation-speed,1)) cubic-bezier(.16,.82,.22,1) both;z-index:7}
+.cell.combat-elite .piece.combat-survivor{animation:eliteStagger calc(.66s * var(--game-animation-speed,1)) ease-out both}
+.cell.combat-marshal{box-shadow:inset 0 0 0 2px #f4d58acc,0 0 18px #f0c65dcc;background-image:radial-gradient(circle,#fff0b977 0,#b78b4c33 36%,transparent 78%)}
+.cell.combat-marshal:after{border-width:3px;border-color:#fff3c4;box-shadow:0 0 12px #ffe6a4,0 0 24px #d9a94d,inset 0 0 10px #fff1b8}
+.combat-callout-marshal .combat-callout-label{border-color:#f6d98b;box-shadow:0 3px 14px #000d,0 0 16px #e8bb5e99}
+@keyframes eliteVictory{0%{transform:translateY(0) scale(1);filter:brightness(1)}22%{transform:translateY(-8px) scale(1.13);filter:brightness(1.9) drop-shadow(0 0 10px #ffe7a0)}48%{transform:translateY(-2px) scale(1.06);filter:brightness(1.5) drop-shadow(0 0 15px #f4c76b)}100%{transform:translateY(0) scale(1);filter:brightness(1.08) drop-shadow(0 0 4px #d6a844)}}
+@keyframes eliteStagger{0%{transform:translateX(0) rotate(0)}18%{transform:translateX(-4px) rotate(-5deg);filter:brightness(1.8)}36%{transform:translateX(4px) rotate(5deg)}58%{transform:translateX(-2px) rotate(-2deg)}100%{transform:translateX(0) rotate(0)}}
+.no-game-animations .cell.combat-elite .piece.combat-winner,.no-game-animations .cell.combat-elite .piece.combat-survivor{animation:none!important}
+@media(prefers-reduced-motion:reduce){.cell.combat-elite .piece.combat-winner,.cell.combat-elite .piece.combat-survivor{animation:none!important}}
