@@ -181,10 +181,10 @@ function choose(index){
 }
 function finishMove(from,to){
  if(from===null||!validMoves.includes(to)||busy){clearSelection();return;}
- const attacker=board[from],defender=board[to];markPlayerMove(attacker,from,to);if(defender)playerPatterns.attacks++;let animationKind="move",winner=null;
+ const attacker=board[from],defender=board[to];markPlayerMove(attacker,from,to);if(defender)playerPatterns.attacks++;let animationKind="move",winner=null,combatOutcome=null;
  if(defender){
   defender.revealed=true;attacker.revealed=true;
-  const outcome=resolveCombat(attacker,defender);animationKind="combat";winner=outcome.result==="attacker"?"blue":outcome.result==="defender"?"red":null;
+  const outcome=resolveCombat(attacker,defender);combatOutcome=outcome.result;animationKind="combat";winner=outcome.result==="attacker"?"blue":outcome.result==="defender"?"red":null;
   if(outcome.result==="attacker")attacker.revealed=combatRevealMode==="daueraufdeckregel";
   else if(outcome.result==="defender")defender.revealed=combatRevealMode==="daueraufdeckregel";
   const survivor=outcome.result==="attacker"?attacker:outcome.result==="defender"?defender:null;
@@ -199,7 +199,7 @@ function finishMove(from,to){
   }
  }else{board[to]=attacker;board[from]=null;setMessage("Zug ausgeführt.");}
  const survivor=animationKind==="combat"?(winner==="blue"?attacker:winner==="red"?defender:null):null;
- pendingAnimation={from,to,kind:animationKind,winner,outcome:animationKind==="combat"?outcome.result:null,revealType:survivor?.type||null};
+ pendingAnimation={from,to,kind:animationKind,winner,outcome:combatOutcome,revealType:survivor?.type||null};
  selected=null;validMoves=[];dragFrom=null;if(strengthEl)strengthEl.textContent="";
  playSound(animationKind==="combat"?"combat":"move");
  if(!sideHasMoves(board,"red",currentMode)){render();endGame("blue");return;}
@@ -383,11 +383,11 @@ function cpuMove(){
  if(!options.length){endGame("blue");return;}
  const move=chooseCpuMove(options),attacker=board[move.from],defender=board[move.to];
  lastCpuMove={from:move.from,to:move.to};
- let animationKind="move",winner=null;
+ let animationKind="move",winner=null,combatOutcome=null;
  if(defender){
   rememberPlayerPiece(defender);
   defender.revealed=true;attacker.revealed=true;
-  const result=resolveCombat(attacker,defender);animationKind="combat";winner=result.result==="attacker"?"red":result.result==="defender"?"blue":null;
+  const result=resolveCombat(attacker,defender);combatOutcome=result.result;animationKind="combat";winner=result.result==="attacker"?"red":result.result==="defender"?"blue":null;
   if(result.result==="attacker")attacker.revealed=combatRevealMode==="daueraufdeckregel";
   else if(result.result==="defender")defender.revealed=combatRevealMode==="daueraufdeckregel";
   const survivor=result.result==="attacker"?attacker:result.result==="defender"?defender:null;
@@ -401,7 +401,7 @@ function cpuMove(){
   }
  }else{board[move.to]=attacker;board[move.from]=null;setMessage("Der CPU hat seinen Zug ausgeführt.");}
  const survivor=animationKind==="combat"?(winner==="red"?attacker:winner==="blue"?defender:null):null;
- pendingAnimation={from:move.from,to:move.to,kind:animationKind,winner,outcome:animationKind==="combat"?(defender?resolveCombat(attacker,defender).result:null):null,revealType:survivor?.type||null};
+ pendingAnimation={from:move.from,to:move.to,kind:animationKind,winner,outcome:combatOutcome,revealType:survivor?.type||null};
  playSound(animationKind==="combat"?"combat":"move");
  busy=false;setTurn("blue");render();saveGameState();
  if(!sideHasMoves(board,"blue",currentMode))endGame("red");
