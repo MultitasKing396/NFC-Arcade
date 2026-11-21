@@ -112,3 +112,10 @@
 .home-footer{text-align:center;color:#8d99ab;font-size:10px;letter-spacing:.08em;padding:8px}
 @media(max-width:620px){.home-screen{padding:24px 10px}.home-hero{min-height:370px;padding:30px 18px}.home-highlights{gap:7px}.home-highlights article{padding:13px 7px}.home-highlights b{font-size:10px}.home-highlights small{font-size:9px}}
 @media(prefers-reduced-motion:no-preference){.home-hero{animation:homeReveal .55s ease-out both}.home-emblem{animation:homeGlow 3s ease-in-out infinite alternate}@keyframes homeReveal{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}@keyframes homeGlow{to{box-shadow:0 0 48px #d5a94a66;transform:scale(1.035)}}}
+
+
+/* Home menu extensions: resume, settings and return-to-menu control. */
+.home-menu-links{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+.home-menu-links .home-rules{margin-top:14px}
+#homeResumeBtn{margin-bottom:10px;border-color:#e4c47e;background:linear-gradient(180deg,#d8c18b,#9c783d)}
+#newGameBtn{min-width:92px}
