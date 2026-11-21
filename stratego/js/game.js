@@ -54,7 +54,7 @@ function finishMove(from,to){
   if(defender.type==="flag"&&outcome.result==="attacker"){endGame("blue");return;}
  }else{board[to]=attacker;board[from]=null;setMessage("Zug ausgeführt.");}
  clearSelection();
- if(!sideHasMoves(board,"red")){endGame("blue");return;}
+ if(!sideHasMoves(board,"red",currentMode)){endGame("blue");return;}
  setTurn("red");busy=true;render();
  window.setTimeout(cpuMove,650+Math.random()*650);
 }
@@ -73,7 +73,7 @@ function cpuMove(){
   if(defender.type==="flag"&&result.result==="attacker"){busy=false;render();endGame("red");return;}
  }else{board[move.to]=attacker;board[move.from]=null;setMessage("Der CPU hat seinen Zug ausgeführt.");}
  busy=false;setTurn("blue");render();
- if(!sideHasMoves(board,"blue"))endGame("red");
+ if(!sideHasMoves(board,"blue",currentMode))endGame("red");
 }
 function endGame(winner){
  busy=true;setTurn("blue");turnEl.textContent=winner==="blue"?"Sieg!":"Niederlage";
