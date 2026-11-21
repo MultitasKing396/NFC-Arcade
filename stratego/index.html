@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#10131d">
 <title>Stratego – Fantasy Battlefield Edition</title>
-<link rel="stylesheet" href="style.css?v=20261121-15">
+<link rel="stylesheet" href="style.css?v=20261121-16">
 </head>
 <body>
 <div class="app-shell">
@@ -79,7 +79,13 @@
  <section class="modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
   <button class="modal-close" id="closeSettings" aria-label="Schließen">×</button>
   <div class="eyebrow">SPIELANPASSUNG</div><h2 id="settingsTitle">Einstellungen</h2>
-  <p class="setup-intro">Hier entsteht künftig der Bereich für deine persönlichen Spieleinstellungen. Weitere Optionen folgen.</p>
+  <p class="setup-intro">Passe die Atmosphäre der Schlacht an. Deine Auswahl wird auf diesem Gerät gespeichert.</p>
+  <div class="settings-group">
+   <label class="setting-row" for="settingSound"><span><b>Soundeffekte</b><small>Dezente Klänge bei Zügen und Kämpfen</small></span><input id="settingSound" type="checkbox"></label>
+   <label class="setting-row" for="settingAnimations"><span><b>Animationen</b><small>Bewegungen und Kampf-Effekte anzeigen</small></span><input id="settingAnimations" type="checkbox" checked></label>
+   <div class="setting-row setting-speed"><span><b>Spielgeschwindigkeit</b><small>Tempo der CPU-Züge und Animationen</small></span><select id="settingSpeed"><option value="slow">Entspannt</option><option value="normal" selected>Normal</option><option value="fast">Schnell</option></select></div>
+   <p class="settings-note">Hinweis: Sound wird erst nach deiner ersten Spielaktion aktiviert, damit dein iPhone die Audiowiedergabe freigeben kann.</p>
+  </div>
  </section>
 </div>
 <div class="modal-backdrop" id="setupModal" hidden>
@@ -135,6 +141,6 @@
   <div class="setup-actions"><button id="cancelManualSetup" class="secondary-button">Zurück</button><button id="confirmManualSetup" class="gold-button" disabled>Aufstellung übernehmen</button></div>
  </section>
 </div>
-<script type="module" src="js/game.js?v=20261121-15"></script>
+<script type="module" src="js/game.js?v=20261121-16"></script>
 </body>
 </html>
