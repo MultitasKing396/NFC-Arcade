@@ -48,3 +48,15 @@
  .selection-info #message{font-size:11px}
  .selection-info #selectedStrength{font-size:11px;padding:5px 8px}
 }
+
+/* Army setup modal */
+.setup-intro{color:#c1c9d7;font-size:13px;line-height:1.5;margin:-6px 0 18px}
+.setup-side{padding:14px;margin:12px 0;border:1px solid #ffffff18;border-radius:11px;background:#11172288}
+.setup-side-title{display:flex;align-items:center;gap:9px;margin-bottom:12px}
+.setup-side-title b{display:block;font-size:13px}
+.setup-side-title small{display:block;color:var(--muted);font-size:10px;margin-top:2px}
+.setup-side label{display:block;color:#c1c9d7;font-size:11px;font-weight:700;margin-bottom:6px}
+.setup-side select{width:100%;min-height:43px;padding:9px 11px;border:1px solid #8d744777;border-radius:8px;background:#202838;color:#f7f8fc;font:inherit;font-size:13px}
+.setup-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:18px}
+.secondary-button{border:1px solid #687387;background:#252d3b;color:#e5eaf2;font-weight:800;border-radius:8px;padding:10px 14px}
+@media(max-width:620px){.setup-modal{padding:22px 16px}.setup-intro{font-size:12px}.setup-side{padding:12px}.setup-actions{position:sticky;bottom:-1px;background:linear-gradient(transparent,#171d29 22%);padding-top:12px}.setup-actions button{flex:1}}
