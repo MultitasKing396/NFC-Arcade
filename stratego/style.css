@@ -1121,3 +1121,42 @@
 }
 .no-game-animations .board-wrap.isometric-board .environment-layer:before,
 .no-game-animations .board-wrap.isometric-board .environment-layer:after{animation:none!important}
+
+
+/* MOBILE INPUT + FIGURE VOLUME PATCH */
+.board-wrap.isometric-board .board{touch-action:manipulation}
+.board-wrap.isometric-board .cell{cursor:pointer;-webkit-tap-highlight-color:transparent}
+.board-wrap.isometric-board .piece-upright{
+  transform:translateZ(7px) rotateZ(-45deg) rotateX(-53deg) scale(1.04);
+  transform-origin:50% 78%;
+  filter:drop-shadow(0 2px 1px #000b);
+}
+.board-wrap.isometric-board .piece .miniature{
+  width:112%;
+  height:112%;
+  max-width:none;
+  max-height:none;
+  overflow:visible;
+  transform:translateY(-4%);
+  transform-origin:50% 82%;
+  filter:
+    drop-shadow(1px 0 0 #191a1c)
+    drop-shadow(2px 1px 0 #111315)
+    drop-shadow(3px 2px 1px #080a0d)
+    drop-shadow(0 5px 4px #000c)
+    drop-shadow(0 0 2px #fff3);
+}
+.board-wrap.isometric-board .piece.hidden-rank .piece-upright .miniature{
+  width:108%;
+  height:108%;
+  filter:
+    drop-shadow(1px 0 0 #17121e)
+    drop-shadow(2px 1px 0 #0b0910)
+    drop-shadow(0 4px 4px #000d);
+}
+@media(max-width:620px){
+  .board-wrap.isometric-board .piece-upright{
+    transform:translateZ(6px) rotateZ(-45deg) rotateX(-53deg) scale(.98);
+  }
+  .board-wrap.isometric-board .piece .miniature{width:110%;height:110%}
+}
