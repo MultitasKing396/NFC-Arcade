@@ -523,3 +523,39 @@
  .board-wrap[data-theme="forest"],.board-wrap[data-theme="ice"],.board-wrap[data-theme="volcano"],.board-wrap[data-theme="ruins"]{border-width:1px}
  .board-wrap .board{outline-offset:2px}
 }
+
+
+/* Thematische Kantenornamente: Wurzeln, Eiskanten, erkaltete Lava und verwitterter Stein. */
+.board-wrap{border-style:ridge;border-width:4px}
+.board-wrap[data-theme="forest"]{
+ border-style:ridge;
+ box-shadow:0 0 0 2px #1a2c20,0 0 0 5px #78945b66,0 18px 50px #000b,
+ inset 0 0 0 2px #b5ca7655,inset 0 0 0 5px #162a1d,inset 0 0 22px #091b12,
+ inset 9px 0 12px -11px #b5d17b,inset -9px 0 12px -11px #b5d17b;
+}
+.board-wrap[data-theme="forest"]{background-blend-mode:screen}
+.board-wrap[data-theme="ice"]{
+ border-style:double;
+ box-shadow:0 0 0 2px #183448,0 0 0 5px #9ed9eb66,0 18px 50px #000b,
+ inset 0 0 0 2px #e8fcff99,inset 0 0 0 5px #25465c,inset 0 0 22px #b7efff33,
+ inset 10px 0 13px -12px #e8fcff,inset -10px 0 13px -12px #e8fcff;
+}
+.board-wrap[data-theme="ice"]{background-blend-mode:screen}
+.board-wrap[data-theme="volcano"]{
+ border-style:ridge;
+ box-shadow:0 0 0 2px #291a1a,0 0 0 5px #d4774866,0 18px 50px #000b,
+ inset 0 0 0 2px #ffb46a66,inset 0 0 0 5px #2c1b1b,inset 0 0 25px #f15b2b33,
+ inset 10px 0 14px -12px #ff743d,inset -10px 0 14px -12px #ff743d;
+}
+.board-wrap[data-theme="volcano"]{background-blend-mode:screen}
+.board-wrap[data-theme="ruins"]{
+ border-style:groove;
+ box-shadow:0 0 0 2px #292822,0 0 0 5px #b9a88766,0 18px 50px #000b,
+ inset 0 0 0 2px #e5d5b477,inset 0 0 0 5px #38352e,inset 0 0 22px #151713,
+ inset 10px 0 13px -12px #e5d5b4,inset -10px 0 13px -12px #e5d5b4;
+}
+.board-wrap[data-theme="ruins"]{background-blend-mode:screen}
+@media(max-width:620px){
+ .board-wrap{border-width:2px}
+ .board-wrap[data-theme="forest"],.board-wrap[data-theme="ice"],.board-wrap[data-theme="volcano"],.board-wrap[data-theme="ruins"]{border-width:2px}
+}
