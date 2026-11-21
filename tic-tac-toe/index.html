@@ -114,6 +114,10 @@ function aiVanishing(){const sim=board.slice(),list=vanish.O.slice();if(list.len
 function placeVanishAI(i){const list=vanish.O;if(list.length===3)board[list.shift()]='';board[i]='O';list.push(i);const w=winner(board);if(w){finish(w);return}if(board.every(Boolean)){finish(null);return}switchTurn();render()}
 function aiUltimate(){const allowed=nextBoard===-1||winner(ultimate[nextBoard])||ultimate[nextBoard].every(Boolean)?openBoards():[nextBoard];for(const bi of allowed){let c=ultimate[bi];let ci=tacticalMove(c,'O');if(ci<0&&difficulty!=='easy')ci=tacticalMove(c,'X');if(ci>=0)return[bi,ci]}let opts=[];for(const bi of allowed)for(const ci of available(ultimate[bi]))opts.push([bi,ci]);if(!opts.length)return null;if(difficulty==='easy')return opts[Math.floor(Math.random()*opts.length)];return opts.find(x=>x[1]===4)||opts[Math.floor(Math.random()*opts.length)]}
 function placeUltimateAI(bi,ci){ultimate[bi][ci]='O';let mw=macroWinner();if(mw){finish(mw.p?{p:mw.p,line:mw.line}:null);return}nextBoard=ci;switchTurn();render()}
-document.addEventListener('dblclick',e=>e.preventDefault(),{passive:false});\n})();
+window.addEventListener('pagehide',saveGame);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')saveGame()});
+updateStartLabel();
+document.addEventListener('dblclick',e=>e.preventDefault(),{passive:false});
+})();
 </script>
 </body></html>
