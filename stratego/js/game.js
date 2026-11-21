@@ -187,7 +187,7 @@ function render(){
   const label=document.createElement("span");
   label.className="combat-callout-label";
   const revealInfo=pendingAnimation.revealType?RANKS[pendingAnimation.revealType]:null;
-  label.textContent=revealInfo?.rank>0?"STÄRKE "+revealInfo.rank:revealInfo?.name||"SIEG!";
+  label.textContent=pendingAnimation.special==="spy-marshal"?"SPION STÜRZT FELDMARSCHALL!":revealInfo?.rank>0?"STÄRKE "+revealInfo.rank:revealInfo?.name||"SIEG!";
   callout.append(label);
   calloutLayer.append(callout);
   boardWrap.append(calloutLayer);
