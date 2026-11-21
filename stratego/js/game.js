@@ -166,7 +166,7 @@ function choose(index){
 }
 function finishMove(from,to){
  if(from===null||!validMoves.includes(to)||busy){clearSelection();return;}
- const attacker=board[from],defender=board[to];markPlayerMove(attacker,from,to);let animationKind="move",winner=null;
+ const attacker=board[from],defender=board[to];markPlayerMove(attacker,from,to);if(defender)playerPatterns.attacks++;let animationKind="move",winner=null;
  if(defender){
   defender.revealed=true;attacker.revealed=true;
   const outcome=resolveCombat(attacker,defender);animationKind="combat";winner=outcome.result==="attacker"?"blue":outcome.result==="defender"?"red":null;
