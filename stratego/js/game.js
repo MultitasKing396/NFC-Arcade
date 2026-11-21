@@ -196,7 +196,8 @@ function render(){
   callout.style.gridRow=String(Math.floor(pendingAnimation.to/size)+1);
   const label=document.createElement("span");
   label.className="combat-callout-label";
-  const opponentInfo=pendingAnimation.opponentType?RANKS[pendingAnimation.opponentType]:null;
+  const defeatedType=pendingAnimation.outcome==="attacker"?pendingAnimation.opponentType:pendingAnimation.outcome==="defender"?pendingAnimation.attackerType:null;
+  const opponentInfo=defeatedType?RANKS[defeatedType]:null;
   const resultForPlayer=pendingAnimation.winner==="blue"?"win":pendingAnimation.winner==="red"?"loss":"draw";
   callout.classList.add("combat-callout-"+resultForPlayer);
   const opponentLabel=opponentInfo?.rank>0?"STÄRKE "+opponentInfo.rank:opponentInfo?.name||"SONDERFIGUR";
