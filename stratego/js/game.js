@@ -81,7 +81,7 @@ function endGame(winner){
  const banner=document.createElement("div");banner.className="result-banner";banner.innerHTML=`<div class="result-card"><div class="eyebrow">DIE SCHLACHT IST ENTSCHIEDEN</div><h2>${winner==="blue"?"SIEG":"NIEDERLAGE"}</h2><p>${winner==="blue"?"Deine Armee triumphiert.":"Deine Armee wurde besiegt."}</p><button class="gold-button" id="resultNew">Neue Partie</button></div>`;
  document.body.append(banner);banner.querySelector("#resultNew").addEventListener("click",()=>{banner.remove();openSetup();});
 }
-function openSetup(){setupModal.hidden=false;}
+function openSetup(){setupModal.hidden=false;const manual=document.querySelector("#playerFormation").value==="manual";document.querySelector("#openManualSetupBtn").hidden=!manual;}
 function closeSetup(){setupModal.hidden=true;}
 const SAVE_KEY="nfc-arcade-stratego-formations-v1";
 function readSavedFormations(){try{return JSON.parse(localStorage.getItem(SAVE_KEY)||"[]");}catch{return [];}}
@@ -133,7 +133,8 @@ boardEl.addEventListener("click",e=>{
  else if(board[i]?.side==="blue")choose(i);
 });
 document.querySelector("#newGameBtn").addEventListener("click",openSetup);
-document.querySelector("#playerFormation").addEventListener("change",e=>{if(e.target.value==="manual")openManualSetup();});
+document.querySelector("#openManualSetupBtn").addEventListener("click",()=>openManualSetup());
+document.querySelector("#playerFormation").addEventListener("change",e=>{const manual=e.target.value==="manual";document.querySelector("#openManualSetupBtn").hidden=!manual;});
 document.querySelector("#startGameBtn").addEventListener("click",startConfiguredGame);
 document.querySelector("#confirmManualSetup").addEventListener("click",confirmManualPlacement);
 document.querySelector("#cancelManualSetup").addEventListener("click",()=>{closeManualSetup();openSetup();});
