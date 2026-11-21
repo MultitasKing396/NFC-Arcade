@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#10131d">
 <title>Stratego – Fantasy Battlefield Edition</title>
-<link rel="stylesheet" href="style.css?v=20261121-19">
+<link rel="stylesheet" href="style.css?v=20261121-22">
 </head>
 <body>
 <div class="app-shell">
@@ -107,6 +107,11 @@
     <option value="spearhead">Speerspitze – taktische Formation</option>
     <option value="bastion">Bollwerk – taktische Formation</option>
    </select>
+   <label for="combatRevealMode">Kampfregel</label>
+   <select id="combatRevealMode">
+    <option value="classic">Klassischer Modus – überlebende Gegner werden wieder verdeckt</option>
+    <option value="daueraufdeckregel" selected>Daueraufdeckregel – sie bleiben aufgedeckt</option>
+   </select>
   </div>
   <div class="setup-side">
    <div class="setup-side-title"><span class="army-dot red"></span><div><b>CPU-Gegner</b><small>Wähle die gegnerische Fraktion</small></div></div>
@@ -142,6 +147,6 @@
   <div class="setup-actions"><button id="cancelManualSetup" class="secondary-button">Zurück</button><button id="confirmManualSetup" class="gold-button" disabled>Aufstellung übernehmen</button></div>
  </section>
 </div>
-<script type="module" src="js/game.js?v=20261121-19"></script>
+<script type="module" src="js/game.js?v=20261121-22"></script>
 </body>
 </html>
