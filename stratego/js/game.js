@@ -549,26 +549,23 @@ function loadManualFormation(index){const saved=savedFormations()[index];if(!sav
 function clearManualFormation(){const slots=savedFormations();if(!slots[activeSaveSlot])return;if(!confirm("Diesen Speicherplatz wirklich leeren?"))return;slots[activeSaveSlot]=null;writeSavedFormations(slots);updateSaveLabels();}
 function confirmManualPlacement(){if(manualSlots.some(p=>!p))return;cpuDifficulty=document.querySelector("#cpuDifficulty").value;combatRevealMode=document.querySelector("#combatRevealMode").value==="classic"?"classic":"daueraufdeckregel";setCombatRuleStatus();lastCpuMove=null;cpuIntel={known:{},moved:[]};playerPatterns={advances:0,attacks:0,scouts:0,miners:0,center:0};const player=manualSlots.map((p,i)=>({...p,id:"blue-manual-"+i,side:"blue",revealed:false}));const cpuFormation=document.querySelector("#cpuFormation").value;board=applyFactions(initialBoard("balanced",cpuFormation,currentMode));const n=modeConfig(currentMode).size,start=(n-setupRows(currentMode))*n;for(let i=0;i<player.length;i++)board[start+i]=player[i];selected=null;validMoves=[];busy=false;dragPointer=null;dragFrom=null;if(strengthEl)strengthEl.textContent="";closeManualSetup();showGameScreen();setTurn("blue");setMessage("Deine manuelle Aufstellung ist bereit.");render();saveGameState();}
 function startConfiguredGame(){const chosenTheme=document.querySelector("#setupBattlefield").value;changeSetting("theme",["forest","ice","volcano","ruins"].includes(chosenTheme)?chosenTheme:"forest");cpuDifficulty=document.querySelector("#cpuDifficulty").value;combatRevealMode=document.querySelector("#combatRevealMode").value==="classic"?"classic":"daueraufdeckregel";setCombatRuleStatus();lastCpuMove=null;cpuIntel={known:{},moved:[]};playerPatterns={advances:0,attacks:0,scouts:0,miners:0,center:0};const chosen=document.querySelector("#gameMode").value;currentMode=MODES[chosen]?chosen:"classic";setMode(currentMode);playerFaction=document.querySelector("#playerFaction").value;cpuFaction=document.querySelector("#cpuFaction").value;const player=document.querySelector("#playerFormation").value;const cpu=document.querySelector("#cpuFormation").value;if(player==="manual"){openManualSetup();return;}board=applyFactions(initialBoard(player,cpu,currentMode));selected=null;validMoves=[];busy=false;dragPointer=null;dragFrom=null;if(strengthEl)strengthEl.textContent="";closeSetup();showGameScreen();setTurn("blue");setMessage("Aufstellung bereit – wähle eine deiner Figuren aus.");render();saveGameState();}
-boardEl.addEventListener("pointerdown",e=>{
- const cell=e.target.closest(".cell");if(!cell||turn!=="blue"||busy)return;
- const index=Number(cell.dataset.index),p=board[index];
- if(selected!==null&&validMoves.includes(index)){dragPointer=e.pointerId;dragFrom=selected;return;}
- if(p?.side==="blue"){choose(index);dragPointer=e.pointerId;dragFrom=index;}
-});
-boardEl.addEventListener("pointerup",e=>{
- if(dragPointer!==e.pointerId||dragFrom===null)return;
- const el=document.elementFromPoint(e.clientX,e.clientY)?.closest(".cell");
- const to=el?Number(el.dataset.index):-1,from=dragFrom;
- dragPointer=null;dragFrom=null;
- if(validMoves.includes(to))finishMove(from,to);
- else if(to===from){}else if(board[to]?.side==="blue")choose(to);
-});
-boardEl.addEventListener("click",e=>{
- const cell=e.target.closest(".cell");if(!cell||turn!=="blue"||busy)return;
- const i=Number(cell.dataset.index);
- if(selected!==null&&validMoves.includes(i))finishMove(selected,i);
- else if(board[i]?.side==="blue")choose(i);
-});
+// Robuste Tap-Steuerung: Das Spielfeld wird erst nach dem Klick neu gerendert.
+ // Pointerdown darf die angeklickte Zelle nicht vor dem Click-Event ersetzen.
+ boardEl.addEventListener("click",e=>{
+  const cell=e.target.closest(".cell");
+  if(!cell||!boardEl.contains(cell)||turn!=="blue"||busy)return;
+  const index=Number(cell.dataset.index);
+  if(!Number.isInteger(index)||index<0||index>=board.length)return;
+  if(selected!==null&&validMoves.includes(index)){
+   finishMove(selected,index);
+   return;
+  }
+  if(board[index]?.side==="blue"){
+   choose(index);
+   return;
+  }
+  if(selected!==null)setMessage("Wähle ein markiertes Zielfeld oder eine andere eigene Figur.");
+ });
 document.querySelector("#newGameBtn").addEventListener("click",showHomeScreen);
 document.querySelector("#homeStartBtn").addEventListener("click",()=>openSetup(true));
 document.querySelector("#homeResumeBtn").addEventListener("click",resumeSavedGame);
