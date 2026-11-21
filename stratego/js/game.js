@@ -4,6 +4,17 @@ const rulesModal=document.querySelector("#rulesModal"),setupModal=document.query
 let currentMode="classic";setMode(currentMode);let board=initialBoard("balanced","balanced",currentMode),turn="blue",selected=null,validMoves=[],busy=false,dragPointer=null,dragFrom=null;
 let manualSlots=Array(armyCount(currentMode)).fill(null),manualReserve={},manualSelectedType=null,manualMovingIndex=null,activeSaveSlot=0;
 const pieceInfo=p=>RANKS[p.type];
+const FACTIONS={
+ aurelia:{name:"Aurelia",light:"#fff0b8",mid:"#d6a844",dark:"#785326",metal:"#fff0b8",crest:"#fff8d8"},
+ shadow:{name:"Schattenlegion",light:"#c4b4e8",mid:"#684c91",dark:"#29233e",metal:"#c7a6ed",crest:"#e5d5ff"},
+ iron:{name:"Eisenbund",light:"#c7d0d8",mid:"#66798c",dark:"#293744",metal:"#d9e1e8",crest:"#f4f7fa"},
+ sylvan:{name:"Sylvanische Wacht",light:"#c7e2a4",mid:"#628b4b",dark:"#294532",metal:"#d9c58b",crest:"#f0e4b6"},
+ ash:{name:"Aschenzirkel",light:"#f0b28b",mid:"#a94f38",dark:"#482b2b",metal:"#e7a66f",crest:"#ffe0b5"},
+ storm:{name:"Sturmklan",light:"#a8e0e8",mid:"#347d91",dark:"#183b50",metal:"#b9dce8",crest:"#e1fbff"}
+};
+let playerFaction="aurelia",cpuFaction="shadow";
+function factionForSide(side){return FACTIONS[side==="blue"?playerFaction:cpuFaction]||FACTIONS.aurelia;}
+function applyFactions(target){for(const piece of target){if(piece)piece.faction=piece.side==="blue"?playerFaction:cpuFaction;}return target;}
 function pieceArt(piece){
  const enemy=piece.side==="red",palette=FACTIONS[piece.faction]||factionForSide(piece.side),light=palette.light,mid=palette.mid,dark=palette.dark,metal=palette.metal;
  if(enemy&&!piece.revealed)return `<svg class="miniature" viewBox="0 0 100 100" aria-hidden="true"><ellipse cx="50" cy="91" rx="29" ry="6" fill="#05080d" opacity=".45"/><path d="M50 8 78 20v28c0 20-12 34-28 43C34 82 22 68 22 48V20z" fill="${dark}" stroke="${metal}" stroke-width="3"/><path d="M50 16 69 24v23c0 14-8 25-19 32-11-7-19-18-19-32V24z" fill="${mid}"/><path d="m50 28 5 12 13 1-10 8 3 13-11-7-11 7 3-13-10-8 13-1z" fill="${palette.crest}" stroke="${light}" stroke-width="2"/></svg>`;
