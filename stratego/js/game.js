@@ -1,6 +1,7 @@
 import {RANKS,MODES,modeConfig,armyCount,setupRows,lakeSet,setMode,initialBoard,legalMoves,resolveCombat,sideHasMoves} from "./rules.js";
 const boardEl=document.querySelector("#board"),messageEl=document.querySelector("#message"),strengthEl=document.querySelector("#selectedStrength"),turnEl=document.querySelector("#turnStatus");
 const rulesModal=document.querySelector("#rulesModal"),setupModal=document.querySelector("#setupModal"),manualSetupModal=document.querySelector("#manualSetupModal");
+let pendingAnimation=null;
 let currentMode="classic";setMode(currentMode);let board=initialBoard("balanced","balanced",currentMode),turn="blue",selected=null,validMoves=[],busy=false,dragPointer=null,dragFrom=null;
 let manualSlots=Array(armyCount(currentMode)).fill(null),manualReserve={},manualSelectedType=null,manualMovingIndex=null,activeSaveSlot=0;
 const pieceInfo=p=>RANKS[p.type];
@@ -95,17 +96,20 @@ function render(){
   const cell=document.createElement("div");cell.className="cell";cell.dataset.index=i;
   if(lakes.has(i))cell.classList.add("lake");
   if(i===selected)cell.classList.add("selected");
+  if(pendingAnimation?.from===i)cell.classList.add("move-origin");
+  if(pendingAnimation?.to===i)cell.classList.add(pendingAnimation.kind==="combat"?"combat-impact":"move-arrival");
   if(validMoves.includes(i))cell.classList.add("valid");
   const p=board[i];
   if(p){
    const info=pieceInfo(p),el=document.createElement("div");
-   el.className="piece "+p.side+(p.side==="red"&&!p.revealed?" hidden-rank":"");
+   el.className="piece "+p.side+(p.side==="red"&&!p.revealed?" hidden-rank":"")+(pendingAnimation?.to===i&&pendingAnimation.kind==="combat"&&pendingAnimation.winner===p.side?" attack-piece":"")+(pendingAnimation?.to===i&&pendingAnimation.kind==="move"?" moving-piece":"");
    el.setAttribute("aria-label",p.side==="red"&&!p.revealed?"Gegnerische Figur":info.name);
    el.innerHTML=pieceArt(p);
    cell.append(el);
   }
   boardEl.append(cell);
  }
+ pendingAnimation=null;
 }
 function clearSelection(){selected=null;validMoves=[];dragFrom=null;if(strengthEl)strengthEl.textContent="";render();}
 function choose(index){
@@ -114,18 +118,19 @@ function choose(index){
 }
 function finishMove(from,to){
  if(from===null||!validMoves.includes(to)||busy){clearSelection();return;}
- const attacker=board[from],defender=board[to];
+ const attacker=board[from],defender=board[to];let animationKind="move",winner=null;
  if(defender){
   defender.revealed=true;attacker.revealed=true;
-  const outcome=resolveCombat(attacker,defender);
+  const outcome=resolveCombat(attacker,defender);animationKind="combat";winner=outcome.result==="attacker"?"blue":outcome.result==="defender"?"red":null;
   if(outcome.result==="attacker"){board[to]=attacker;board[from]=null;}
   else if(outcome.result==="defender"){board[to]=defender;board[from]=null;}
   else {board[to]=null;board[from]=null;}
   setMessage(outcome.message);
   if(defender.type==="flag"&&outcome.result==="attacker"){endGame("blue");return;}
  }else{board[to]=attacker;board[from]=null;setMessage("Zug ausgeführt.");}
- clearSelection();
- if(!sideHasMoves(board,"red",currentMode)){endGame("blue");return;}
+ pendingAnimation={from,to,kind:animationKind,winner};
+ selected=null;validMoves=[];dragFrom=null;if(strengthEl)strengthEl.textContent="";
+ if(!sideHasMoves(board,"red",currentMode)){render();endGame("blue");return;}
  setTurn("red");busy=true;render();
  window.setTimeout(cpuMove,650+Math.random()*650);
 }
@@ -134,15 +139,17 @@ function cpuMove(){
  for(let i=0;i<board.length;i++){const p=board[i];if(p?.side==="red")for(const to of legalMoves(board,i,currentMode))options.push({from:i,to});}
  if(!options.length){endGame("blue");return;}
  const move=options[Math.floor(Math.random()*options.length)],attacker=board[move.from],defender=board[move.to];
+ let animationKind="move",winner=null;
  if(defender){
   defender.revealed=true;attacker.revealed=true;
-  const result=resolveCombat(attacker,defender);
+  const result=resolveCombat(attacker,defender);animationKind="combat";winner=result.result==="attacker"?"red":result.result==="defender"?"blue":null;
   if(result.result==="attacker"){board[move.to]=attacker;board[move.from]=null;}
   else if(result.result==="defender"){board[move.to]=defender;board[move.from]=null;}
   else{board[move.to]=null;board[move.from]=null;}
   setMessage(result.message);
-  if(defender.type==="flag"&&result.result==="attacker"){busy=false;render();endGame("red");return;}
+  if(defender.type==="flag"&&result.result==="attacker"){pendingAnimation={from:move.from,to:move.to,kind:animationKind,winner};busy=false;render();endGame("red");return;}
  }else{board[move.to]=attacker;board[move.from]=null;setMessage("Der CPU hat seinen Zug ausgeführt.");}
+ pendingAnimation={from:move.from,to:move.to,kind:animationKind,winner};
  busy=false;setTurn("blue");render();
  if(!sideHasMoves(board,"blue",currentMode))endGame("red");
 }
