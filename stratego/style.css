@@ -73,3 +73,18 @@
 .palette-piece{min-width:0;padding:8px 4px;border:1px solid #ffffff24;border-radius:8px;background:#202838;color:#f5f7fb;display:flex;flex-direction:column;align-items:center;gap:2px}.palette-piece span{font-size:19px;color:var(--gold)}.palette-piece b{font-size:10px;white-space:nowrap}.palette-piece small{font-size:9px;color:var(--muted)}.palette-piece.active{border-color:var(--gold);background:#3a3020}.palette-piece.exhausted{opacity:.35}
 .formation-saves{border-top:1px solid #ffffff1c;padding-top:12px}.save-heading b{display:block;font-size:12px}.save-heading small,.save-hint{color:var(--muted);font-size:10px}.save-slots{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:8px 0}.save-slot{padding:9px 5px;border:1px solid #8d744755;border-radius:8px;background:#252b37;color:#f7f8fc;display:flex;flex-direction:column;gap:3px;min-width:0}.save-slot b{font-size:10px}.save-slot small{font-size:9px;color:var(--gold)}.save-hint{line-height:1.4;margin:5px 0}.save-actions{display:flex;gap:7px;flex-wrap:wrap}
 @media(max-width:620px){.manual-setup-modal{padding:22px 13px;max-height:95vh}.manual-board-wrap{padding:4px}.manual-board{gap:2px}.manual-palette{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}.palette-piece{padding:6px 3px}.manual-progress{font-size:10px}.save-slot b{font-size:9px}}
+
+/* Subtile Bewegungs- und Kampfanimationen für die Fantasy-Miniaturen. */
+.cell{position:relative}
+.piece{transform-origin:50% 85%;will-change:transform,filter}
+.cell.selected .piece{animation:pieceSelect .42s ease-in-out infinite alternate;filter:drop-shadow(0 0 7px #f5d27a)}
+.cell.move-origin .piece{animation:pieceDepart .24s ease-in both}
+.cell.move-arrival .piece,.piece.moving-piece{animation:pieceArrive .34s cubic-bezier(.2,.8,.2,1) both}
+.cell.combat-impact{animation:combatCell .42s ease-out both}
+.cell.combat-impact .piece,.piece.attack-piece{animation:pieceAttack .42s cubic-bezier(.2,.8,.2,1) both}
+@keyframes pieceSelect{from{transform:translateY(0) scale(1)}to{transform:translateY(-3px) scale(1.045)}}
+@keyframes pieceDepart{to{transform:translateY(-5px) scale(.88);opacity:.65}}
+@keyframes pieceArrive{0%{transform:translateY(-9px) scale(.88);opacity:.7}65%{transform:translateY(2px) scale(1.06)}100%{transform:translateY(0) scale(1);opacity:1}}
+@keyframes pieceAttack{0%{transform:translateX(-5px) scale(.92)}35%{transform:translateX(5px) scale(1.12)}65%{transform:translateX(-2px) scale(1.04)}100%{transform:translateX(0) scale(1)}}
+@keyframes combatCell{0%{filter:brightness(1)}35%{filter:brightness(1.8)}100%{filter:brightness(1)}}
+@media(prefers-reduced-motion:reduce){.cell.selected .piece,.cell.move-origin .piece,.cell.move-arrival .piece,.cell.combat-impact,.cell.combat-impact .piece,.piece.moving-piece,.piece.attack-piece{animation:none!important;filter:none!important}}
