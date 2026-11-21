@@ -21,8 +21,8 @@ export function makeArmy(side){
 export function shuffle(items){const a=[...items];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 function formationPriority(type,formation){
  const priorities={
-  balanced:{flag:0,bomb:1,marshal:10,general:9,colonel:8,major:7,captain:6,lieutenant:5,sergeant:4,miner:3,scout:2,spy:1},
-  defensive:{flag:0,bomb:1,miner:8,marshal:7,general:6,colonel:5,major:4,captain:3,lieutenant:2,sergeant:1,scout:0,spy:5},
+  balanced:{flag:20,bomb:19,marshal:18,general:17,colonel:16,major:15,captain:14,lieutenant:13,sergeant:12,miner:11,scout:10,spy:9},
+  defensive:{flag:20,bomb:19,miner:18,marshal:17,general:16,colonel:15,major:14,captain:13,lieutenant:12,sergeant:11,scout:10,spy:9},
   offensive:{marshal:12,general:11,colonel:10,major:9,captain:8,lieutenant:7,sergeant:6,miner:5,scout:4,spy:3,bomb:1,flag:0},
   bastion:{flag:0,bomb:2,miner:9,marshal:8,general:7,colonel:6,major:5,captain:4,lieutenant:3,sergeant:2,scout:1,spy:6},
   spearhead:{marshal:12,general:11,colonel:10,major:9,captain:8,lieutenant:7,sergeant:6,miner:5,scout:4,spy:3,bomb:1,flag:0}
