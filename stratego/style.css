@@ -431,3 +431,29 @@
 .board-wrap[data-theme="ice"] .cell:not(.lake):after{background:linear-gradient(135deg,#ffffff66,transparent 42%),linear-gradient(315deg,#b4eaff22,transparent 60%)}
 .board-wrap[data-theme="volcano"] .cell:not(.lake):after{background:linear-gradient(135deg,#ffbd7522,transparent 38%),linear-gradient(315deg,#170d1422,transparent 62%)}
 .board-wrap[data-theme="ruins"] .cell:not(.lake):after{background:linear-gradient(135deg,#f2e3c633,transparent 40%),linear-gradient(315deg,#25221d22,transparent 62%)}
+
+
+/* Dezente, animierte Umgebungsstimmung – rein dekorativ und für Mobilgeräte sparsam gehalten. */
+.board-wrap{isolation:isolate}
+.board-wrap .board{position:relative;z-index:1}
+.board-wrap:before,.board-wrap:after{content:"";position:absolute;z-index:3;inset:13px;border-radius:7px;pointer-events:none;opacity:0;overflow:hidden}
+.board-wrap:before,.board-wrap:after{background-repeat:repeat;background-size:100% 100%}
+.board-wrap[data-theme="forest"]:before{opacity:.42;background-image:radial-gradient(ellipse 3px 7px at 12% 18%,#b7d68caa 0 55%,transparent 62%),radial-gradient(ellipse 3px 7px at 39% 62%,#83ad68aa 0 55%,transparent 62%),radial-gradient(ellipse 2px 6px at 72% 34%,#d1df9c99 0 55%,transparent 62%),radial-gradient(ellipse 3px 7px at 88% 78%,#8ebc78aa 0 55%,transparent 62%);animation:forestLeaves 13s linear infinite}
+.board-wrap[data-theme="forest"]:after{opacity:.18;background:radial-gradient(ellipse at 15% 0%,#d4e8a8 0,transparent 28%),radial-gradient(ellipse at 85% 100%,#8ebc78 0,transparent 32%);animation:forestCanopy 8s ease-in-out infinite alternate}
+.board-wrap[data-theme="ice"]:before{opacity:.48;background-image:radial-gradient(circle at 8% 13%,#fff 0 1px,transparent 2px),radial-gradient(circle at 27% 72%,#e7fbff 0 1.4px,transparent 2.5px),radial-gradient(circle at 48% 31%,#fff 0 1px,transparent 2px),radial-gradient(circle at 69% 84%,#e7fbff 0 1.2px,transparent 2.4px),radial-gradient(circle at 91% 47%,#fff 0 1px,transparent 2px);animation:iceSnow 9s linear infinite}
+.board-wrap[data-theme="ice"]:after{opacity:.23;background:linear-gradient(112deg,transparent 30%,#e8fbff44 48%,transparent 62%);background-size:220% 100%;animation:iceShimmer 7s ease-in-out infinite}
+.board-wrap[data-theme="volcano"]:before{opacity:.5;background-image:radial-gradient(circle at 12% 82%,#ffcb6b 0 1px,transparent 2px),radial-gradient(circle at 33% 53%,#ff7440 0 1.3px,transparent 2.5px),radial-gradient(circle at 57% 91%,#ffd27a 0 1px,transparent 2px),radial-gradient(circle at 76% 42%,#ff8146 0 1.2px,transparent 2.4px),radial-gradient(circle at 91% 73%,#ffd27a 0 1px,transparent 2px);animation:volcanoEmbers 6s ease-in-out infinite}
+.board-wrap[data-theme="volcano"]:after{opacity:.22;background:radial-gradient(ellipse at 50% 100%,#ff7a35 0,transparent 48%);animation:volcanoGlow 3.8s ease-in-out infinite alternate}
+.board-wrap[data-theme="ruins"]:before{opacity:.28;background-image:radial-gradient(circle at 14% 22%,#e8d7ad 0 1px,transparent 2px),radial-gradient(circle at 38% 68%,#d5c7a4 0 1px,transparent 2px),radial-gradient(circle at 63% 39%,#eee0be 0 1px,transparent 2px),radial-gradient(circle at 86% 81%,#c9c0a5 0 1px,transparent 2px);animation:ruinsDust 15s linear infinite}
+.board-wrap[data-theme="ruins"]:after{opacity:.17;background:linear-gradient(115deg,transparent 25%,#f1e2bd44 50%,transparent 72%);background-size:240% 100%;animation:ruinsLight 12s ease-in-out infinite}
+@keyframes forestLeaves{0%{background-position:0 -8%,0 0,0 -12%,0 0}50%{background-position:8% 55%,-5% 48%,6% 52%,-8% 58%}100%{background-position:15% 112%,-10% 108%,12% 116%,-15% 110%}}
+@keyframes forestCanopy{from{opacity:.1;transform:translateX(-2%)}to{opacity:.28;transform:translateX(2%)}}
+@keyframes iceSnow{from{background-position:0 -8%,0 0,0 -12%,0 0,0 -5%}to{background-position:4% 110%,-3% 108%,5% 115%,-4% 112%,3% 109%}}
+@keyframes iceShimmer{0%,100%{background-position:120% 0}50%{background-position:-30% 0}}
+@keyframes volcanoEmbers{0%,100%{background-position:0 8%,0 12%,0 4%,0 15%,0 6%;opacity:.28}50%{background-position:2% -20%,-2% -28%,3% -16%,-3% -24%,2% -18%;opacity:.62}}
+@keyframes volcanoGlow{from{opacity:.12}to{opacity:.32}}
+@keyframes ruinsDust{0%{background-position:0 0,0 0,0 0,0 0}100%{background-position:12% -18%,-8% -12%,10% -20%,-12% -14%}}
+@keyframes ruinsLight{0%,100%{background-position:130% 0}50%{background-position:-30% 0}}
+.no-game-animations .board-wrap:before,.no-game-animations .board-wrap:after{animation:none!important}
+@media(prefers-reduced-motion:reduce){.board-wrap:before,.board-wrap:after{animation:none!important}}
+@media(max-width:520px){.board-wrap:before,.board-wrap:after{inset:9px;opacity:.65}}
