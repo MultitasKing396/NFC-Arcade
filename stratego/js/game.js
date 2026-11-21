@@ -98,7 +98,7 @@ function renderManualSetup(){
   btn.innerHTML="<span>"+info.sigil+"</span><b>"+info.name+"</b><small>"+count+" übrig</small>";btn.addEventListener("click",()=>{manualSelectedType=type;manualMovingIndex=null;renderManualSetup();});palette.append(btn);}
  const placed=manualSlots.filter(Boolean).length;document.querySelector("#manualProgress").textContent=placed+" / "+armyCount(currentMode)+" platziert";
  document.querySelector("#manualSelected").textContent=manualMovingIndex!==null?"Figur zum Verschieben gewählt":manualSelectedType?RANKS[manualSelectedType].name+" ausgewählt":"Keine Figur ausgewählt";
- document.querySelector("#confirmManualSetup").disabled=placed!==40;updateSaveLabels();
+ document.querySelector("#confirmManualSetup").disabled=placed!==armyCount(currentMode);updateSaveLabels();
 }
 function placeManualCell(index){
  if(manualMovingIndex!==null){if(manualMovingIndex===index){manualMovingIndex=null;renderManualSetup();return;}if(!manualSlots[index]){manualSlots[index]=manualSlots[manualMovingIndex];manualSlots[manualMovingIndex]=null;}manualMovingIndex=null;renderManualSetup();return;}
