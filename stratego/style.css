@@ -1205,3 +1205,43 @@
  .board-wrap.isometric-board .combat-callout-layer{transform:translate(-50%,-50%) perspective(1300px) rotateX(58deg) rotateZ(45deg) scale(.94)}
 }
 @media(prefers-reduced-motion:reduce){.board-wrap.isometric-board .terrain-prop{filter:none}}
+
+/* Figure-first pass: both armies read as physical miniatures, not flat tokens. */
+.board-wrap.isometric-board .piece-upright{
+ width:128%;
+ height:128%;
+ transform:translateZ(10px) rotateZ(-45deg) rotateX(-58deg) scale(1.28);
+ transform-origin:50% 84%;
+}
+.board-wrap.isometric-board .piece .miniature{
+ width:100%;
+ height:100%;
+ overflow:visible;
+ filter:drop-shadow(1px 0 0 #25251f) drop-shadow(2px 2px 0 #10130f) drop-shadow(0 7px 5px #000d);
+}
+.board-wrap.isometric-board .piece.hidden-rank .piece-upright .miniature{
+ width:100%;
+ height:100%;
+ filter:drop-shadow(1px 0 0 #17121e) drop-shadow(2px 2px 0 #0b0910) drop-shadow(0 7px 5px #000e);
+}
+.board-wrap.isometric-board .piece:before{
+ left:7%;width:86%;height:17%;bottom:0;
+ background:radial-gradient(ellipse at 30% 18%,#fff9df 0 7%,transparent 34%),linear-gradient(145deg,#c2a46b,#80633d 40%,#342b20 78%,#161916);
+ border:2px solid #f0d59a;
+ box-shadow:0 4px 3px #000d,0 0 0 2px #191b16,inset 0 2px 3px #fff9,inset 0 -5px 6px #000c;
+}
+.board-wrap.isometric-board .terrain-dressing{width:98%;z-index:1}
+.board-wrap.isometric-board .terrain-prop{width:11%;height:11%;filter:drop-shadow(0 7px 4px #000b)}
+.board-wrap.isometric-board .prop-a{left:1%;top:19%}
+.board-wrap.isometric-board .prop-b{right:0;top:2%}
+.board-wrap.isometric-board .prop-c{right:0;bottom:10%}
+.board-wrap.isometric-board .prop-d{left:0;bottom:17%;width:15%;height:8%}
+.board-wrap.isometric-board .prop-e{right:14%;top:0;width:8%;height:8%}
+.board-wrap.isometric-board .prop-f{left:12%;bottom:0;width:9%;height:9%}
+@media(max-width:620px){
+ .board-wrap.isometric-board .piece-upright{
+  width:130%;height:130%;
+  transform:translateZ(9px) rotateZ(-45deg) rotateX(-58deg) scale(1.24);
+ }
+ .board-wrap.isometric-board .terrain-dressing{width:98%}
+}
