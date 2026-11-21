@@ -457,3 +457,69 @@
 .no-game-animations .board-wrap:before,.no-game-animations .board-wrap:after{animation:none!important}
 @media(prefers-reduced-motion:reduce){.board-wrap:before,.board-wrap:after{animation:none!important}}
 @media(max-width:520px){.board-wrap:before,.board-wrap:after{inset:9px;opacity:.65}}
+
+
+/* Landschaftsrahmen: der Bereich um das Brett wirkt wie ein eigener Schauplatz. */
+.board-wrap{
+ position:relative;
+ border-style:solid;
+ border-width:2px;
+ background-clip:padding-box;
+}
+.board-wrap .board{
+ outline:1px solid #ffffff20;
+ outline-offset:3px;
+}
+.board-wrap[data-theme="forest"]{
+ border-color:#78945b;
+ background:
+  radial-gradient(circle at 5% 8%,#c4d88a55 0 2px,transparent 3px),
+  radial-gradient(circle at 95% 12%,#8bb46a66 0 3px,transparent 4px),
+  radial-gradient(circle at 8% 92%,#426b3c 0 4px,transparent 5px),
+  radial-gradient(circle at 93% 90%,#9ab86b55 0 2px,transparent 3px),
+  repeating-linear-gradient(38deg,#66804a22 0 3px,transparent 3px 8px),
+  linear-gradient(145deg,#344c30,#1c2c22 58%,#101c18);
+ box-shadow:0 0 0 3px #1a2c20,0 0 0 5px #78945b66,0 18px 50px #000b,inset 0 0 0 3px #b5ca7655,inset 0 0 22px #091b12;
+}
+.board-wrap[data-theme="ice"]{
+ border-color:#b6e5f2;
+ background:
+  radial-gradient(circle at 7% 9%,#ffffffcc 0 2px,transparent 3px),
+  radial-gradient(circle at 93% 13%,#c9f3ffcc 0 2px,transparent 3px),
+  radial-gradient(circle at 9% 90%,#8dd3e855 0 3px,transparent 4px),
+  radial-gradient(circle at 94% 91%,#ffffffaa 0 2px,transparent 3px),
+  repeating-linear-gradient(135deg,#e8fbff22 0 2px,transparent 2px 9px),
+  linear-gradient(145deg,#47748a,#25465c 58%,#142b3a);
+ box-shadow:0 0 0 3px #183448,0 0 0 5px #9ed9eb66,0 18px 50px #000b,inset 0 0 0 3px #e8fcff77,inset 0 0 22px #b7efff33;
+}
+.board-wrap[data-theme="volcano"]{
+ border-color:#d47748;
+ background:
+  radial-gradient(circle at 6% 8%,#ffc16c 0 2px,transparent 4px),
+  radial-gradient(circle at 94% 12%,#f36b37 0 3px,transparent 5px),
+  radial-gradient(circle at 8% 92%,#ff8a43 0 2px,transparent 4px),
+  radial-gradient(circle at 93% 91%,#ffc16c 0 3px,transparent 5px),
+  repeating-linear-gradient(32deg,#f27b3a22 0 2px,transparent 2px 8px),
+  linear-gradient(145deg,#65372a,#382322 58%,#1c171a);
+ box-shadow:0 0 0 3px #291a1a,0 0 0 5px #d4774866,0 18px 50px #000b,inset 0 0 0 3px #ffb46a55,inset 0 0 25px #f15b2b33;
+}
+.board-wrap[data-theme="ruins"]{
+ border-color:#c1b18f;
+ background:
+  radial-gradient(circle at 6% 8%,#e8d8b5aa 0 2px,transparent 4px),
+  radial-gradient(circle at 94% 12%,#9e9a7d 0 3px,transparent 5px),
+  radial-gradient(circle at 8% 92%,#c6b38d 0 3px,transparent 5px),
+  radial-gradient(circle at 93% 91%,#d8c7a4aa 0 2px,transparent 4px),
+  repeating-linear-gradient(45deg,#e8d9b522 0 3px,transparent 3px 10px),
+  linear-gradient(145deg,#625c4e,#393832 58%,#242321);
+ box-shadow:0 0 0 3px #292822,0 0 0 5px #b9a88766,0 18px 50px #000b,inset 0 0 0 3px #e5d5b477,inset 0 0 22px #151713;
+}
+/* Kleine Eck-Highlights geben dem Rahmen Tiefe, ohne Felder oder Figuren zu verdecken. */
+.board-wrap[data-theme="forest"] .board{box-shadow:0 0 0 2px #a4bd6b55,0 0 12px #081b12aa}
+.board-wrap[data-theme="ice"] .board{box-shadow:0 0 0 2px #d8f8ff99,0 0 13px #9de8ff55}
+.board-wrap[data-theme="volcano"] .board{box-shadow:0 0 0 2px #e98a4b88,0 0 13px #f15c3155}
+.board-wrap[data-theme="ruins"] .board{box-shadow:0 0 0 2px #d4c39c88,0 0 12px #181713aa}
+@media(max-width:620px){
+ .board-wrap[data-theme="forest"],.board-wrap[data-theme="ice"],.board-wrap[data-theme="volcano"],.board-wrap[data-theme="ruins"]{border-width:1px}
+ .board-wrap .board{outline-offset:2px}
+}
