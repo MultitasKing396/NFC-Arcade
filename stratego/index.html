@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#10131d">
+<title>Stratego – Fantasy Battlefield Edition</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app-shell">
+  <header class="topbar">
+    <a class="back" href="../" aria-label="Zur NFC Arcade">← <span>ARCADE</span></a>
+    <div class="brand"><span class="brand-mark">✦</span><div><strong>STRATEGO</strong><small>FANTASY BATTLEFIELD EDITION</small></div></div>
+    <button class="icon-button" id="rulesBtn" aria-label="Regelbuch öffnen">?</button>
+  </header>
+  <main>
+    <section class="intro">
+      <div class="eyebrow">KLASSISCHES STRATEGO</div>
+      <h1>Die Schlacht beginnt.</h1>
+      <p>Führe deine Armee, entdecke die gegnerischen Ränge und beschütze deine Flagge.</p>
+    </section>
+    <section class="statusbar">
+      <div class="player-label"><span class="army-dot blue"></span><div><b>Dein Königreich</b><small>Deine Armee</small></div></div>
+      <div class="turn-status" id="turnStatus">Dein Zug</div>
+      <div class="player-label enemy"><div><b>CPU-Gegner</b><small>Unbekannte Armee</small></div><span class="army-dot red"></span></div>
+    </section>
+    <div class="board-wrap">
+      <div class="board" id="board" aria-label="Stratego Spielfeld"></div>
+    </div>
+    <div class="game-footer">
+      <div id="message" role="status">Wähle eine deiner Figuren und ziehe sie auf ein markiertes Feld.</div>
+      <button id="newGameBtn" class="gold-button">Neue Partie</button>
+    </div>
+    <div class="legend"><span><i class="legend-dot move"></i>Möglicher Zug</span><span><i class="legend-dot selected"></i>Ausgewählte Figur</span><span><i class="legend-dot lake"></i>See – unpassierbar</span></div>
+  </main>
+</div>
+<div class="modal-backdrop" id="rulesModal" hidden>
+ <section class="modal" role="dialog" aria-modal="true" aria-labelledby="rulesTitle">
+  <button class="modal-close" id="closeRules" aria-label="Schließen">×</button>
+  <div class="eyebrow">SPIELREGELN</div><h2 id="rulesTitle">Stratego – Kurz erklärt</h2>
+  <div class="rules-content">
+   <h3>Spielziel</h3><p>Finde und erobere die gegnerische Flagge. Alternativ gewinnst du, wenn dein Gegner keinen beweglichen Zug mehr ausführen kann.</p>
+   <h3>Bewegung</h3><p>Bewege eine Figur pro Zug ein Feld waagerecht oder senkrecht. Späher dürfen beliebig weit geradeaus ziehen, solange der Weg frei ist. Figuren dürfen nicht diagonal ziehen oder über andere Figuren springen. Seen sind unpassierbar.</p>
+   <h3>Kämpfe</h3><p>Ziehst du auf ein gegnerisches Feld, kommt es zum Kampf. Der höhere Rang gewinnt. Bei gleichem Rang werden beide Figuren entfernt. Bomben besiegen alle Angreifer außer Mineuren. Mineure entschärfen Bomben. Der Spion besiegt den Feldmarschall nur, wenn er ihn selbst angreift.</p>
+   <h3>Besondere Figuren</h3><p><b>Bomben und Flagge:</b> unbeweglich. <b>Mineur:</b> besiegt Bomben. <b>Späher:</b> kann beliebig weit geradeaus ziehen. <b>Spion:</b> schlägt den Feldmarschall nur im Angriff.</p>
+   <h3>Ränge</h3><p>Feldmarschall 10 · General 9 · Oberst 8 · Major 7 · Hauptmann 6 · Leutnant 5 · Unteroffizier 4 · Mineur 3 · Späher 2 · Spion 1.</p>
+   <p class="note">Die Figuren deiner Armee sind sichtbar. Die Ränge der gegnerischen Figuren bleiben verborgen, bis sie an einem Kampf teilnehmen.</p>
+  </div>
+ </section>
+</div>
+<script type="module" src="js/game.js"></script>
+</body>
+</html>
