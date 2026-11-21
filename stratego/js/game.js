@@ -496,7 +496,7 @@ function selectRulesTab(tab){
 }
 function openHomeRules(){renderRulesRankList();selectRulesTab("basics");rulesModal.hidden=false;}
 function openSettings(){applySettings();settingsModal.hidden=false;}
-function openSetup(fromHome=false){setupFromHome=fromHome;applySettings();const environment=document.querySelector("#setupBattlefield");if(environment)environment.value=gameSettings.theme;setupModal.hidden=false;}
+function openSetup(fromHome=false){setupFromHome=fromHome;applySettings();if(fromHome){const formation=document.querySelector("#playerFormation");if(formation)formation.value="balanced";}const environment=document.querySelector("#setupBattlefield");if(environment)environment.value=gameSettings.theme;setupModal.hidden=false;}
 function closeSetup(){setupModal.hidden=true;if(setupFromHome){document.querySelector("#homeScreen").hidden=false;document.querySelector("#gameScreen").hidden=true;}setupFromHome=false;}
 const SAVE_KEY=()=>currentMode==="classic"?"nfc-arcade-stratego-formations-v1":`nfc-arcade-stratego-formations-${currentMode}-v1`;
 function readSavedFormations(){try{return JSON.parse(localStorage.getItem(SAVE_KEY())||"[]");}catch{return [];}}
