@@ -1,8 +1,10 @@
 import {RANKS,MODES,modeConfig,armyCount,setupRows,lakeSet,setMode,initialBoard,legalMoves,resolveCombat,sideHasMoves} from "./rules.js";
 const boardEl=document.querySelector("#board"),messageEl=document.querySelector("#message"),strengthEl=document.querySelector("#selectedStrength"),turnEl=document.querySelector("#turnStatus");
-const rulesModal=document.querySelector("#rulesModal"),setupModal=document.querySelector("#setupModal"),manualSetupModal=document.querySelector("#manualSetupModal");
+const rulesModal=document.querySelector("#rulesModal"),setupModal=document.querySelector("#setupModal"),manualSetupModal=document.querySelector("#manualSetupModal"),settingsModal=document.querySelector("#settingsModal");
 let pendingAnimation=null;
 let setupFromHome=false;
+const GAME_SAVE_KEY="nfc-arcade-stratego-current-game-v1";
+let hasSavedGame=false;
 let currentMode="classic";setMode(currentMode);let board=initialBoard("balanced","balanced",currentMode),turn="blue",selected=null,validMoves=[],busy=false,dragPointer=null,dragFrom=null;
 let manualSlots=Array(armyCount(currentMode)).fill(null),manualReserve={},manualSelectedType=null,manualMovingIndex=null,activeSaveSlot=0;
 const pieceInfo=p=>RANKS[p.type];
@@ -132,7 +134,7 @@ function finishMove(from,to){
  pendingAnimation={from,to,kind:animationKind,winner};
  selected=null;validMoves=[];dragFrom=null;if(strengthEl)strengthEl.textContent="";
  if(!sideHasMoves(board,"red",currentMode)){render();endGame("blue");return;}
- setTurn("red");busy=true;render();
+ setTurn("red");busy=true;render();saveGameState();
  window.setTimeout(cpuMove,650+Math.random()*650);
 }
 function cpuMove(){
@@ -151,17 +153,23 @@ function cpuMove(){
   if(defender.type==="flag"&&result.result==="attacker"){pendingAnimation={from:move.from,to:move.to,kind:animationKind,winner};busy=false;render();endGame("red");return;}
  }else{board[move.to]=attacker;board[move.from]=null;setMessage("Der CPU hat seinen Zug ausgeführt.");}
  pendingAnimation={from:move.from,to:move.to,kind:animationKind,winner};
- busy=false;setTurn("blue");render();
+ busy=false;setTurn("blue");render();saveGameState();
  if(!sideHasMoves(board,"blue",currentMode))endGame("red");
 }
 function endGame(winner){
- busy=true;setTurn("blue");turnEl.textContent=winner==="blue"?"Sieg!":"Niederlage";
+ busy=true;try{localStorage.removeItem(GAME_SAVE_KEY);}catch{}hasSavedGame=false;updateResumeButton();setTurn("blue");turnEl.textContent=winner==="blue"?"Sieg!":"Niederlage";
  setMessage(winner==="blue"?"Du hast gewonnen! Die gegnerische Flagge ist gefallen.":"Du hast verloren. Deine Flagge wurde erobert.");
  const banner=document.createElement("div");banner.className="result-banner";banner.innerHTML=`<div class="result-card"><div class="eyebrow">DIE SCHLACHT IST ENTSCHIEDEN</div><h2>${winner==="blue"?"SIEG":"NIEDERLAGE"}</h2><p>${winner==="blue"?"Deine Armee triumphiert.":"Deine Armee wurde besiegt."}</p><button class="gold-button" id="resultNew">Neue Partie</button></div>`;
  document.body.append(banner);banner.querySelector("#resultNew").addEventListener("click",()=>{banner.remove();openSetup();});
 }
 function showGameScreen(){document.querySelector("#homeScreen").hidden=true;document.querySelector("#gameScreen").hidden=false;}
+function showHomeScreen(){saveGameState();document.querySelector("#gameScreen").hidden=true;document.querySelector("#homeScreen").hidden=false;updateResumeButton();}
+function saveGameState(){if(!board||!board.some(Boolean))return;try{const state={version:1,currentMode,board,turn,playerFaction,cpuFaction,message:messageEl.textContent};localStorage.setItem(GAME_SAVE_KEY,JSON.stringify(state));hasSavedGame=true;updateResumeButton();}catch(error){console.warn("Spielstand konnte nicht gespeichert werden.",error);}}
+function updateResumeButton(){const btn=document.querySelector("#homeResumeBtn");if(btn)btn.hidden=!hasSavedGame;}
+function loadGameState(){try{const raw=localStorage.getItem(GAME_SAVE_KEY);if(!raw)return false;const state=JSON.parse(raw);if(state?.version!==1||!MODES[state.currentMode]||!Array.isArray(state.board)||state.board.length!==modeConfig(state.currentMode).size**2||!state.board.every(p=>p===null||(p&&typeof p.type==="string"&&(p.side==="blue"||p.side==="red"))))return false;currentMode=state.currentMode;setMode(currentMode);board=state.board;turn=state.turn==="red"?"red":"blue";playerFaction=FACTIONS[state.playerFaction]?state.playerFaction:"aurelia";cpuFaction=FACTIONS[state.cpuFaction]?state.cpuFaction:"shadow";setMessage(state.message||"Spielstand geladen.");hasSavedGame=true;return true;}catch(error){console.warn("Gespeicherter Spielstand ist ungültig.",error);return false;}}
+function resumeSavedGame(){if(!loadGameState())return;selected=null;validMoves=[];busy=turn==="red";showGameScreen();setTurn(turn);render();updateResumeButton();if(busy)window.setTimeout(cpuMove,500);}
 function openHomeRules(){rulesModal.hidden=false;}
+function openSettings(){settingsModal.hidden=false;}
 function openSetup(fromHome=false){setupFromHome=fromHome;setupModal.hidden=false;}
 function closeSetup(){setupModal.hidden=true;if(setupFromHome){document.querySelector("#homeScreen").hidden=false;document.querySelector("#gameScreen").hidden=true;}setupFromHome=false;}
 const SAVE_KEY=()=>currentMode==="classic"?"nfc-arcade-stratego-formations-v1":`nfc-arcade-stratego-formations-${currentMode}-v1`;
@@ -192,8 +200,8 @@ function closeManualSetup(){manualSetupModal.hidden=true;}
 function saveManualFormation(){const placed=manualSlots.filter(Boolean).length;if(placed!==armyCount(currentMode))return;const slots=savedFormations();const old=slots[activeSaveSlot];if(old&&!confirm("Diesen Speicherplatz zuerst leeren, bevor du ihn neu belegst."))return;if(old)return;slots[activeSaveSlot]={name:["Formation Alpha","Formation Beta","Formation Charlie"][activeSaveSlot],types:manualSlots.map(p=>p.type)};if(!writeSavedFormations(slots)){alert("Speichern ist in diesem Browser nicht verfügbar.");return;}updateSaveLabels();}
 function loadManualFormation(index){const saved=savedFormations()[index];if(!saved)return;if(manualSlots.some(Boolean)&&!confirm("Die aktuelle Aufstellung durch diese Formation ersetzen?"))return;manualSlots=saved.types.map(type=>({type}));manualReserve={};for(const [type,count] of Object.entries(modeConfig(currentMode).counts))manualReserve[type]=count;manualSlots.forEach(p=>manualReserve[p.type]--);manualSelectedType=null;manualMovingIndex=null;activeSaveSlot=index;renderManualSetup();}
 function clearManualFormation(){const slots=savedFormations();if(!slots[activeSaveSlot])return;if(!confirm("Diesen Speicherplatz wirklich leeren?"))return;slots[activeSaveSlot]=null;writeSavedFormations(slots);updateSaveLabels();}
-function confirmManualPlacement(){if(manualSlots.some(p=>!p))return;const player=manualSlots.map((p,i)=>({...p,id:"blue-manual-"+i,side:"blue",revealed:false}));const cpuFormation=document.querySelector("#cpuFormation").value;board=applyFactions(initialBoard("balanced",cpuFormation,currentMode));const n=modeConfig(currentMode).size,start=(n-setupRows(currentMode))*n;for(let i=0;i<player.length;i++)board[start+i]=player[i];selected=null;validMoves=[];busy=false;dragPointer=null;dragFrom=null;if(strengthEl)strengthEl.textContent="";closeManualSetup();showGameScreen();setTurn("blue");setMessage("Deine manuelle Aufstellung ist bereit.");render();}
-function startConfiguredGame(){const chosen=document.querySelector("#gameMode").value;currentMode=MODES[chosen]?chosen:"classic";setMode(currentMode);playerFaction=document.querySelector("#playerFaction").value;cpuFaction=document.querySelector("#cpuFaction").value;const player=document.querySelector("#playerFormation").value;const cpu=document.querySelector("#cpuFormation").value;if(player==="manual"){openManualSetup();return;}board=applyFactions(initialBoard(player,cpu,currentMode));selected=null;validMoves=[];busy=false;dragPointer=null;dragFrom=null;if(strengthEl)strengthEl.textContent="";closeSetup();showGameScreen();setTurn("blue");setMessage("Aufstellung bereit – wähle eine deiner Figuren aus.");render();}
+function confirmManualPlacement(){if(manualSlots.some(p=>!p))return;const player=manualSlots.map((p,i)=>({...p,id:"blue-manual-"+i,side:"blue",revealed:false}));const cpuFormation=document.querySelector("#cpuFormation").value;board=applyFactions(initialBoard("balanced",cpuFormation,currentMode));const n=modeConfig(currentMode).size,start=(n-setupRows(currentMode))*n;for(let i=0;i<player.length;i++)board[start+i]=player[i];selected=null;validMoves=[];busy=false;dragPointer=null;dragFrom=null;if(strengthEl)strengthEl.textContent="";closeManualSetup();showGameScreen();setTurn("blue");setMessage("Deine manuelle Aufstellung ist bereit.");render();saveGameState();}
+function startConfiguredGame(){const chosen=document.querySelector("#gameMode").value;currentMode=MODES[chosen]?chosen:"classic";setMode(currentMode);playerFaction=document.querySelector("#playerFaction").value;cpuFaction=document.querySelector("#cpuFaction").value;const player=document.querySelector("#playerFormation").value;const cpu=document.querySelector("#cpuFormation").value;if(player==="manual"){openManualSetup();return;}board=applyFactions(initialBoard(player,cpu,currentMode));selected=null;validMoves=[];busy=false;dragPointer=null;dragFrom=null;if(strengthEl)strengthEl.textContent="";closeSetup();showGameScreen();setTurn("blue");setMessage("Aufstellung bereit – wähle eine deiner Figuren aus.");render();saveGameState();}
 boardEl.addEventListener("pointerdown",e=>{
  const cell=e.target.closest(".cell");if(!cell||turn!=="blue"||busy)return;
  const index=Number(cell.dataset.index),p=board[index];
@@ -214,8 +222,12 @@ boardEl.addEventListener("click",e=>{
  if(selected!==null&&validMoves.includes(i))finishMove(selected,i);
  else if(board[i]?.side==="blue")choose(i);
 });
-document.querySelector("#newGameBtn").addEventListener("click",()=>openSetup(false));
+document.querySelector("#newGameBtn").addEventListener("click",showHomeScreen);
 document.querySelector("#homeStartBtn").addEventListener("click",()=>openSetup(true));
+document.querySelector("#homeResumeBtn").addEventListener("click",resumeSavedGame);
+document.querySelector("#homeSettingsBtn").addEventListener("click",openSettings);
+document.querySelector("#closeSettings").addEventListener("click",()=>settingsModal.hidden=true);
+settingsModal.addEventListener("click",e=>{if(e.target===settingsModal)settingsModal.hidden=true;});
 document.querySelector("#homeRulesBtn").addEventListener("click",openHomeRules);
 document.querySelector("#startGameBtn").addEventListener("click",startConfiguredGame);
 document.querySelector("#confirmManualSetup").addEventListener("click",confirmManualPlacement);
@@ -229,5 +241,8 @@ setupModal.addEventListener("click",e=>{if(e.target===setupModal)closeSetup();})
 document.querySelector("#rulesBtn").addEventListener("click",()=>rulesModal.hidden=false);
 document.querySelector("#closeRules").addEventListener("click",()=>rulesModal.hidden=true);
 rulesModal.addEventListener("click",e=>{if(e.target===rulesModal)rulesModal.hidden=true;});
-document.addEventListener("keydown",e=>{if(e.key==="Escape"){rulesModal.hidden=true;closeSetup();closeManualSetup();}});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){rulesModal.hidden=true;settingsModal.hidden=true;closeSetup();closeManualSetup();}});
+window.addEventListener("pagehide",saveGameState);
+window.addEventListener("beforeunload",saveGameState);
+if(loadGameState()){updateResumeButton();setTurn(turn);}else{try{localStorage.removeItem(GAME_SAVE_KEY);}catch{}hasSavedGame=false;updateResumeButton();}
 render();
