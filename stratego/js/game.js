@@ -20,7 +20,8 @@ function showSelectedStrength(piece){if(!strengthEl)return;const info=pieceInfo(
 function setTurn(t){turn=t;turnEl.textContent=t==="blue"?"Dein Zug":"CPU denkt nach …";turnEl.classList.toggle("cpu",t==="red");}
 function render(){
  boardEl.innerHTML="";
- const size=modeConfig(currentMode).size,lakes=lakeSet(currentMode);boardEl.style.gridTemplateColumns=`repeat(${size},minmax(0,1fr))`;boardEl.style.gridTemplateRows=`repeat(${size},minmax(0,1fr))`;\n for(let i=0;i<board.length;i++){
+ const size=modeConfig(currentMode).size,lakes=lakeSet(currentMode);boardEl.style.gridTemplateColumns=`repeat(${size},minmax(0,1fr))`;boardEl.style.gridTemplateRows=`repeat(${size},minmax(0,1fr))`;
+ for(let i=0;i<board.length;i++){
   const cell=document.createElement("div");cell.className="cell";cell.dataset.index=i;
   if(lakes.has(i))cell.classList.add("lake");
   if(i===selected)cell.classList.add("selected");
@@ -91,7 +92,8 @@ function updateSaveLabels(){savedFormations().forEach((s,i)=>{const el=document.
 function resetManualPlacement(){manualSlots=Array(armyCount(currentMode)).fill(null);manualReserve={};for(const [type,count] of Object.entries(modeConfig(currentMode).counts))manualReserve[type]=count;manualSelectedType=null;manualMovingIndex=null;activeSaveSlot=0;renderManualSetup();}
 function renderManualSetup(){
  const grid=document.querySelector("#manualBoard"),palette=document.querySelector("#manualPalette");grid.innerHTML="";palette.innerHTML="";
- const size=modeConfig(currentMode).size;grid.style.gridTemplateColumns=`repeat(${size},minmax(0,1fr))`;grid.style.aspectRatio=`${size}/${setupRows(currentMode)}`;\n for(let i=0;i<manualSlots.length;i++){const p=manualSlots[i],cell=document.createElement("button");cell.type="button";cell.className="manual-cell"+(p?" occupied":"")+(manualMovingIndex===i?" moving":"");
+ const size=modeConfig(currentMode).size;grid.style.gridTemplateColumns=`repeat(${size},minmax(0,1fr))`;grid.style.aspectRatio=`${size}/${setupRows(currentMode)}`;
+ for(let i=0;i<manualSlots.length;i++){const p=manualSlots[i],cell=document.createElement("button");cell.type="button";cell.className="manual-cell"+(p?" occupied":"")+(manualMovingIndex===i?" moving":"");
   cell.innerHTML=p?("<span class=\"manual-piece\">"+RANKS[p.type].sigil+"</span><small>"+RANKS[p.type].name+"</small>"):"<span class=\"empty-mark\">＋</span>";
   cell.addEventListener("click",()=>placeManualCell(i));grid.append(cell);}
  for(const [type,countAvailable] of Object.entries(modeConfig(currentMode).counts)){const info=RANKS[type],count=manualReserve[type]||0,btn=document.createElement("button");btn.type="button";btn.className="palette-piece"+(manualSelectedType===type?" active":"")+(count===0?" exhausted":"");btn.disabled=count===0;
