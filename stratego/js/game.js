@@ -133,6 +133,7 @@ boardEl.addEventListener("click",e=>{
  else if(board[i]?.side==="blue")choose(i);
 });
 document.querySelector("#newGameBtn").addEventListener("click",openSetup);
+document.querySelector("#playerFormation").addEventListener("change",e=>{if(e.target.value==="manual")openManualSetup();});
 document.querySelector("#startGameBtn").addEventListener("click",startConfiguredGame);
 document.querySelector("#confirmManualSetup").addEventListener("click",confirmManualPlacement);
 document.querySelector("#cancelManualSetup").addEventListener("click",()=>{closeManualSetup();openSetup();});
