@@ -30,7 +30,7 @@
     </div>
     <div class="game-footer">
       <div class="selection-info"><span id="message" role="status">Wähle eine deiner Figuren aus.</span><strong id="selectedStrength" aria-live="polite"></strong></div>
-      <button id="newGameBtn" class="gold-button">Neue Partie</button>
+      <button id="newGameBtn" class="gold-button">Aufstellung</button>
     </div>
     <div class="legend"><span><i class="legend-dot move"></i>Möglicher Zug</span><span><i class="legend-dot selected"></i>Ausgewählte Figur</span><span><i class="legend-dot lake"></i>See – unpassierbar</span></div>
   </main>
@@ -46,6 +46,40 @@
    <h3>Besondere Figuren</h3><p><b>Bomben und Flagge:</b> unbeweglich. <b>Mineur:</b> besiegt Bomben. <b>Späher:</b> kann beliebig weit geradeaus ziehen. <b>Spion:</b> schlägt den Feldmarschall nur im Angriff.</p>
    <h3>Ränge</h3><p>Feldmarschall 10 · General 9 · Oberst 8 · Major 7 · Hauptmann 6 · Leutnant 5 · Unteroffizier 4 · Mineur 3 · Späher 2 · Spion 1.</p>
    <p class="note">Die Figuren deiner Armee sind sichtbar. Die Ränge der gegnerischen Figuren bleiben verborgen, bis sie an einem Kampf teilnehmen.</p>
+  </div>
+ </section>
+</div>
+<div class="modal-backdrop" id="setupModal" hidden>
+ <section class="modal setup-modal" role="dialog" aria-modal="true" aria-labelledby="setupTitle">
+  <button class="modal-close" id="closeSetup" aria-label="Schließen">×</button>
+  <div class="eyebrow">VORBEREITUNG DER SCHLACHT</div>
+  <h2 id="setupTitle">Stelle deine Armee auf</h2>
+  <p class="setup-intro">Wähle für beide Seiten eine Aufstellung. Die Figuren bleiben klassisch: 40 Einheiten pro Armee.</p>
+  <div class="setup-side">
+   <div class="setup-side-title"><span class="army-dot blue"></span><div><b>Dein Königreich</b><small>Deine Aufstellung</small></div></div>
+   <label for="playerFormation">Taktik wählen</label>
+   <select id="playerFormation">
+    <option value="balanced">Ausgewogen – Zufallsaufstellung</option>
+    <option value="offensive">Offensiv – Zufallsaufstellung</option>
+    <option value="defensive">Defensiv – Zufallsaufstellung</option>
+    <option value="spearhead">Speerspitze – taktische Formation</option>
+    <option value="bastion">Bollwerk – taktische Formation</option>
+   </select>
+  </div>
+  <div class="setup-side">
+   <div class="setup-side-title"><span class="army-dot red"></span><div><b>CPU-Gegner</b><small>Gegnerische Aufstellung</small></div></div>
+   <label for="cpuFormation">Taktik des Gegners</label>
+   <select id="cpuFormation">
+    <option value="balanced">Ausgewogen – Zufallsaufstellung</option>
+    <option value="offensive">Offensiv – Zufallsaufstellung</option>
+    <option value="defensive">Defensiv – Zufallsaufstellung</option>
+    <option value="spearhead">Speerspitze – taktische Formation</option>
+    <option value="bastion">Bollwerk – taktische Formation</option>
+   </select>
+  </div>
+  <div class="setup-actions">
+   <button id="cancelSetup" class="secondary-button">Abbrechen</button>
+   <button id="startGameBtn" class="gold-button">Schlacht beginnen</button>
   </div>
  </section>
 </div>
