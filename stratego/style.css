@@ -255,3 +255,29 @@
 .cell.combat-impact .piece .faction-mantle,.cell.combat-impact .piece .faction-armor{animation-play-state:paused}
 .no-game-animations .piece .faction-mantle,.no-game-animations .piece .faction-armor{animation:none!important}
 @media(prefers-reduced-motion:reduce){.piece .faction-mantle,.piece .faction-armor{animation:none!important}}
+
+
+/* Fraktionsspezifische Kampf-Signaturen: farbiger Einschlag plus eigener Effekt. */
+.cell.combat-impact{--combat-color:#fff0b8;--combat-glow:#d6a844}
+.cell.combat-impact:after{border-color:var(--combat-color);box-shadow:0 0 7px var(--combat-color),inset 0 0 7px var(--combat-color)}
+.cell.combat-impact:before{content:"";position:absolute;z-index:3;inset:15%;border-radius:50%;pointer-events:none;opacity:0;background:radial-gradient(circle,var(--combat-color) 0, color-mix(in srgb,var(--combat-glow) 32%,transparent) 27%,transparent 70%)}
+.cell.combat-faction-aurelia:before{animation:combatAurelia calc(.62s * var(--game-animation-speed,1)) ease-out both}
+.cell.combat-faction-shadow:before{animation:combatShadow calc(.7s * var(--game-animation-speed,1)) ease-out both}
+.cell.combat-faction-iron:before{animation:combatIron calc(.5s * var(--game-animation-speed,1)) cubic-bezier(.15,.8,.2,1) both}
+.cell.combat-faction-sylvan:before{animation:combatSylvan calc(.72s * var(--game-animation-speed,1)) ease-out both}
+.cell.combat-faction-ash:before{animation:combatAsh calc(.65s * var(--game-animation-speed,1)) ease-out both}
+.cell.combat-faction-storm:before{animation:combatStorm calc(.55s * var(--game-animation-speed,1)) ease-out both}
+.cell.combat-faction-aurelia:after{box-shadow:0 0 10px var(--combat-color),0 0 20px var(--combat-glow)}
+.cell.combat-faction-shadow:after{border-style:dashed;box-shadow:0 0 12px var(--combat-color)}
+.cell.combat-faction-iron:after{border-radius:8px;box-shadow:0 0 8px var(--combat-color)}
+.cell.combat-faction-sylvan:after{border-radius:42% 58% 48% 52%;box-shadow:0 0 10px var(--combat-color)}
+.cell.combat-faction-ash:after{border-width:3px;box-shadow:0 0 12px var(--combat-color),0 0 22px var(--combat-glow)}
+.cell.combat-faction-storm:after{border-style:dotted;box-shadow:0 0 12px var(--combat-color)}
+@keyframes combatAurelia{0%{opacity:0;transform:scale(.25)}25%{opacity:.8}100%{opacity:0;transform:scale(1.5)}}
+@keyframes combatShadow{0%{opacity:0;transform:scale(.4)}35%{opacity:.8;transform:scale(1.05)}100%{opacity:0;transform:scale(1.5)}}
+@keyframes combatIron{0%{opacity:0;transform:scale(.55)}24%{opacity:.9;transform:scale(1.12)}100%{opacity:0;transform:scale(1.28)}}
+@keyframes combatSylvan{0%{opacity:0;transform:scale(.35) rotate(-18deg)}35%{opacity:.8}100%{opacity:0;transform:scale(1.55) rotate(22deg)}}
+@keyframes combatAsh{0%{opacity:0;transform:scale(.2)}20%{opacity:1;transform:scale(.85)}55%{opacity:.65;transform:scale(1.2)}100%{opacity:0;transform:scale(1.65)}}
+@keyframes combatStorm{0%{opacity:0;transform:scale(.3)}18%{opacity:1;transform:scale(1.08)}38%{opacity:.3;transform:scale(1.28)}58%{opacity:.9;transform:scale(1.38)}100%{opacity:0;transform:scale(1.65)}}
+.no-game-animations .cell.combat-impact:before{animation:none!important;opacity:0}
+@media(prefers-reduced-motion:reduce){.cell.combat-impact:before{animation:none!important;opacity:0}}
