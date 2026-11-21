@@ -151,7 +151,9 @@ function render(){
    const info=pieceInfo(p),el=document.createElement("div");
    const movingClass=pendingAnimation?.to===i&&pendingAnimation.kind==="move"?(p.type==="scout"?" move-scout":["marshal","general","colonel"].includes(p.type)?" move-commander":p.type==="miner"?" move-miner":" move-standard"):"";
    const combatClass=pendingAnimation?.to===i&&pendingAnimation.kind==="combat"?(pendingAnimation.winner===p.side?" combat-winner":" combat-survivor"):"";
-   el.className="piece "+p.side+(p.side==="red"&&!p.revealed?" hidden-rank":"")+(pendingAnimation?.to===i&&pendingAnimation.kind==="combat"&&pendingAnimation.winner===p.side?" attack-piece":"")+(pendingAnimation?.to===i&&pendingAnimation.kind==="move"?" moving-piece":"")+movingClass+combatClass;
+   const isAnimatingHere=pendingAnimation&&(pendingAnimation.from===i||pendingAnimation.to===i);
+   const idleClass=i!==selected&&!isAnimatingHere?" idle-piece":"";
+   el.className="piece "+p.side+(p.side==="red"&&!p.revealed?" hidden-rank":"")+(pendingAnimation?.to===i&&pendingAnimation.kind==="combat"&&pendingAnimation.winner===p.side?" attack-piece":"")+(pendingAnimation?.to===i&&pendingAnimation.kind==="move"?" moving-piece":"")+movingClass+combatClass+idleClass;
    el.setAttribute("aria-label",p.side==="red"&&!p.revealed?"Gegnerische Figur":info.name);
    el.innerHTML=pieceArt(p);
    if(p.side==="blue"||p.revealed){
