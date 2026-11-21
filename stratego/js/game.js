@@ -141,21 +141,32 @@ function render(){
   if(lakes.has(i))cell.classList.add("lake");
   if(i===selected)cell.classList.add("selected");
   if(pendingAnimation?.from===i)cell.classList.add("move-origin");
-  if(pendingAnimation?.to===i)cell.classList.add(pendingAnimation.kind==="combat"?"combat-impact":"move-arrival");
+  if(pendingAnimation?.to===i){
+   cell.classList.add(pendingAnimation.kind==="combat"?"combat-impact":"move-arrival");
+   if(pendingAnimation.kind==="combat")cell.classList.add("combat-"+(pendingAnimation.outcome||"hit"));
+  }
   if(validMoves.includes(i))cell.classList.add("valid");
   const p=board[i];
   if(p){
    const info=pieceInfo(p),el=document.createElement("div");
-   el.className="piece "+p.side+(p.side==="red"&&!p.revealed?" hidden-rank":"")+(pendingAnimation?.to===i&&pendingAnimation.kind==="combat"&&pendingAnimation.winner===p.side?" attack-piece":"")+(pendingAnimation?.to===i&&pendingAnimation.kind==="move"?" moving-piece":"");
+   const movingClass=pendingAnimation?.to===i&&pendingAnimation.kind==="move"?(p.type==="scout"?" move-scout":["marshal","general","colonel"].includes(p.type)?" move-commander":p.type==="miner"?" move-miner":" move-standard"):"";
+   const combatClass=pendingAnimation?.to===i&&pendingAnimation.kind==="combat"?(pendingAnimation.winner===p.side?" combat-winner":" combat-survivor"):"";
+   el.className="piece "+p.side+(p.side==="red"&&!p.revealed?" hidden-rank":"")+(pendingAnimation?.to===i&&pendingAnimation.kind==="combat"&&pendingAnimation.winner===p.side?" attack-piece":"")+(pendingAnimation?.to===i&&pendingAnimation.kind==="move"?" moving-piece":"")+movingClass+combatClass;
    el.setAttribute("aria-label",p.side==="red"&&!p.revealed?"Gegnerische Figur":info.name);
    el.innerHTML=pieceArt(p);
-   if(p.side==="blue"){
+   if(p.side==="blue"||p.revealed){
     const rankMark=document.createElement("span");
     rankMark.className="piece-rank-badge";
     rankMark.textContent=info.rank>0?String(info.rank):p.type==="bomb"?"B":"F";
     rankMark.setAttribute("aria-label",info.rank>0?"Stärke "+info.rank:p.type==="bomb"?"Bombe":"Flagge");
     rankMark.title=info.rank>0?"Stärke "+info.rank:info.name;
     el.append(rankMark);
+   }
+   if(pendingAnimation?.to===i&&pendingAnimation.kind==="combat"&&pendingAnimation.revealType){
+    const reveal=document.createElement("span");reveal.className="combat-reveal-badge";
+    const revealInfo=RANKS[pendingAnimation.revealType];
+    reveal.textContent=revealInfo?.rank>0?"STÄRKE "+revealInfo.rank:revealInfo?.name||"ENTHÜLLT";
+    el.append(reveal);
    }
    cell.append(el);
   }
@@ -176,13 +187,19 @@ function finishMove(from,to){
   const outcome=resolveCombat(attacker,defender);animationKind="combat";winner=outcome.result==="attacker"?"blue":outcome.result==="defender"?"red":null;
   if(outcome.result==="attacker")attacker.revealed=combatRevealMode==="daueraufdeckregel";
   else if(outcome.result==="defender")defender.revealed=combatRevealMode==="daueraufdeckregel";
+  const survivor=outcome.result==="attacker"?attacker:outcome.result==="defender"?defender:null;
   if(outcome.result==="attacker"){board[to]=attacker;board[from]=null;}
   else if(outcome.result==="defender"){board[to]=defender;board[from]=null;}
   else {board[to]=null;board[from]=null;}
   setMessage(outcome.message);
-  if(defender.type==="flag"&&outcome.result==="attacker"){endGame("blue");return;}
+  if(defender.type==="flag"&&outcome.result==="attacker"){
+   pendingAnimation={from,to,kind:animationKind,winner,outcome:outcome.result,revealType:survivor?.type||null};
+   selected=null;validMoves=[];dragFrom=null;if(strengthEl)strengthEl.textContent="";
+   render();busy=true;playSound("combat");window.setTimeout(()=>endGame("blue"),850);return;
+  }
  }else{board[to]=attacker;board[from]=null;setMessage("Zug ausgeführt.");}
- pendingAnimation={from,to,kind:animationKind,winner};
+ const survivor=animationKind==="combat"?(winner==="blue"?attacker:winner==="red"?defender:null):null;
+ pendingAnimation={from,to,kind:animationKind,winner,outcome:animationKind==="combat"?outcome.result:null,revealType:survivor?.type||null};
  selected=null;validMoves=[];dragFrom=null;if(strengthEl)strengthEl.textContent="";
  playSound(animationKind==="combat"?"combat":"move");
  if(!sideHasMoves(board,"red",currentMode)){render();endGame("blue");return;}
@@ -373,13 +390,18 @@ function cpuMove(){
   const result=resolveCombat(attacker,defender);animationKind="combat";winner=result.result==="attacker"?"red":result.result==="defender"?"blue":null;
   if(result.result==="attacker")attacker.revealed=combatRevealMode==="daueraufdeckregel";
   else if(result.result==="defender")defender.revealed=combatRevealMode==="daueraufdeckregel";
+  const survivor=result.result==="attacker"?attacker:result.result==="defender"?defender:null;
   if(result.result==="attacker"){board[move.to]=attacker;board[move.from]=null;}
   else if(result.result==="defender"){board[move.to]=defender;board[move.from]=null;}
   else{board[move.to]=null;board[move.from]=null;}
   setMessage(result.message);
-  if(defender.type==="flag"&&result.result==="attacker"){pendingAnimation={from:move.from,to:move.to,kind:animationKind,winner};busy=false;render();endGame("red");return;}
+  if(defender.type==="flag"&&result.result==="attacker"){
+   pendingAnimation={from:move.from,to:move.to,kind:animationKind,winner,outcome:result.result,revealType:survivor?.type||null};
+   busy=false;render();window.setTimeout(()=>endGame("red"),850);return;
+  }
  }else{board[move.to]=attacker;board[move.from]=null;setMessage("Der CPU hat seinen Zug ausgeführt.");}
- pendingAnimation={from:move.from,to:move.to,kind:animationKind,winner};
+ const survivor=animationKind==="combat"?(winner==="red"?attacker:winner==="blue"?defender:null):null;
+ pendingAnimation={from:move.from,to:move.to,kind:animationKind,winner,outcome:animationKind==="combat"?(defender?resolveCombat(attacker,defender).result:null):null,revealType:survivor?.type||null};
  playSound(animationKind==="combat"?"combat":"move");
  busy=false;setTurn("blue");render();saveGameState();
  if(!sideHasMoves(board,"blue",currentMode))endGame("red");
