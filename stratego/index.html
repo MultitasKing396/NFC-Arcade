@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#10131d">
 <title>Stratego – Fantasy Battlefield Edition</title>
-<link rel="stylesheet" href="style.css?v=20261121-12">
+<link rel="stylesheet" href="style.css?v=20261121-13">
 </head>
 <body>
 <div class="app-shell">
@@ -20,8 +20,9 @@
       <div class="eyebrow">FANTASY BATTLEFIELD EDITION</div>
       <h1>STRATEGO<br><span>SPIELEN</span></h1>
       <p>Stelle deine Armee auf, wähle deine Fraktion und führe dein Königreich zum Sieg.</p>
+      <button id="homeResumeBtn" class="gold-button home-start" hidden>Spiel fortsetzen <span aria-hidden="true">↗</span></button>
       <button id="homeStartBtn" class="gold-button home-start">Spiel starten <span aria-hidden="true">→</span></button>
-      <button id="homeRulesBtn" class="home-rules">?　Spielregeln ansehen</button>
+      <div class="home-menu-links"><button id="homeRulesBtn" class="home-rules">?　Spielregeln</button><button id="homeSettingsBtn" class="home-rules">⚙　Einstellungen</button></div>
     </section>
     <section class="home-highlights">
       <article><span>♜</span><b>Vier Spielgrößen</b><small>Vom Blitzgefecht bis zur großen Schlacht</small></article>
@@ -47,7 +48,7 @@
     </div>
     <div class="game-footer">
       <div class="selection-info"><span id="message" role="status">Wähle eine deiner Figuren aus.</span><strong id="selectedStrength" aria-live="polite"></strong></div>
-      <button id="newGameBtn" class="gold-button">Aufstellung</button>
+      <button id="newGameBtn" class="gold-button">← Menü</button>
     </div>
     <div class="legend"><span><i class="legend-dot move"></i>Möglicher Zug</span><span><i class="legend-dot selected"></i>Ausgewählte Figur</span><span><i class="legend-dot lake"></i>See – unpassierbar</span></div>
   </main>
@@ -65,6 +66,13 @@
    <h3>Ränge</h3><p>Feldmarschall 10 · General 9 · Oberst 8 · Major 7 · Hauptmann 6 · Leutnant 5 · Unteroffizier 4 · Mineur 3 · Späher 2 · Spion 1.</p>
    <p class="note">Die Figuren deiner Armee sind sichtbar. Die Ränge der gegnerischen Figuren bleiben verborgen, bis sie an einem Kampf teilnehmen.</p>
   </div>
+ </section>
+</div>
+<div class="modal-backdrop" id="settingsModal" hidden>
+ <section class="modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+  <button class="modal-close" id="closeSettings" aria-label="Schließen">×</button>
+  <div class="eyebrow">SPIELANPASSUNG</div><h2 id="settingsTitle">Einstellungen</h2>
+  <p class="setup-intro">Hier entsteht künftig der Bereich für deine persönlichen Spieleinstellungen. Weitere Optionen folgen.</p>
  </section>
 </div>
 <div class="modal-backdrop" id="setupModal" hidden>
@@ -120,6 +128,6 @@
   <div class="setup-actions"><button id="cancelManualSetup" class="secondary-button">Zurück</button><button id="confirmManualSetup" class="gold-button" disabled>Aufstellung übernehmen</button></div>
  </section>
 </div>
-<script type="module" src="js/game.js?v=20261121-12"></script>
+<script type="module" src="js/game.js?v=20261121-13"></script>
 </body>
 </html>
