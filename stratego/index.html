@@ -59,6 +59,7 @@
    <div class="setup-side-title"><span class="army-dot blue"></span><div><b>Dein Königreich</b><small>Deine Aufstellung</small></div></div>
    <label for="playerFormation">Taktik wählen</label>
    <select id="playerFormation">
+    <option value="manual">Manuell aufstellen</option>
     <option value="balanced">Ausgewogen – Zufallsaufstellung</option>
     <option value="offensive">Offensiv – Zufallsaufstellung</option>
     <option value="defensive">Defensiv – Zufallsaufstellung</option>
@@ -81,6 +82,22 @@
    <button id="cancelSetup" class="secondary-button">Abbrechen</button>
    <button id="startGameBtn" class="gold-button">Schlacht beginnen</button>
   </div>
+ </section>
+</div>
+<div class="modal-backdrop" id="manualSetupModal" hidden>
+ <section class="modal manual-setup-modal" role="dialog" aria-modal="true" aria-labelledby="manualSetupTitle">
+  <button class="modal-close" id="closeManualSetup" aria-label="Schließen">×</button>
+  <div class="eyebrow">DEINE ARMEE · MANUELLE AUFSTELLUNG</div><h2 id="manualSetupTitle">Platziere deine 40 Figuren</h2>
+  <p class="setup-intro">Wähle unten eine Figur und tippe auf ein freies Feld in deinen vier Startreihen. Bereits platzierte Figuren kannst du antippen und verschieben.</p>
+  <div class="manual-progress"><strong id="manualProgress">0 / 40 platziert</strong><span id="manualSelected">Keine Figur ausgewählt</span></div>
+  <div class="manual-board-wrap"><div id="manualBoard" class="manual-board"></div></div>
+  <div class="manual-palette" id="manualPalette"></div>
+  <div class="formation-saves"><div class="save-heading"><b>Eigene Formationen</b><small>Bis zu drei Aufstellungen speichern</small></div>
+   <div class="save-slots"><button class="save-slot" data-slot="0"><b>Formation Alpha</b><small id="saveStatus0">Leer</small></button><button class="save-slot" data-slot="1"><b>Formation Beta</b><small id="saveStatus1">Leer</small></button><button class="save-slot" data-slot="2"><b>Formation Charlie</b><small id="saveStatus2">Leer</small></button></div>
+   <p class="save-hint">Freie Plätze speichern die aktuelle Aufstellung. Belegte Plätze laden sie; zum Überschreiben zuerst leeren.</p>
+   <div class="save-actions"><button id="clearFormationBtn" class="secondary-button">Ausgewählten Speicherplatz leeren</button></div>
+  </div>
+  <div class="setup-actions"><button id="cancelManualSetup" class="secondary-button">Zurück</button><button id="confirmManualSetup" class="gold-button" disabled>Aufstellung übernehmen</button></div>
  </section>
 </div>
 <script type="module" src="js/game.js"></script>
