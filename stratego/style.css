@@ -316,3 +316,10 @@
 @keyframes calloutPop{from{opacity:0;transform:translate(-50%,6px) scale(.82)}to{opacity:1;transform:translate(-50%,0) scale(1)}}
 .no-game-animations .combat-callout-label{animation:none!important}
 @media(prefers-reduced-motion:reduce){.combat-callout-label{animation:none!important}}
+
+
+/* Schritt 1: Kampfmeldungen unterscheiden Sieg, Niederlage und Gleichstand klar. */
+.combat-callout-label{max-width:min(82vw,300px);white-space:normal;min-width:108px;padding:7px 10px;font-size:clamp(9px,2.1vw,12px);line-height:1.25}
+.combat-callout-win .combat-callout-label{border-color:#9bdc9b;background:linear-gradient(135deg,#102c24f7,#1e4935f7);color:#e5ffe9;box-shadow:0 3px 13px #000c,0 0 13px #65d58a66}
+.combat-callout-loss .combat-callout-label{border-color:#e18a83;background:linear-gradient(135deg,#351b24f7,#54232bf7);color:#ffe7e3;box-shadow:0 3px 13px #000c,0 0 13px #ed686866}
+.combat-callout-draw .combat-callout-label{border-color:#c4cbd8;background:linear-gradient(135deg,#222b39f7,#394354f7);color:#f0f4ff;box-shadow:0 3px 13px #000c,0 0 13px #b9c8e666}
