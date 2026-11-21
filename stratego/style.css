@@ -210,3 +210,15 @@
 @keyframes badgePop{from{transform:scale(.55);opacity:.3}to{transform:scale(1);opacity:1}}
 @media(prefers-reduced-motion:reduce){.cell.move-arrival .piece.move-scout,.cell.move-arrival .piece.move-miner,.cell.move-arrival .piece.move-commander,.cell.move-arrival .piece.move-standard,.cell.combat-impact:after,.cell.combat-impact .piece.combat-winner,.cell.combat-impact .piece.combat-survivor,.combat-reveal-badge,.piece-rank-badge{animation:none!important}}
 .no-game-animations .cell.move-arrival .piece,.no-game-animations .cell.combat-impact:after,.no-game-animations .combat-reveal-badge,.no-game-animations .piece-rank-badge{animation:none!important}
+
+
+/* Lebendige Miniaturen: ruhige Idle-Bewegung ohne Einfluss auf das Spielfeld. */
+.piece.idle-piece{transform-origin:50% 88%;animation:miniatureIdle 3.6s ease-in-out infinite;will-change:transform,filter}
+.cell:nth-child(3n) .piece.idle-piece{animation-delay:-1.1s}
+.cell:nth-child(5n) .piece.idle-piece{animation-delay:-2.2s}
+.piece.idle-piece .miniature{transform-origin:50% 88%;animation:miniatureGlimmer 4.8s ease-in-out infinite}
+@keyframes miniatureIdle{0%,100%{transform:translateY(0) rotate(0deg);filter:drop-shadow(0 2px 2px #0009)}48%{transform:translateY(-1.7px) rotate(-.45deg);filter:drop-shadow(0 3px 4px #000a)}}
+@keyframes miniatureGlimmer{0%,100%{opacity:1}50%{opacity:.94}}
+.cell.selected .piece.idle-piece,.cell.move-origin .piece.idle-piece,.cell.move-arrival .piece.idle-piece,.cell.combat-impact .piece.idle-piece{animation:none}
+.no-game-animations .piece.idle-piece,.no-game-animations .piece.idle-piece .miniature{animation:none!important}
+@media(prefers-reduced-motion:reduce){.piece.idle-piece,.piece.idle-piece .miniature{animation:none!important}}
