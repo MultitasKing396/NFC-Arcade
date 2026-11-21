@@ -1,8 +1,8 @@
 export const MODES = {
  quick:{label:"Blitzgefecht",size:6,count:12,rows:2,counts:{marshal:1,general:1,colonel:1,captain:1,lieutenant:1,sergeant:1,scout:4,spy:1,flag:1}},
- small:{label:"Schnellgefecht",size:8,count:24,rows:3,counts:{marshal:1,general:1,colonel:1,major:1,captain:2,lieutenant:2,sergeant:2,miner:2,scout:5,spy:1,bomb:4,flag:1}},
+ small:{label:"Schnellgefecht",size:8,count:24,rows:3,counts:{marshal:1,general:1,colonel:1,major:1,captain:2,lieutenant:2,sergeant:2,miner:2,scout:6,spy:1,bomb:4,flag:1}},
  classic:{label:"Klassisch",size:10,count:40,rows:4,counts:{marshal:1,general:1,colonel:2,major:3,captain:4,lieutenant:4,sergeant:4,miner:5,scout:8,spy:1,bomb:6,flag:1}},
- large:{label:"Große Schlacht",size:12,count:48,rows:4,counts:{marshal:1,general:1,colonel:3,major:4,captain:5,lieutenant:5,sergeant:5,miner:6,scout:10,spy:1,bomb:7,flag:1}}
+ large:{label:"Große Schlacht",size:12,count:48,rows:4,counts:{marshal:1,general:1,colonel:3,major:4,captain:5,lieutenant:5,sergeant:5,miner:6,scout:9,spy:1,bomb:7,flag:1}}
 };
 export let CURRENT_MODE="classic";
 export function setMode(mode){CURRENT_MODE=MODES[mode]?mode:"classic";}
