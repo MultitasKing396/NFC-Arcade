@@ -42,6 +42,7 @@ const GAME_SAVE_KEY="nfc-arcade-stratego-current-game-v1";
 let hasSavedGame=false;
 let currentMode="classic";let cpuDifficulty="normal";setMode(currentMode);let board=initialBoard("balanced","balanced",currentMode),turn="blue",selected=null,validMoves=[],busy=false,dragPointer=null,dragFrom=null;
 let cpuIntel={known:{},moved:[]};
+let playerPatterns={advances:0,attacks:0,scouts:0,miners:0,center:0};
 let manualSlots=Array(armyCount(currentMode)).fill(null),manualReserve={},manualSelectedType=null,manualMovingIndex=null,activeSaveSlot=0;
 const pieceInfo=p=>RANKS[p.type];
 const FACTIONS={
@@ -165,7 +166,7 @@ function choose(index){
 }
 function finishMove(from,to){
  if(from===null||!validMoves.includes(to)||busy){clearSelection();return;}
- const attacker=board[from],defender=board[to];markPlayerMove(attacker);let animationKind="move",winner=null;
+ const attacker=board[from],defender=board[to];markPlayerMove(attacker,from,to);let animationKind="move",winner=null;
  if(defender){
   defender.revealed=true;attacker.revealed=true;
   const outcome=resolveCombat(attacker,defender);animationKind="combat";winner=outcome.result==="attacker"?"blue":outcome.result==="defender"?"red":null;
@@ -187,9 +188,17 @@ function rememberPlayerPiece(piece){
  if(!piece||piece.side!=="blue")return;
  cpuIntel.known[piece.id]={type:piece.type,seen:true};
 }
-function markPlayerMove(piece){
+function markPlayerMove(piece,from,to){
  if(!piece||piece.side!=="blue")return;
  if(!cpuIntel.moved.includes(piece.id))cpuIntel.moved.push(piece.id);
+ const n=modeConfig(currentMode).size;
+ playerPatterns.scouts+=piece.type==="scout"?1:0;
+ playerPatterns.miners+=piece.type==="miner"?1:0;
+ if(Number.isInteger(from)&&Number.isInteger(to)){
+  const fr=Math.floor(from/n),tr=Math.floor(to/n),fc=from%n,tc=to%n;
+  if(tr<fr)playerPatterns.advances++;
+  if(Math.abs(tc-(n-1)/2)<Math.abs(fc-(n-1)/2))playerPatterns.center++;
+ }
 }
 function remainingEnemyPool(){
  const counts={...modeConfig(currentMode).counts};
@@ -216,28 +225,46 @@ function expectedAttackScore(attacker,defender){
  }
  return expected;
 }
+function cpuPersonality(){
+ const aggressive=playerPatterns.advances+playerPatterns.attacks*2;
+ const cautious=playerPatterns.miners+playerPatterns.center;
+ if(aggressive>cautious+2)return "defensive";
+ if(cautious>aggressive+2)return "aggressive";
+ return "balanced";
+}
 function cpuMoveScore(from,to){
- const attacker=board[from],defender=board[to],n=modeConfig(currentMode).size;
- let score=Math.random()*3;
+ const attacker=board[from],defender=board[to],n=modeConfig(currentMode).size,style=cpuPersonality();
+ let score=Math.random()*1.5;
  if(defender)return expectedAttackScore(attacker,defender);
  const fromRow=Math.floor(from/n),toRow=Math.floor(to/n),fromCol=from%n,toCol=to%n;
- // Langfristiger Vormarsch: Linien öffnen, Zentrum erreichen und gegnerische Front erkunden.
- score+=(toRow-fromRow)*3.4;
  const centre=(n-1)/2;
+ score+=(toRow-fromRow)*3.4;
  score+=(Math.abs(fromCol-centre)-Math.abs(toCol-centre))*1.35;
  const simulated=board.slice();simulated[to]=attacker;simulated[from]=null;
- score+=Math.min(legalMoves(simulated,to,currentMode).length,5)*1.8;
- // Nur tatsächlich aufgedeckte gegnerische Ränge dürfen als sichere Ziele gelten.
+ const mobility=legalMoves(simulated,to,currentMode).length;
+ score+=Math.min(mobility,5)*1.8;
+ // Scouts erkunden bevorzugt unbekannte Frontbereiche und bleiben beweglich.
+ if(attacker.type==="scout"){
+  const unknown=board.reduce((sum,p,i)=>sum+(p?.side==="blue"&&!cpuIntel.known[p.id]?1/(1+Math.abs(Math.floor(i/n)-toRow)+Math.abs(i%n-toCol)):0),0);
+  score+=Math.min(unknown*2.4,13)+mobility*1.4;
+ }
+ // Miner rücken vorsichtig an unbewegte, unbekannte Figuren heran: dort sind Bomben wahrscheinlicher.
+ if(attacker.type==="miner"){
+  for(let i=0;i<board.length;i++){
+   const p=board[i];if(!p||p.side!=="blue"||cpuIntel.known[p.id]||cpuIntel.moved.includes(p.id))continue;
+   const d=Math.abs(Math.floor(i/n)-toRow)+Math.abs(i%n-toCol);
+   if(d<=2)score+=(3-d)*4.5;
+  }
+ }
+ // Nur tatsächlich aufgedeckte gegnerische Ränge gelten als sichere Jagdziele.
  for(let i=0;i<board.length;i++){
   const enemy=board[i];if(!enemy||enemy.side!=="blue"||!cpuIntel.known[enemy.id])continue;
-  const knownType=cpuIntel.known[enemy.id].type;
-  const result=resolveCombat(attacker,{...enemy,type:knownType});
+  const knownType=cpuIntel.known[enemy.id].type,result=resolveCombat(attacker,{...enemy,type:knownType});
   if(result.result==="attacker"){
    const distance=Math.abs(toRow-Math.floor(i/n))+Math.abs(toCol-i%n);
    score+=Math.max(0,18-distance*3)+(RANKS[knownType]?.rank||0)*1.8;
   }
  }
- // Eigene Flagge lokalisieren und Verteidiger nicht unnötig aus dem Schutzbereich ziehen.
  const flagIndex=board.findIndex(p=>p?.side==="red"&&p.type==="flag");
  if(flagIndex>=0){
   const fr=Math.floor(flagIndex/n),fc=flagIndex%n;
@@ -246,8 +273,15 @@ function cpuMoveScore(from,to){
   if(nearbyThreat&&before<=4&&after>before&&["marshal","general","colonel","major","captain","lieutenant","sergeant","miner"].includes(attacker.type))score-=18+(before<=2?15:0);
   if(before<=3&&after<before)score+=nearbyThreat?12:3;
  }
- // Bereits bekannte starke gegnerische Figuren werden mit Abstand und günstigen Winkeln angegangen.
- if(cpuIntel.known[defender?.id])score+=0;
+ // Taktischer Stil: gegen aggressive Vorstöße kompakter verteidigen, gegen passive Gegner Druck aufbauen.
+ if(style==="defensive"){
+  const blueNear=board.some((p,i)=>p?.side==="blue"&&Math.abs(Math.floor(i/n)-toRow)+Math.abs(i%n-toCol)<=2);
+  if(blueNear)score+=attacker.type==="miner"?5:2;
+  if(attacker.type==="marshal"||attacker.type==="general")score-=7;
+ }else if(style==="aggressive"){
+  score+=(toRow-fromRow)*1.8;
+  if(attacker.type==="scout"||attacker.type==="miner")score+=2;
+ }else if(attacker.type==="miner"||attacker.type==="scout")score+=1.5;
  if(lastCpuMove&&lastCpuMove.from===to&&lastCpuMove.to===from)score-=24;
  if(["marshal","general"].includes(attacker.type))score-=3;
  return score;
@@ -276,14 +310,36 @@ function expertThreatPenalty(move){
  }
  return penalty;
 }
+function expertLookahead(move){
+ // Zweite Ebene: Nach jedem Kandidatenzug wird die gefährlichste legale Antwort gesucht.
+ const simulated=board.slice(),attacker=simulated[move.from],defender=simulated[move.to];
+ if(defender){
+  const known=cpuIntel.known[defender.id]?.type;
+  if(!known)return expertThreatPenalty(move);
+  const result=resolveCombat(attacker,{...defender,type:known});
+  if(result.result==="attacker"){simulated[move.to]=attacker;simulated[move.from]=null;}
+  else if(result.result==="defender")simulated[move.from]=null;
+  else{simulated[move.from]=null;simulated[move.to]=null;}
+ }else{simulated[move.to]=attacker;simulated[move.from]=null;}
+ let worstReply=0;
+ for(let i=0;i<simulated.length;i++){
+  const p=simulated[i];if(!p||p.side!=="blue")continue;
+  for(const target of legalMoves(simulated,i,currentMode)){
+   const victim=simulated[target];if(!victim||victim.side!=="red")continue;
+   const outcome=resolveCombat(p,victim);
+   const value=outcome.result==="attacker"?24+(RANKS[victim.type]?.rank||0)*9+(victim.type==="flag"?500:0):outcome.result==="both"?16:0;
+   worstReply=Math.max(worstReply,value);
+  }
+ }
+ return worstReply;
+}
 function chooseCpuMove(options){
  const ranked=options.map(move=>{
   const base=cpuMoveScore(move.from,move.to);
-  const expertRisk=cpuDifficulty==="expert"?expertThreatPenalty(move)*1.35:0;
+  const expertRisk=cpuDifficulty==="expert"?(expertThreatPenalty(move)*.8+expertLookahead(move)*1.15):0;
   return {...move,score:base-expertRisk};
  }).sort((a,b)=>b.score-a.score);
  if(cpuDifficulty==="easy"){
-  // Leicht: wählt bewusst aus einem breiteren Feld brauchbarer Züge.
   const pool=ranked.slice(0,Math.max(1,Math.ceil(ranked.length*.55)));
   return pool[Math.floor(Math.random()*pool.length)];
  }
@@ -291,8 +347,11 @@ function chooseCpuMove(options){
   const top=ranked.slice(0,Math.min(3,ranked.length));
   return top[Math.floor(Math.random()*top.length)];
  }
- // Schwer und Experte wählen den stärksten Zug; Experte bewertet zusätzlich
- // die unmittelbaren gegnerischen Antwortmöglichkeiten nach jedem Kandidatenzug.
+ if(cpuDifficulty==="hard"){
+  // Schwer priorisiert Angriff und Raumgewinn, berücksichtigt aber unmittelbare Risiken.
+  return ranked[0];
+ }
+ // Experte bewertet die gefährlichste Antwort des Spielers zusätzlich eine Ebene voraus.
  return ranked[0];
 }
 function cpuMove(){
@@ -326,7 +385,7 @@ function endGame(winner){
 }
 function showGameScreen(){document.querySelector("#homeScreen").hidden=true;document.querySelector("#gameScreen").hidden=false;}
 function showHomeScreen(){saveGameState();document.querySelector("#gameScreen").hidden=true;document.querySelector("#homeScreen").hidden=false;updateResumeButton();}
-function saveGameState(){if(!board||!board.some(Boolean))return;try{const state={version:1,currentMode,board,turn,playerFaction,cpuFaction,cpuDifficulty,cpuIntel,message:messageEl.textContent};localStorage.setItem(GAME_SAVE_KEY,JSON.stringify(state));hasSavedGame=true;updateResumeButton();}catch(error){console.warn("Spielstand konnte nicht gespeichert werden.",error);}}
+function saveGameState(){if(!board||!board.some(Boolean))return;try{const state={version:1,currentMode,board,turn,playerFaction,cpuFaction,cpuDifficulty,cpuIntel,playerPatterns,message:messageEl.textContent};localStorage.setItem(GAME_SAVE_KEY,JSON.stringify(state));hasSavedGame=true;updateResumeButton();}catch(error){console.warn("Spielstand konnte nicht gespeichert werden.",error);}}
 function updateResumeButton(){
  const card=document.querySelector("#savedGameCard"),btn=document.querySelector("#homeResumeBtn");
  if(card)card.hidden=!hasSavedGame;
@@ -343,7 +402,7 @@ function updateResumeButton(){
  document.querySelector("#savedDifficultyInfo").textContent="CPU: "+({easy:"Leicht",normal:"Normal",hard:"Schwer",expert:"Experte"}[cpuDifficulty]||"Normal");
  document.querySelector("#savedFactionMark").textContent=({aurelia:"✦",shadow:"☾",iron:"⚒",sylvan:"❧",ash:"♨",storm:"ϟ"})[playerFaction]||"⚔";
 }
-function loadGameState(){try{const raw=localStorage.getItem(GAME_SAVE_KEY);if(!raw)return false;const state=JSON.parse(raw);if(state?.version!==1||!MODES[state.currentMode]||!Array.isArray(state.board)||state.board.length!==modeConfig(state.currentMode).size**2||!state.board.every(p=>p===null||(p&&typeof p.type==="string"&&(p.side==="blue"||p.side==="red"))))return false;currentMode=state.currentMode;setMode(currentMode);board=state.board;turn=state.turn==="red"?"red":"blue";playerFaction=FACTIONS[state.playerFaction]?state.playerFaction:"aurelia";cpuFaction=FACTIONS[state.cpuFaction]?state.cpuFaction:"shadow";cpuDifficulty=["easy","normal","hard","expert"].includes(state.cpuDifficulty)?state.cpuDifficulty:"normal";cpuIntel=state.cpuIntel&&typeof state.cpuIntel==="object"?{known:state.cpuIntel.known&&typeof state.cpuIntel.known==="object"?state.cpuIntel.known:{},moved:Array.isArray(state.cpuIntel.moved)?state.cpuIntel.moved:[]}: {known:{},moved:[]};setMessage(state.message||"Spielstand geladen.");hasSavedGame=true;updateResumeButton();return true;}catch(error){console.warn("Gespeicherter Spielstand ist ungültig.",error);return false;}}
+function loadGameState(){try{const raw=localStorage.getItem(GAME_SAVE_KEY);if(!raw)return false;const state=JSON.parse(raw);if(state?.version!==1||!MODES[state.currentMode]||!Array.isArray(state.board)||state.board.length!==modeConfig(state.currentMode).size**2||!state.board.every(p=>p===null||(p&&typeof p.type==="string"&&(p.side==="blue"||p.side==="red"))))return false;currentMode=state.currentMode;setMode(currentMode);board=state.board;turn=state.turn==="red"?"red":"blue";playerFaction=FACTIONS[state.playerFaction]?state.playerFaction:"aurelia";cpuFaction=FACTIONS[state.cpuFaction]?state.cpuFaction:"shadow";cpuDifficulty=["easy","normal","hard","expert"].includes(state.cpuDifficulty)?state.cpuDifficulty:"normal";cpuIntel=state.cpuIntel&&typeof state.cpuIntel==="object"?{known:state.cpuIntel.known&&typeof state.cpuIntel.known==="object"?state.cpuIntel.known:{},moved:Array.isArray(state.cpuIntel.moved)?state.cpuIntel.moved:[]}: {known:{},moved:[]};playerPatterns={advances:0,attacks:0,scouts:0,miners:0,center:0,...(state.playerPatterns||{})};setMessage(state.message||"Spielstand geladen.");hasSavedGame=true;updateResumeButton();return true;}catch(error){console.warn("Gespeicherter Spielstand ist ungültig.",error);return false;}}
 function resumeSavedGame(){if(!loadGameState())return;selected=null;validMoves=[];busy=turn==="red";showGameScreen();setTurn(turn);render();updateResumeButton();if(busy)window.setTimeout(cpuMove,500);}
 function openHomeRules(){rulesModal.hidden=false;}
 function openSettings(){applySettings();settingsModal.hidden=false;}
@@ -377,8 +436,8 @@ function closeManualSetup(){manualSetupModal.hidden=true;}
 function saveManualFormation(){const placed=manualSlots.filter(Boolean).length;if(placed!==armyCount(currentMode))return;const slots=savedFormations();const old=slots[activeSaveSlot];if(old&&!confirm("Diesen Speicherplatz zuerst leeren, bevor du ihn neu belegst."))return;if(old)return;slots[activeSaveSlot]={name:["Formation Alpha","Formation Beta","Formation Charlie"][activeSaveSlot],types:manualSlots.map(p=>p.type)};if(!writeSavedFormations(slots)){alert("Speichern ist in diesem Browser nicht verfügbar.");return;}updateSaveLabels();}
 function loadManualFormation(index){const saved=savedFormations()[index];if(!saved)return;if(manualSlots.some(Boolean)&&!confirm("Die aktuelle Aufstellung durch diese Formation ersetzen?"))return;manualSlots=saved.types.map(type=>({type}));manualReserve={};for(const [type,count] of Object.entries(modeConfig(currentMode).counts))manualReserve[type]=count;manualSlots.forEach(p=>manualReserve[p.type]--);manualSelectedType=null;manualMovingIndex=null;activeSaveSlot=index;renderManualSetup();}
 function clearManualFormation(){const slots=savedFormations();if(!slots[activeSaveSlot])return;if(!confirm("Diesen Speicherplatz wirklich leeren?"))return;slots[activeSaveSlot]=null;writeSavedFormations(slots);updateSaveLabels();}
-function confirmManualPlacement(){if(manualSlots.some(p=>!p))return;cpuDifficulty=document.querySelector("#cpuDifficulty").value;lastCpuMove=null;cpuIntel={known:{},moved:[]};const player=manualSlots.map((p,i)=>({...p,id:"blue-manual-"+i,side:"blue",revealed:false}));const cpuFormation=document.querySelector("#cpuFormation").value;board=applyFactions(initialBoard("balanced",cpuFormation,currentMode));const n=modeConfig(currentMode).size,start=(n-setupRows(currentMode))*n;for(let i=0;i<player.length;i++)board[start+i]=player[i];selected=null;validMoves=[];busy=false;dragPointer=null;dragFrom=null;if(strengthEl)strengthEl.textContent="";closeManualSetup();showGameScreen();setTurn("blue");setMessage("Deine manuelle Aufstellung ist bereit.");render();saveGameState();}
-function startConfiguredGame(){cpuDifficulty=document.querySelector("#cpuDifficulty").value;lastCpuMove=null;cpuIntel={known:{},moved:[]};const chosen=document.querySelector("#gameMode").value;currentMode=MODES[chosen]?chosen:"classic";setMode(currentMode);playerFaction=document.querySelector("#playerFaction").value;cpuFaction=document.querySelector("#cpuFaction").value;const player=document.querySelector("#playerFormation").value;const cpu=document.querySelector("#cpuFormation").value;if(player==="manual"){openManualSetup();return;}board=applyFactions(initialBoard(player,cpu,currentMode));selected=null;validMoves=[];busy=false;dragPointer=null;dragFrom=null;if(strengthEl)strengthEl.textContent="";closeSetup();showGameScreen();setTurn("blue");setMessage("Aufstellung bereit – wähle eine deiner Figuren aus.");render();saveGameState();}
+function confirmManualPlacement(){if(manualSlots.some(p=>!p))return;cpuDifficulty=document.querySelector("#cpuDifficulty").value;lastCpuMove=null;cpuIntel={known:{},moved:[]};playerPatterns={advances:0,attacks:0,scouts:0,miners:0,center:0};const player=manualSlots.map((p,i)=>({...p,id:"blue-manual-"+i,side:"blue",revealed:false}));const cpuFormation=document.querySelector("#cpuFormation").value;board=applyFactions(initialBoard("balanced",cpuFormation,currentMode));const n=modeConfig(currentMode).size,start=(n-setupRows(currentMode))*n;for(let i=0;i<player.length;i++)board[start+i]=player[i];selected=null;validMoves=[];busy=false;dragPointer=null;dragFrom=null;if(strengthEl)strengthEl.textContent="";closeManualSetup();showGameScreen();setTurn("blue");setMessage("Deine manuelle Aufstellung ist bereit.");render();saveGameState();}
+function startConfiguredGame(){cpuDifficulty=document.querySelector("#cpuDifficulty").value;lastCpuMove=null;cpuIntel={known:{},moved:[]};playerPatterns={advances:0,attacks:0,scouts:0,miners:0,center:0};const chosen=document.querySelector("#gameMode").value;currentMode=MODES[chosen]?chosen:"classic";setMode(currentMode);playerFaction=document.querySelector("#playerFaction").value;cpuFaction=document.querySelector("#cpuFaction").value;const player=document.querySelector("#playerFormation").value;const cpu=document.querySelector("#cpuFormation").value;if(player==="manual"){openManualSetup();return;}board=applyFactions(initialBoard(player,cpu,currentMode));selected=null;validMoves=[];busy=false;dragPointer=null;dragFrom=null;if(strengthEl)strengthEl.textContent="";closeSetup();showGameScreen();setTurn("blue");setMessage("Aufstellung bereit – wähle eine deiner Figuren aus.");render();saveGameState();}
 boardEl.addEventListener("pointerdown",e=>{
  const cell=e.target.closest(".cell");if(!cell||turn!=="blue"||busy)return;
  const index=Number(cell.dataset.index),p=board[index];
