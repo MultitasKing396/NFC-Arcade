@@ -34,7 +34,7 @@ h1{font:700 clamp(34px,9vw,44px)/1.05 Georgia,serif;letter-spacing:.08em;text-al
 .row{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}.row>*{min-width:0}.design-field{grid-column:1/-1}
 body.playing[data-game-design="gold"]{--bg:#171717;--panel:#252525;--panel2:#303030;--text:#f1eadb;--muted:#aaa397;--line:#756342;--accent:#d8b66a;--x:#e8c879;--o:#d88787;--win:#9fc9a5;background:radial-gradient(ellipse at 50% 0,#333 0,#171717 65%);font-family:Georgia,serif}
 body.playing[data-game-design="ocean"]{--bg:#0b1824;--panel:#142b3c;--panel2:#1d3b50;--text:#e8f3f5;--muted:#9bb5bf;--line:#47788a;--accent:#65c8d0;--x:#6ce0e8;--o:#f2b66d;--win:#9bd9b0;background:radial-gradient(ellipse at 50% 0,#20465a,#0b1824 70%);font-family:Trebuchet MS,system-ui,sans-serif}
-body.playing[data-game-design="rose"]{--bg:#21151f;--panel:#352332;--panel2:#493044;--text:#f8eaf0;--muted:#c0a3b1;--line:#98627d;--accent:#e49ab7;--x:#f08ab4;--o:#e9c17a;--win:#9bd4b0;background:radial-gradient(ellipse at 50% 0,#59354e,#21151f 70%);font-family:ui-rounded,system-ui,sans-serif}
+body.playing[data-game-design="rose"]{--bg:#171323;--panel:#2a2035;--panel2:#3a2b46;--text:#fff1df;--muted:#b6a6bd;--line:#a45b45;--accent:#ff914d;--x:#ff665e;--o:#d7f36a;--win:#8de0a5;background:radial-gradient(ellipse at 50% 0,#56304a,#171323 72%);font-family:ui-rounded,system-ui,sans-serif}
 body.playing[data-game-design="ocean"] .panel,body.playing[data-game-design="rose"] .panel{background:linear-gradient(145deg,var(--panel),color-mix(in srgb,var(--panel) 78%,#000));border-color:var(--line);box-shadow:0 5px 0 #0008,0 10px 22px #0005}
 body.playing[data-game-design="ocean"] .board,body.playing[data-game-design="rose"] .board{background:linear-gradient(145deg,var(--panel2),var(--bg));border-color:var(--accent);box-shadow:0 5px 0 #0008,0 0 18px color-mix(in srgb,var(--accent) 18%,transparent)}
 body.playing[data-game-design="ocean"] .mode,body.playing[data-game-design="rose"] .mode{background:linear-gradient(145deg,var(--panel2),var(--panel));border-color:var(--line)}
@@ -56,7 +56,7 @@ body.playing[data-game-design="ocean"] .primary,body.playing[data-game-design="r
    <div class="row">
     <label class="field">GEGENSPIELER<select id="opponent"><option value="ai">Computer</option><option value="human">Zweiter Spieler</option></select></label>
     <label class="field" id="difficultyWrap">COMPUTER-STÄRKE<select id="difficulty"><option value="easy">Leicht</option><option value="normal" selected>Normal</option><option value="hard">Schwer</option></select></label>
-    <label class="field design-field">DESIGN<select id="gameDesign"><option value="gold">Gold Edition</option><option value="ocean">Ocean Edition</option><option value="rose">Rose Edition</option></select></label>
+    <label class="field design-field">DESIGN<select id="gameDesign"><option value="gold">Gold Edition</option><option value="ocean">Ocean Edition</option><option value="rose">Solar Flare Edition</option></select></label>
    </div>
    <div class="field" id="variantHint">Classic: drei gleiche Zeichen in einer Reihe gewinnen.</div>
    <button class="primary" id="start" style="width:100%">Spiel starten</button>
