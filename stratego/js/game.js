@@ -181,11 +181,53 @@ function finishMove(from,to){
  setTurn("red");busy=true;render();saveGameState();
  window.setTimeout(cpuMove,cpuDelay());
 }
+let lastCpuMove=null;
+function cpuMoveScore(from,to){
+ const attacker=board[from],defender=board[to],n=modeConfig(currentMode).size;
+ let score=Math.random()*5;
+ if(defender){
+  const outcome=resolveCombat(attacker,defender);
+  if(defender.type==="flag")return 100000;
+  if(outcome.result==="attacker")score+=120+(RANKS[defender.type]?.rank||0)*7;
+  else if(outcome.result==="both")score-=35+(RANKS[attacker.type]?.rank||0)*4;
+  else score-=150+(RANKS[attacker.type]?.rank||0)*9;
+  if(defender.type==="bomb"&&attacker.type==="miner")score+=35;
+  return score;
+ }
+ const fromRow=Math.floor(from/n),toRow=Math.floor(to/n),fromCol=from%n,toCol=to%n;
+ // Red begins at the top: moving towards the bottom advances towards the player's army.
+ score+=(toRow-fromRow)*3;
+ const centre=(n-1)/2;
+ score+=(Math.abs(fromCol-centre)-Math.abs(toCol-centre))*1.2;
+ // Prefer positions with more useful follow-up choices.
+ const simulated=[...board];simulated[to]=attacker;simulated[from]=null;
+ score+=Math.min(legalMoves(simulated,to,currentMode).length,5)*1.5;
+ // Do not walk a valuable unit into a square where a known player unit can beat it.
+ for(let i=0;i<board.length;i++){
+  const enemy=board[i];if(!enemy||enemy.side!=="blue")continue;
+  if(!legalMoves(board,i,currentMode).includes(to))continue;
+  const danger=resolveCombat(enemy,attacker);
+  if(danger.result==="attacker")score-=55+(RANKS[attacker.type]?.rank||0)*7;
+  else if(danger.result==="both")score-=18;
+ }
+ // Discourage immediately undoing the previous move.
+ if(lastCpuMove&&lastCpuMove.from===to&&lastCpuMove.to===from)score-=22;
+ // Keep the strongest leaders out of unnecessary danger.
+ if(["marshal","general"].includes(attacker.type))score-=2;
+ return score;
+}
+function chooseCpuMove(options){
+ return options.map(move=>({...move,score:cpuMoveScore(move.from,move.to)}))
+  .sort((a,b)=>b.score-a.score)
+  .slice(0,Math.min(3,options.length))
+  .sort(()=>Math.random()-.5)[0];
+}
 function cpuMove(){
  const options=[];
  for(let i=0;i<board.length;i++){const p=board[i];if(p?.side==="red")for(const to of legalMoves(board,i,currentMode))options.push({from:i,to});}
  if(!options.length){endGame("blue");return;}
- const move=options[Math.floor(Math.random()*options.length)],attacker=board[move.from],defender=board[move.to];
+ const move=chooseCpuMove(options),attacker=board[move.from],defender=board[move.to];
+ lastCpuMove={from:move.from,to:move.to};
  let animationKind="move",winner=null;
  if(defender){
   defender.revealed=true;attacker.revealed=true;
