@@ -1,5 +1,5 @@
 import {RANKS,LAKES,initialBoard,legalMoves,resolveCombat,sideHasMoves} from "./rules.js";
-const boardEl=document.querySelector("#board"),messageEl=document.querySelector("#message"),turnEl=document.querySelector("#turnStatus");
+const boardEl=document.querySelector("#board"),messageEl=document.querySelector("#message"),strengthEl=document.querySelector("#selectedStrength"),turnEl=document.querySelector("#turnStatus");
 const rulesModal=document.querySelector("#rulesModal");
 let board=initialBoard(),turn="blue",selected=null,validMoves=[],busy=false,dragPointer=null,dragFrom=null;
 const pieceInfo=p=>RANKS[p.type];
@@ -14,7 +14,7 @@ function pieceArt(piece){
  return `<svg class="miniature" viewBox="0 0 100 100" aria-hidden="true"><ellipse cx="50" cy="91" rx="29" ry="6" fill="#05080d" opacity=".45"/><path d="M24 83q3-19 12-26h28q10 8 13 26l-9 6H33z" fill="${dark}" stroke="${metal}" stroke-width="2"/><path d="M35 57 25 67l-7-6 8-16 13-3M65 57l10 10 8-6-8-17-13-3" fill="${mid}" stroke="${metal}" stroke-width="2"/><path d="M39 38q11-8 22 0l8 22-19 12-19-12z" fill="${mid}" stroke="${metal}" stroke-width="2"/><path d="m39 48 11 7 11-7M50 56v15" stroke="${metal}" stroke-width="2" fill="none"/><circle cx="50" cy="29" r="15" fill="${light}" stroke="${metal}" stroke-width="3"/><path d="M37 29q13-11 26 0" stroke="${dark}" stroke-width="4" fill="none"/>${head}<path d="M42 34h5m7 0h5" stroke="${dark}" stroke-width="2" stroke-linecap="round"/>${weapon}<path d="M30 82h40" stroke="${metal}" stroke-width="3" stroke-linecap="round"/></svg>`;
 }
 
-function setMessage(t){messageEl.textContent=t;}
+function setMessage(t){messageEl.textContent=t;}\nfunction showSelectedStrength(piece){if(!strengthEl)return;const info=pieceInfo(piece);strengthEl.textContent=info.rank>0?`Stärke ${info.rank}`:piece.type==="bomb"?"Sonderfigur · unbeweglich":"Sonderfigur · unbeweglich";}
 function setTurn(t){turn=t;turnEl.textContent=t==="blue"?"Dein Zug":"CPU denkt nach …";turnEl.classList.toggle("cpu",t==="red");}
 function render(){
  boardEl.innerHTML="";
@@ -34,10 +34,10 @@ function render(){
   boardEl.append(cell);
  }
 }
-function clearSelection(){selected=null;validMoves=[];dragFrom=null;render();}
+function clearSelection(){selected=null;validMoves=[];dragFrom=null;if(strengthEl)strengthEl.textContent="";render();}
 function choose(index){
  const p=board[index];if(!p||p.side!=="blue"||!legalMoves(board,index).length)return false;
- selected=index;validMoves=legalMoves(board,index);render();setMessage(`${pieceInfo(p).name}: Ziehe die Figur auf ein markiertes Feld.`);return true;
+ selected=index;validMoves=legalMoves(board,index);render();setMessage(`Ausgewählt: ${pieceInfo(p).name}`);showSelectedStrength(p);return true;
 }
 function finishMove(from,to){
  if(from===null||!validMoves.includes(to)||busy){clearSelection();return;}
@@ -79,7 +79,7 @@ function endGame(winner){
  const banner=document.createElement("div");banner.className="result-banner";banner.innerHTML=`<div class="result-card"><div class="eyebrow">DIE SCHLACHT IST ENTSCHIEDEN</div><h2>${winner==="blue"?"SIEG":"NIEDERLAGE"}</h2><p>${winner==="blue"?"Deine Armee triumphiert.":"Deine Armee wurde besiegt."}</p><button class="gold-button" id="resultNew">Neue Partie</button></div>`;
  document.body.append(banner);banner.querySelector("#resultNew").addEventListener("click",()=>{banner.remove();newGame();});
 }
-function newGame(){board=initialBoard();selected=null;validMoves=[];busy=false;setTurn("blue");setMessage("Wähle eine deiner Figuren und ziehe sie auf ein markiertes Feld.");render();}
+function newGame(){board=initialBoard();selected=null;validMoves=[];busy=false;if(strengthEl)strengthEl.textContent="";setTurn("blue");setMessage("Wähle eine deiner Figuren aus.");render();}
 boardEl.addEventListener("pointerdown",e=>{
  const cell=e.target.closest(".cell");if(!cell||turn!=="blue"||busy)return;
  const index=Number(cell.dataset.index),p=board[index];
